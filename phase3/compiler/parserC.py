@@ -28,15 +28,44 @@ grammer=r"""
     expr: assignment_expr | constant | lvalue | /this/ | call | "(" expr ")" | math_expr  | sign_expr | condition_expr | bool_math_expr
          | input_expr | "new" ident | "NewArray" "(" expr "," type ")" | type_change_expr
     
-    assignment_expr: lvalue "=" expr | lvalue "+=" expr | lvalue "*=" expr | lvalue "/=" expr | lvalue "-=" expr
-    math_expr: expr "-" expr | expr "+" expr | expr "*" expr | expr "/" expr | expr "%" expr
+    assignment_expr: assignment_expr_empty | assignment_expr__with_plus | assignment_expr_with_mul | assignment_expr_with_div | assignment_expr_with_min
+    math_expr: math_expr_minus | math_expr_sum | math_expr_mul | math_expr_div | math_expr_mod
     not_expr:  "!" expr
     sign_expr: "-" expr
-    condition_expr: expr "<" expr | expr "<=" expr | expr ">" expr | expr ">=" expr | expr "==" expr | expr "!=" expr
-    bool_math_expr: expr "&&" expr | expr "||" expr
-    type_change_expr: "itod(" expr ")"| "dtoi(" expr ")" | "itob(" expr ")" | "btoi(" expr ")" 
-    input_expr: "ReadInteger()" | "ReadLine()"
+    condition_expr: condition_expr_less | condition_expr_less_equal | condition_expr_greater | condition_expr_greater_equal | condition_expr_equal | condition_expr_not_equal
+    bool_math_expr: bool_math_expr_and | bool_math_expr_or
+    type_change_expr: type_change_expr_itod | type_change_expr_dtoi | type_change_expr_itob | type_change_expr_btoi
+    input_expr: input_expr_readint | input_expr_readline
     
+    assignment_expr_empty: lvalue "=" expr
+    assignment_expr__with_plus: lvalue "+=" expr
+    assignment_expr_with_mul: lvalue "*=" expr
+    assignment_expr_with_div: lvalue "/=" expr
+    assignment_expr_with_min: lvalue "-=" expr
+
+    math_expr_minus: expr "-" expr
+    math_expr_sum: expr "+" expr
+    math_expr_mul: expr "*" expr
+    math_expr_div: expr "/" expr
+    math_expr_mod: expr "%" expr
+
+    condition_expr_less: expr "<" expr
+    condition_expr_less_equal: expr "<=" expr
+    condition_expr_greater: expr ">" expr
+    condition_expr_greater_equal: expr ">=" expr
+    condition_expr_equal: expr "==" expr
+    condition_expr_not_equal: expr "!=" expr
+
+    bool_math_expr_and: expr "&&" expr
+    bool_math_expr_or: expr "||" expr
+
+    type_change_expr_itod: "itod(" expr ")"
+    type_change_expr_dtoi: "dtoi(" expr ")"
+    type_change_expr_itob: "itob(" expr ")"
+    type_change_expr_btoi: "btoi(" expr ")"
+
+    input_expr_readint: "ReadInteger()"
+    input_expr_readline: "ReadLine()"
     
     lvalue: ident | expr "." ident | expr "[" expr "]" 
     call: ident "(" actuals ")" | expr "." ident "(" actuals ")" 
