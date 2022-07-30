@@ -1,7 +1,6 @@
 import random
 import string
 
-
 class Type():
     def __init__(self, name="int", array_length=0, inside_type=None):
         self.name = name
@@ -29,12 +28,24 @@ class Type():
             return False
         return self.inside_type == other.inside_type
 
-
 class Variable():
     def __init__(self, name, type: Type):
         self.name = name
         self.type = type
-
+        
+class Class:
+	def __init__(self, classname, superclass):
+		self.name = classname
+		self.superclass = superclass
+		self.fields = []
+		self.constructors = []
+		self.methods = []
+    def add_constructor(self, constructor):
+        self.constructors.append(constructor)
+    def add_method(self, method):
+        self.methods.append(method)
+    def add_method(self, field):
+        self.fields.append(field)
 
 class Scope():
     def __init__(self):
