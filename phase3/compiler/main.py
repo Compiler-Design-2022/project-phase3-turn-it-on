@@ -5,19 +5,22 @@ from phase3.compiler.SymbolTable import SymbolTable
 
 
 def run(input_file_address: str) -> bool:
-    input_file = open(input_file_address)
-    input_content = input_file.read()
+    # input_file = open(input_file_address)
+    # input_content = input_file.read()
     input_content = """
     int main() {
         int a;
         a=(b*5);
     }"""
     try:
+        print(input_content)
         parse_tree, code = parser(input_content)
         print(parse_tree.pretty())
         # print(parse_tree)
         try:
-            return cgen(parse_tree, SymbolTable())
+            mips_code, _ = cgen(parse_tree, SymbolTable())
+            print(mips_code)
+            return mips_code
         except Exception:
             print("Semantic Error")
             raise ValueError
@@ -28,6 +31,7 @@ def run(input_file_address: str) -> bool:
     return None
 
 
+run(None)
 # all_tests = {}
 # for f in listdir('./'):
 #     all_tests[f.split('.')[0]] = True

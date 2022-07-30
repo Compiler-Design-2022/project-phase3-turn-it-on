@@ -186,4 +186,3 @@ def replace_defines(input):
     return answer
 
 # print(parser(open(f"../tests/in-out/t205-define.in").read()).pretty())
-print("T"*100, grammer[193:197])

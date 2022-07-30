@@ -3,7 +3,7 @@ import lark
 
 
 def cgen_token(token: lark.Token, symboltable: SymbolTable):
-    return token.value
+    return token.value, Type()
 
 
 def cgen(parse_tree, symbol_table: SymbolTable):
@@ -15,8 +15,11 @@ def cgen(parse_tree, symbol_table: SymbolTable):
     before_enter(parse_tree, symbol_table)
     child_return = []
     for child in parse_tree.children:
-        child_return.append(cgen(child, symbol_table))
-    return after_enter(parse_tree, symbol_table, child_return)
+        child_code, child_type=cgen(child, symbol_table)
+        child_return.append(child_code)
+
+    mips_code, result_type = after_enter(parse_tree, symbol_table, child_return)
+    return mips_code, result_type
 
 
 def before_enter(parse_tree, symbol_table):
@@ -32,15 +35,15 @@ def after_enter(parse_tree, symbol_table, child_return):
         symbol_table.last_scope().push_variable(variable)
         return f'''
         addi $sp, $sp, -{variable.type.size}\n
-        '''
-    elif parse_tree.data == "assignment_expr":
+        ''', None
+    elif parse_tree.data == "assignment_expr_empty":
         variable_name = child_return[0]
         expr_code = child_return[1]
         return f'''{expr_code}
             \tlw $t0, 4($sp)\n
             \taddi $sp, $sp, 4\n
             \tsw $t0, {symbol_table.get_address_diff(variable_name)}($sp)\n
-        '''
+        ''', Type()
 
     elif parse_tree.data == "constant":
         value = child_return[0]
@@ -48,14 +51,13 @@ def after_enter(parse_tree, symbol_table, child_return):
             \taddi $sp, $sp, -4\n
             \tli $t0, {value}\n
             \tsw $t0, 4($sp)\n
-        '''
-
+        ''', Type()
 
     elif parse_tree.data == "lvalue":
-        return child_return[0]
+        return child_return[0], Type()
 
     elif parse_tree.data == "stmtblock":
         symbol_table.pop_scope()
-        return "".join(child_return)
+        return "".join(child_return), Type()
     else:
-        return "".join(child_return)
+        return "".join(child_return), Type()

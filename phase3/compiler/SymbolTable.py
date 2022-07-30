@@ -3,7 +3,7 @@ import string
 
 
 class Type():
-    def __init__(self, name, array_length=0, inside_type=None):
+    def __init__(self, name="int", array_length=0, inside_type=None):
         self.name = name
         self.length = None
         self.inside_type = None
