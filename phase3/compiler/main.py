@@ -10,7 +10,11 @@ def run(input_file_address: str) -> bool:
     input_content = """
     int main() {
         int a;
-        a=(b*5);
+        int b;
+        int c;
+        a=2;
+        b=2;
+        c=a+b;
     }"""
     try:
         print(input_content)

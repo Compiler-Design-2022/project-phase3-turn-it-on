@@ -1,6 +1,26 @@
 import random
 import string
 
+scope_counter = 0
+
+
+def get_label():
+    global scope_counter
+    scope_counter += 1
+    return "LABEL" + str(scope_counter)
+
+
+class Method():
+    def __int__(self, name, output_type, input_variables):
+        self.name = name
+        self.label = get_label() + "FUNC"
+        self.output_type = output_type
+        self.input_variables = input_variables
+
+    def input_size(self):
+        ans = 0
+        # for input_type in inp
+
 
 class Type():
     def __init__(self, name="int", array_length=0, inside_type=None):
@@ -39,8 +59,7 @@ class Variable():
 class Scope():
     def __init__(self):
         self.variables = []
-        scope_name = "".join(
-            [random.choice(string.ascii_lowercase + string.ascii_uppercase + string.ascii_letters) for i in range(3)])
+        scope_name = get_label()
         self.begin_lable = scope_name + "_start"
         self.end_labele = scope_name + "_end"
 
@@ -58,6 +77,15 @@ class Scope():
                 return offset
         return None
 
+    def pop_variable(self):
+        self.variables.pop()
+
+    def get_variable(self, name):
+        for i in range(len(self.variables) - 1, -1, -1):
+            if self.variables[i].name == name:
+                return self.variables[i]
+        return None
+
     def size(self):
         ans = 0
         for variable in self.variables:
@@ -68,10 +96,13 @@ class Scope():
 class SymbolTable():
     def __init__(self):
         self.scope_stack: [Scope] = []
-        self.vtable = None
+        self.vtable: [Method] = []
 
     def push_scope(self, scope: Scope):
         self.scope_stack.append(scope)
+
+    def get_method(self, name, input_types=None):
+        pass
 
     def get_address_diff(self, name):
         offset = 0
@@ -79,6 +110,13 @@ class SymbolTable():
             if self.scope_stack[i].get_address_diff(name) is not None:
                 return offset + self.scope_stack[i].get_address_diff(name)
             offset += self.scope_stack[i].size()
+        raise ValueError  # value doesn't declared
+
+    def get_variable(self, name):
+        for i in range(len(self.scope_stack) - 1, -1, -1):
+            if self.scope_stack[i].get_variable(name) is not None:
+                return self.scope_stack[i].get_variable(name)
+        print("NAME",name)
         raise ValueError  # value doesn't declared
 
     def last_scope(self) -> Scope:

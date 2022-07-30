@@ -25,14 +25,14 @@ grammer=r"""
     breakstmt: "break" ";"
     continuestmt: "continue" ";"
     printstmt: "Print" "(" expr ("," expr)* ")" ";"
-    expr: assignment_expr | constant | lvalue | this_expr | call | "(" expr ")" | math_expr  | sign_expr | condition_expr | bool_math_expr
-         | input_expr | new_axpr | new_array_expr | type_change_expr
+    expr: assignment_expr | constant | lvalue_exp | this_expr | call | "(" expr ")" | math_expr_minus | math_expr_sum | math_expr_mul | math_expr_div | math_expr_mod  | sign_expr | condition_expr | bool_math_expr
+         | input_expr | new_expr | new_array_expr | type_change_expr 
     
+    lvalue_exp: lvalue
     this_expr: "this"
-    new_axpr: "new" ident
+    new_expr: "new" ident
     new_array_expr: "NewArray" "(" expr "," type ")"
-    assignment_expr: assignment_expr_empty | assignment_expr__with_plus | assignment_expr_with_mul | assignment_expr_with_div | assignment_expr_with_min
-    math_expr: math_expr_minus | math_expr_sum | math_expr_mul | math_expr_div | math_expr_mod
+    assignment_expr: assignment_expr_empty | assignment_expr_with_plus | assignment_expr_with_mul | assignment_expr_with_div | assignment_expr_with_min
     not_expr:  "!" expr
     sign_expr: "-" expr
     condition_expr: condition_expr_less | condition_expr_less_equal | condition_expr_greater | condition_expr_greater_equal | condition_expr_equal | condition_expr_not_equal
@@ -41,7 +41,7 @@ grammer=r"""
     input_expr: input_expr_readint | input_expr_readline
     
     assignment_expr_empty: lvalue "=" expr
-    assignment_expr__with_plus: lvalue "+=" expr
+    assignment_expr_with_plus: lvalue "+=" expr
     assignment_expr_with_mul: lvalue "*=" expr
     assignment_expr_with_div: lvalue "/=" expr
     assignment_expr_with_min: lvalue "-=" expr
@@ -79,7 +79,8 @@ grammer=r"""
     normal_function_call: ident "(" actuals ")"
     
     actuals: expr ("," expr)* | null
-    constant: doubleconstant | INT | boolconstant | ESCAPED_STRING | base16 | "null"
+    constant: doubleconstant | constant_token | boolconstant  
+    constant_token: INT | ESCAPED_STRING | base16 | "null"
     null:
     ident: /@[a-zA-Z][a-zA-Z0-9_]*/ | /@__func__[a-zA-Z0-9_]*/ | /@__line__[a-zA-Z0-9_]*/ 
     doubleconstant: /[0-9]+/"."/[0-9]+/ | /[0-9]+/"." | /[0-9]+/"."/[0-9]*[Ee][+-]?[0-9]+/
