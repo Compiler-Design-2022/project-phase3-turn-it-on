@@ -7,8 +7,8 @@ grammer=r"""
     decl: variable_decl | function_decl | class_decl | interface_decl
     variable_decl: variable ";"
     variable: type ident
-    type: /int/ | /double"/ | /bool/ | /string/ | ident | type "[]" 
-    function_decl: type ident "(" formals ")" stmtblock | "void" ident "(" formals ")" stmtblock
+    type: /int/ | /double/ | /bool/ | /string/ | ident | type "[]" 
+    function_decl: type ident "(" formals ")" stmtblock | /void/ ident "(" formals ")" stmtblock
     formals: variable ("," variable)+ |  variable | null
     class_decl: "class" ident ("extends" ident)? ("implements" ident ("," ident)*)? "{" field* "}"
     field: access_mode variable_decl | access_mode function_decl
@@ -20,14 +20,17 @@ grammer=r"""
     stmt: expr? ";" | ifstmt | whilestmt | whilestmt | forstmt | breakstmt | continuestmt | returnstmt | printstmt | stmtblock     
     ifstmt: "if""(" expr ")" stmt ("else" stmt)?
     whilestmt: "while""(" expr ")" stmt
-    forstmt: "for" "(" expr? ";" expr ";" expr? ")" stmt
+    forstmt: "for" "(" expr? /;/ expr /;/ expr? ")" stmt
     returnstmt: "return" expr? ";"
     breakstmt: "break" ";"
     continuestmt: "continue" ";"
     printstmt: "Print" "(" expr ("," expr)* ")" ";"
-    expr: assignment_expr | constant | lvalue | /this/ | call | "(" expr ")" | math_expr  | sign_expr | condition_expr | bool_math_expr
-         | input_expr | "new" ident | "NewArray" "(" expr "," type ")" | type_change_expr
+    expr: assignment_expr | constant | lvalue | this_expr | call | "(" expr ")" | math_expr  | sign_expr | condition_expr | bool_math_expr
+         | input_expr | new_axpr | new_array_expr | type_change_expr
     
+    this_expr: "this"
+    new_axpr: "new" ident
+    new_array_expr: "NewArray" "(" expr "," type ")"
     assignment_expr: assignment_expr_empty | assignment_expr__with_plus | assignment_expr_with_mul | assignment_expr_with_div | assignment_expr_with_min
     math_expr: math_expr_minus | math_expr_sum | math_expr_mul | math_expr_div | math_expr_mod
     not_expr:  "!" expr
@@ -67,14 +70,22 @@ grammer=r"""
     input_expr_readint: "ReadInteger()"
     input_expr_readline: "ReadLine()"
     
-    lvalue: ident | expr "." ident | expr "[" expr "]" 
-    call: ident "(" actuals ")" | expr "." ident "(" actuals ")" 
+    lvalue: ident |  class_val | array_val
+    class_val: expr "." ident
+    array_val: expr "[" expr "]" 
+    
+    call:  normal_function_call | class_function_call
+    class_function_call: expr "." ident "(" actuals ")" 
+    normal_function_call: ident "(" actuals ")"
+    
     actuals: expr ("," expr)* | null
     constant: doubleconstant | INT | boolconstant | ESCAPED_STRING | base16 | "null"
     null:
     ident: /@[a-zA-Z][a-zA-Z0-9_]*/ | /@__func__[a-zA-Z0-9_]*/ | /@__line__[a-zA-Z0-9_]*/ 
     doubleconstant: /[0-9]+/"."/[0-9]+/ | /[0-9]+/"." | /[0-9]+/"."/[0-9]*[Ee][+-]?[0-9]+/
-    boolconstant: "true" | "false"
+    boolconstant: boolconstant_true | boolconstant_false
+    boolconstant_true: "true"
+    boolconstant_false: "false"
     base16: /0[xX][0-9a-fA-F]+/
     INT: /[0-9]+/
     
