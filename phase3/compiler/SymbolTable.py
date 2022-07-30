@@ -4,6 +4,24 @@ import string
 scope_counter = 0
 
 
+class Class:
+    def __init__(self, classname, superclass):
+        self.name = classname
+        self.superclass = superclass
+        self.fields = []
+        self.constructors = []
+        self.methods = []
+
+    def add_constructor(self, constructor):
+        self.constructors.append(constructor)
+
+    def add_method(self, method):
+        self.methods.append(method)
+
+    def add_method(self, field):
+        self.fields.append(field)
+
+
 def get_label():
     global scope_counter
     scope_counter += 1
@@ -116,7 +134,7 @@ class SymbolTable():
         for i in range(len(self.scope_stack) - 1, -1, -1):
             if self.scope_stack[i].get_variable(name) is not None:
                 return self.scope_stack[i].get_variable(name)
-        print("NAME",name)
+        print("NAME", name)
         raise ValueError  # value doesn't declared
 
     def last_scope(self) -> Scope:
