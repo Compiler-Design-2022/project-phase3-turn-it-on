@@ -1,7 +1,7 @@
 from os import listdir
 from parserC import parser
-from phase3.compiler.CodeGeneration import cgen
-from phase3.compiler.SymbolTable import SymbolTable
+from CodeGeneration import cgen
+from SymbolTable import SymbolTable
 
 
 def run(input_file_address: str) -> bool:
@@ -12,9 +12,9 @@ def run(input_file_address: str) -> bool:
         int a;
         int b;
         int c;
-        a=2;
-        b=2;
-        c=a+b;
+        a=6;
+        b=3;
+        b*=a;
     }"""
     try:
         print(input_content)

@@ -63,6 +63,62 @@ def after_enter(parse_tree, symbol_table, children_return, children_type):
             \tsw $t0, 0($t1)
             \taddi $sp, $sp, {children_type[1].size + children_type[0].size}
         ''', Type()
+    
+    elif parse_tree.data == "assignment_expr_with_plus":
+        variable_code = children_return[0]
+        expr_code = children_return[1]
+        symbol_table.last_scope().pop_variable()
+        symbol_table.last_scope().pop_variable()
+        return f'''{variable_code} {expr_code}
+            \tlw $t0, {children_type[1].size}($sp)
+            \tlw $t1, {children_type[1].size + children_type[0].size}($sp)
+            \tlw $t2, 0($t1)
+            \tadd $t0, $t0, $t2
+            \tsw $t0, 0($t1)
+            \taddi $sp, $sp, {children_type[1].size + children_type[0].size}
+        ''', Type()
+    
+    elif parse_tree.data == "assignment_expr_with_min":
+        variable_code = children_return[0]
+        expr_code = children_return[1]
+        symbol_table.last_scope().pop_variable()
+        symbol_table.last_scope().pop_variable()
+        return f'''{variable_code} {expr_code}
+            \tlw $t0, {children_type[1].size}($sp)
+            \tlw $t1, {children_type[1].size + children_type[0].size}($sp)
+            \tlw $t2, 0($t1)
+            \tsub $t0, $t2, $t0
+            \tsw $t0, 0($t1)
+            \taddi $sp, $sp, {children_type[1].size + children_type[0].size}
+        ''', Type()
+    
+    elif parse_tree.data == "assignment_expr_with_mul":
+        variable_code = children_return[0]
+        expr_code = children_return[1]
+        symbol_table.last_scope().pop_variable()
+        symbol_table.last_scope().pop_variable()
+        return f'''{variable_code} {expr_code}
+            \tlw $t0, {children_type[1].size}($sp)
+            \tlw $t1, {children_type[1].size + children_type[0].size}($sp)
+            \tlw $t2, 0($t1)
+            \tmul $t0, $t2, $t0
+            \tsw $t0, 0($t1)
+            \taddi $sp, $sp, {children_type[1].size + children_type[0].size}
+        ''', Type()
+
+    elif parse_tree.data == "assignment_expr_with_div":
+        variable_code = children_return[0]
+        expr_code = children_return[1]
+        symbol_table.last_scope().pop_variable()
+        symbol_table.last_scope().pop_variable()
+        return f'''{variable_code} {expr_code}
+            \tlw $t0, {children_type[1].size}($sp)
+            \tlw $t1, {children_type[1].size + children_type[0].size}($sp)
+            \tlw $t2, 0($t1)
+            \tdiv $t0, $t2, $t0
+            \tsw $t0, 0($t1)
+            \taddi $sp, $sp, {children_type[1].size + children_type[0].size}
+        ''', Type()
 
     elif parse_tree.data == "constant":  # TODO only int
         symbol_table.last_scope().push_variable(Variable("__IGNORE", children_type[0]))
@@ -83,11 +139,52 @@ def after_enter(parse_tree, symbol_table, children_return, children_type):
                     \tsw $t0, 0($sp)
                     \taddi $sp, $sp, -4
                 ''', Type()
+    
+    elif parse_tree.data == "math_expr_minus":
+        left_expr_code = children_return[0]
+        right_expr_code = children_return[1]
+        symbol_table.last_scope().pop_variable()
+        return f'''{left_expr_code} {right_expr_code}
+                    \tlw $t0, {children_type[1].size}($sp)
+                    \tlw $t1, {children_type[1].size + children_type[0].size}($sp)
+                    \tsub $t0, $t1, $t0
+                    \taddi $sp, $sp, {children_type[1].size + children_type[0].size}
+                    \tsw $t0, 0($sp)
+                    \taddi $sp, $sp, -4
+                ''', Type()
+
+    elif parse_tree.data == "math_expr_mul":
+        left_expr_code = children_return[0]
+        right_expr_code = children_return[1]
+        symbol_table.last_scope().pop_variable()
+        return f'''{left_expr_code} {right_expr_code}
+                    \tlw $t0, {children_type[1].size}($sp)
+                    \tlw $t1, {children_type[1].size + children_type[0].size}($sp)
+                    \tmul $t0, $t1, $t0
+                    \taddi $sp, $sp, {children_type[1].size + children_type[0].size}
+                    \tsw $t0, 0($sp)
+                    \taddi $sp, $sp, -4
+                ''', Type()
+    
+    elif parse_tree.data == "math_expr_div":
+        left_expr_code = children_return[0]
+        right_expr_code = children_return[1]
+        symbol_table.last_scope().pop_variable()
+        return f'''{left_expr_code} {right_expr_code}
+                    \tlw $t0, {children_type[1].size}($sp)
+                    \tlw $t1, {children_type[1].size + children_type[0].size}($sp)
+                    \tdiv $t0, $t1, $t0
+                    \taddi $sp, $sp, {children_type[1].size + children_type[0].size}
+                    \tsw $t0, 0($sp)
+                    \taddi $sp, $sp, -4
+                ''', Type()
+    
+    
 
     elif parse_tree.data == "lvalue_exp":
         return f'''{children_return[0]}
-                            \tlw $t0, {children_type[0].size}($sp)
-                            \tlw $t1, 4($t0)
+                            \tlw $t0, 4($sp)
+                            \tlw $t1, 0($t0)
                             \tsw $t1, 4($sp)
                         ''', Type()
 
