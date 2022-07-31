@@ -119,7 +119,7 @@ def reprep(string):
 
 
 def replace_ident(string):
-    stopWords = ['.', ' ', '\n', ']', '[', '(', ')', ';', '!', '-', '\t', '*', '+', '=']
+    stopWords = ['.', ' ', '\n', ']', '[', '(', ')', ';', '!', '-', '\t', '*', '+', '=', '<', '>', '/', '%']
     ans = ""
     current = ""
     for i in range(len(string)):

@@ -75,11 +75,13 @@ class Variable():
 
 
 class Scope():
-    def __init__(self):
+    def __init__(self, for_scope=False, method_scope=False):
         self.variables = []
         scope_name = get_label()
         self.begin_lable = scope_name + "_start"
         self.end_labele = scope_name + "_end"
+        self.for_scope = for_scope
+        self.method_scope = method_scope
 
     def push_variable(self, variable: Variable):
         self.variables.append(variable)
