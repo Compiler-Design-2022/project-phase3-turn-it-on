@@ -12,12 +12,6 @@ def run(input_file_address: str) -> bool:
         int a;
         a=2;
         Print(a,5);     
-        
-        for (){
-            if(){
-                
-            }
-        } 
     }"""
     try:
         print(input_content)
@@ -25,7 +19,7 @@ def run(input_file_address: str) -> bool:
         print(parse_tree.pretty())
         # print(parse_tree)
         try:
-            mips_code, _ = cgen(parse_tree, SymbolTable())
+            mips_code= cgen(parse_tree, SymbolTable()).code
             print(mips_code)
             return mips_code
         except Exception:
