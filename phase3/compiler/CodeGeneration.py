@@ -1,4 +1,4 @@
-from SymbolTable import SymbolTable, Scope, Variable, Type
+from SymbolTable import SymbolTable, Scope, Variable, Type, get_label
 import lark
 
 
@@ -53,7 +53,7 @@ def after_enter(parse_tree, symbol_table, children_return, children_type):
         \tsw $t0, 0($sp)
         \taddi $sp, $sp, -4
         ''', Type()
-    
+
     # assignment_expr_empty: lvalue "=" expr
     elif parse_tree.data == "assignment_expr_empty":
         variable_code = children_return[0]
@@ -66,7 +66,7 @@ def after_enter(parse_tree, symbol_table, children_return, children_type):
             \tsw $t0, 0($t1)
             \taddi $sp, $sp, {children_type[1].size + children_type[0].size}
         ''', Type()
-    
+
     # assignment_expr_with_plus: lvalue "+=" expr
     elif parse_tree.data == "assignment_expr_with_plus":
         variable_code = children_return[0]
@@ -81,7 +81,7 @@ def after_enter(parse_tree, symbol_table, children_return, children_type):
             \tsw $t0, 0($t1)
             \taddi $sp, $sp, {children_type[1].size + children_type[0].size}
         ''', Type()
-    
+
     # assignment_expr_with_min: lvalue "-=" expr
     elif parse_tree.data == "assignment_expr_with_min":
         variable_code = children_return[0]
@@ -96,7 +96,7 @@ def after_enter(parse_tree, symbol_table, children_return, children_type):
             \tsw $t0, 0($t1)
             \taddi $sp, $sp, {children_type[1].size + children_type[0].size}
         ''', Type()
-    
+
     # assignment_expr_with_mul: lvalue "*=" expr
     elif parse_tree.data == "assignment_expr_with_mul":
         variable_code = children_return[0]
@@ -149,7 +149,48 @@ def after_enter(parse_tree, symbol_table, children_return, children_type):
                     \tsw $t0, 0($sp)
                     \taddi $sp, $sp, -4
                 ''', Type()
-    
+    elif parse_tree.data == "ifstmt":
+        label = get_label() + "ELSE"
+        symbol_table.last_scope().pop_variable()
+        expr_code = children_return[0]
+        stmt_if_code = children_return[1]
+        if len(children_return) == 2:
+            return f'''{expr_code}
+                \tlw $t0, {children_type[1].size}($sp)
+                \taddi $sp, $sp, 4
+                \tsub $t1, $t1, $t1
+                \tbeq $t0, $t1, {label}
+                {stmt_if_code}
+                {label}:            
+            ''', Type()
+        else:
+            stmt_else_code = children_return[2]
+            label_end = get_label() + "ENDELSE"
+            return f'''{expr_code}
+                            \tlw $t0, {children_type[1].size}($sp)
+                            \taddi $sp, $sp, 4
+                            \tsub $t1, $t1, $t1
+                            \tbeq $t0, $t1, {label}
+                            {stmt_if_code}
+                            \tj {label_end}
+                            {label}:
+                            {stmt_else_code}  
+                            {label_end}:          
+                        ''', Type()
+
+
+    elif parse_tree.data == "condition_expr_less":
+        left_expr_code = children_return[0]
+        right_expr_code = children_return[1]
+        symbol_table.last_scope().pop_variable()  # t0 right t1 left
+        return f'''{left_expr_code} {right_expr_code} 
+                    \tlw $t0, {children_type[1].size}($sp)
+                    \tlw $t1, {children_type[1].size + children_type[0].size}($sp)
+                    \tslt $t0, $t1, $t0
+                    \taddi $sp, $sp, {children_type[1].size + children_type[0].size}
+                    \tsw $t0, 0($sp)
+                    \taddi $sp, $sp, -4
+                ''', Type()
     # math_expr_minus: expr "-" expr
     elif parse_tree.data == "math_expr_minus":
         left_expr_code = children_return[0]
@@ -177,7 +218,7 @@ def after_enter(parse_tree, symbol_table, children_return, children_type):
                     \tsw $t0, 0($sp)
                     \taddi $sp, $sp, -4
                 ''', Type()
-    
+
     # math_expr_div: expr "/" expr
     elif parse_tree.data == "math_expr_div":
         left_expr_code = children_return[0]
@@ -191,8 +232,8 @@ def after_enter(parse_tree, symbol_table, children_return, children_type):
                     \tsw $t0, 0($sp)
                     \taddi $sp, $sp, -4
                 ''', Type()
-    
-    
+
+
     # lvalue_exp: lvalue
     elif parse_tree.data == "lvalue_exp":
         return f'''{children_return[0]}
