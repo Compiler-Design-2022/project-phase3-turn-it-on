@@ -70,94 +70,94 @@ def after_enter(parse_tree, symbol_table, children):
 
     # assignment_expr_with_plus: lvalue "+=" expr
     elif parse_tree.data == "assignment_expr_with_plus":
-        variable_code = children_return[0]
-        expr_code = children_return[1]
+        variable_code = children[0].code
+        expr_code = children[1].code
         symbol_table.last_scope().pop_variable()
         symbol_table.last_scope().pop_variable()
         return f'''{variable_code} {expr_code}
-            \tlw $t0, {children_type[1].size}($sp)
-            \tlw $t1, {children_type[1].size + children_type[0].size}($sp)
+            \tlw $t0, {children[1].type.size}($sp)
+            \tlw $t1, {children[1].type.size + children[0].type.size}($sp)
             \tlw $t2, 0($t1)
             \tadd $t0, $t0, $t2
             \tsw $t0, 0($t1)
-            \taddi $sp, $sp, {children_type[1].size + children_type[0].size}
+            \taddi $sp, $sp, {children[1].type.size + children[0].type.size}
         ''', Type()
 
     # assignment_expr_with_min: lvalue "-=" expr
     elif parse_tree.data == "assignment_expr_with_min":
-        variable_code = children_return[0]
-        expr_code = children_return[1]
+        variable_code = children[0].code
+        expr_code = children[1].code
         symbol_table.last_scope().pop_variable()
         symbol_table.last_scope().pop_variable()
         return f'''{variable_code} {expr_code}
-            \tlw $t0, {children_type[1].size}($sp)
-            \tlw $t1, {children_type[1].size + children_type[0].size}($sp)
+            \tlw $t0, {children[1].type.size}($sp)
+            \tlw $t1, {children[1].type.size + children[0].type.size}($sp)
             \tlw $t2, 0($t1)
             \tsub $t0, $t2, $t0
             \tsw $t0, 0($t1)
-            \taddi $sp, $sp, {children_type[1].size + children_type[0].size}
+            \taddi $sp, $sp, {children[1].type.size + children[0].type.size}
         ''', Type()
 
     # assignment_expr_with_mul: lvalue "*=" expr
     elif parse_tree.data == "assignment_expr_with_mul":
-        variable_code = children_return[0]
-        expr_code = children_return[1]
+        variable_code = children[0].code
+        expr_code = children[1].code
         symbol_table.last_scope().pop_variable()
         symbol_table.last_scope().pop_variable()
         return f'''{variable_code} {expr_code}
-            \tlw $t0, {children_type[1].size}($sp)
-            \tlw $t1, {children_type[1].size + children_type[0].size}($sp)
+            \tlw $t0, {children[1].type.size}($sp)
+            \tlw $t1, {children[1].type.size + children[0].type.size}($sp)
             \tlw $t2, 0($t1)
             \tmul $t0, $t2, $t0
             \tsw $t0, 0($t1)
-            \taddi $sp, $sp, {children_type[1].size + children_type[0].size}
+            \taddi $sp, $sp, {children[1].type.size + children[0].type.size}
         ''', Type()
 
     # assignment_expr_with_div: lvalue "/=" expr
     elif parse_tree.data == "assignment_expr_with_div":
-        variable_code = children_return[0]
-        expr_code = children_return[1]
+        variable_code = children[0].code
+        expr_code = children[1].code
         symbol_table.last_scope().pop_variable()
         symbol_table.last_scope().pop_variable()
         return f'''{variable_code} {expr_code}
-            \tlw $t0, {children_type[1].size}($sp)
-            \tlw $t1, {children_type[1].size + children_type[0].size}($sp)
+            \tlw $t0, {children[1].type.size}($sp)
+            \tlw $t1, {children[1].type.size + children[0].type.size}($sp)
             \tlw $t2, 0($t1)
             \tdiv $t0, $t2, $t0
             \tsw $t0, 0($t1)
-            \taddi $sp, $sp, {children_type[1].size + children_type[0].size}
+            \taddi $sp, $sp, {children[1].type.size + children[0].type.size}
         ''', Type()
 
     # constant: doubleconstant | constant_token | boolconstant
     elif parse_tree.data == "constant":  # TODO only int
-        symbol_table.last_scope().push_variable(Variable("__IGNORE", children_type[0]))
+        symbol_table.last_scope().push_variable(Variable("__IGNORE", children[0].type))
         return f''' \tsub $t0, $t0, $t0
-                    \taddi $t0, $t0, {children_return[0]}
+                    \taddi $t0, $t0, {children[0].text}
                     \tsw $t0, 0($sp)
-                    \taddi $sp, $sp, -{children_type[0].size}
+                    \taddi $sp, $sp, -{children[0].type.size}
                 ''', Type()
 
     # math_expr_sum: expr "+" expr
     elif parse_tree.data == "math_expr_sum":
-        left_expr_code = children_return[0]
-        right_expr_code = children_return[1]
+        left_expr_code = children[0].code
+        right_expr_code = children[1].code
         symbol_table.last_scope().pop_variable()
         return f'''{left_expr_code} {right_expr_code}
-                    \tlw $t0, {children_type[1].size}($sp)
-                    \tlw $t1, {children_type[1].size + children_type[0].size}($sp)
+                    \tlw $t0, {children[1].type.size}($sp)
+                    \tlw $t1, {children[1].type.size + children[0].type.size}($sp)
                     \tadd $t0, $t0, $t1
-                    \taddi $sp, $sp, {children_type[1].size + children_type[0].size}
+                    \taddi $sp, $sp, {children[1].type.size + children[0].type.size}
                     \tsw $t0, 0($sp)
                     \taddi $sp, $sp, -4
                 ''', Type()
     elif parse_tree.data == "ifstmt":
-        label = children_return[0].
+        label = children[1].scope.end_labele
         symbol_table.last_scope().pop_variable()
-        expr_code = children_return[0]
-        stmt_if_code = children_return[1]
-        if len(children_return) == 2:
+        expr_code = children[0].code
+        stmt_if_code = children[1].code
+        if len(children) == 2:
             return f'''{expr_code}
-                \tlw $t0, {children_type[1].size}($sp)
+                \tlw $t0, {children[1].type.size}($sp)
                 \taddi $sp, $sp, 4
                 \tsub $t1, $t1, $t1
                 \tbeq $t0, $t1, {label}
@@ -165,10 +165,10 @@ def after_enter(parse_tree, symbol_table, children):
                 {label}:            
             ''', Type()
         else:
-            stmt_else_code = children_return[2]
-            label_end =
+            stmt_else_code = children[2].code
+            label_end = children[2].scope.end_labele
             return f'''{expr_code}
-                            \tlw $t0, {children_type[1].size}($sp)
+                            \tlw $t0, {children[1].type.size}($sp)
                             \taddi $sp, $sp, 4
                             \tsub $t1, $t1, $t1
                             \tbeq $t0, $t1, {label}
@@ -181,14 +181,14 @@ def after_enter(parse_tree, symbol_table, children):
 
 
     elif parse_tree.data == "condition_expr_less":
-        left_expr_code = children_return[0]
-        right_expr_code = children_return[1]
+        left_expr_code = children[0].code
+        right_expr_code = children[1].code
         symbol_table.last_scope().pop_variable()  # t0 right t1 left
         return f'''{left_expr_code} {right_expr_code} 
-                    \tlw $t0, {children_type[1].size}($sp)
-                    \tlw $t1, {children_type[1].size + children_type[0].size}($sp)
+                    \tlw $t0, {children[1].type.size}($sp)
+                    \tlw $t1, {children[1].type.size + children[0].type.size}($sp)
                     \tslt $t0, $t1, $t0
-                    \taddi $sp, $sp, {children_type[1].size + children_type[0].size}
+                    \taddi $sp, $sp, {children[1].type.size + children[0].type.size}
                     \tsw $t0, 0($sp)
                     \taddi $sp, $sp, -4
                 ''', Type()
