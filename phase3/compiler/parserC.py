@@ -119,7 +119,7 @@ def reprep(string):
 
 
 def replace_ident(string):
-    stopWords = ['.', ' ', '\n', ']', '[', '(', ')', ';', '!', '-', '\t', '*', '+', '=']
+    stopWords = ['.', ' ', '\n', ']', '[', '(', ')', ';', '!', '-', '\t', '*', '+', '=', '<', '>', '/', '%']
     ans = ""
     current = ""
     for i in range(len(string)):
@@ -145,10 +145,6 @@ def linker_add_imports(string):
     return ans
 
 def parser(string):
-    string = string.replace("/=", "$^$")
-    string = string.replace("/", " / ")
-    string = string.replace("$^$", "/=")
-
     string = replace_defines(string + ' ')
     string = remove_comment(string)
     string = string.replace(");", ") ;")
