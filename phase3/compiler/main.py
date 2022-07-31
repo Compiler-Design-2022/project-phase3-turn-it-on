@@ -11,15 +11,13 @@ def run(input_file_address: str) -> bool:
     int main() {
         int a;
         a=2;
-        if(a<3){
-            int b;
-            b=2;
-        }else{
-            int d;
-            d=2;
-            d=a/b;
-        }
+        Print(a,5);     
         
+        for (){
+            if(){
+                
+            }
+        } 
     }"""
     try:
         print(input_content)
