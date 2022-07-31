@@ -2,6 +2,14 @@ from SymbolTable import SymbolTable, Scope, Variable, Type, get_label
 import lark
 
 
+class Node_Return:
+    def __init__(self, code, type, scope, name=None):
+        self.code = code
+        self.type = type
+        self.scope = scope
+        self.name = name
+
+
 def cgen_token(token: lark.Token, symboltable: SymbolTable):
     return token.value, Type()
 
@@ -18,7 +26,6 @@ def cgen(parse_tree, symbol_table: SymbolTable):
         child_code, child_type = cgen(child, symbol_table)
         children_type.append(child_type)
         children_return.append(child_code)
-        middle_enter(children_return, children_type, parse_tree, symbol_table)
 
     mips_code, result_type = after_enter(parse_tree, symbol_table, children_return, children_type)
     return mips_code, result_type
@@ -28,10 +35,6 @@ def before_enter(parse_tree, symbol_table):
     if parse_tree.data == "stmtblock":
         symbol_table.push_scope(Scope())
     return
-
-
-def middle_enter(children_code, children_type, parse_tree, symbol_table):
-    pass
 
 
 def after_enter(parse_tree, symbol_table, children_return, children_type):
@@ -127,7 +130,7 @@ def after_enter(parse_tree, symbol_table, children_return, children_type):
             \taddi $sp, $sp, {children_type[1].size + children_type[0].size}
         ''', Type()
 
-    # constant: doubleconstant | constant_token | boolconstant  
+    # constant: doubleconstant | constant_token | boolconstant
     elif parse_tree.data == "constant":  # TODO only int
         symbol_table.last_scope().push_variable(Variable("__IGNORE", children_type[0]))
         return f''' \tsub $t0, $t0, $t0
@@ -150,7 +153,7 @@ def after_enter(parse_tree, symbol_table, children_return, children_type):
                     \taddi $sp, $sp, -4
                 ''', Type()
     elif parse_tree.data == "ifstmt":
-        label = get_label() + "ELSE"
+        label = children_return[0].
         symbol_table.last_scope().pop_variable()
         expr_code = children_return[0]
         stmt_if_code = children_return[1]
@@ -165,7 +168,7 @@ def after_enter(parse_tree, symbol_table, children_return, children_type):
             ''', Type()
         else:
             stmt_else_code = children_return[2]
-            label_end = get_label() + "ENDELSE"
+            label_end =
             return f'''{expr_code}
                             \tlw $t0, {children_type[1].size}($sp)
                             \taddi $sp, $sp, 4
@@ -271,6 +274,13 @@ def after_enter(parse_tree, symbol_table, children_return, children_type):
 
     elif parse_tree.data == "stmtblock":
         symbol_table.pop_scope()
+        code = f'''
+        \t{symbol_table.last_scope().begin_lable}
+        '''
+        code = "".join(children_return)
+        code += f'''
+        \t{symbol_table.last_scope().end_labele}
+        '''
         return "".join(children_return), Type()
     else:
         return "".join(children_return), Type()
