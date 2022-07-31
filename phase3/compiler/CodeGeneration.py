@@ -25,7 +25,15 @@ def cgen(parse_tree, symbol_table: SymbolTable):
         child_return = cgen(child, symbol_table)
         children_return.append(child_return)
 
-    return after_enter(parse_tree, symbol_table, children_return)
+    scope = None
+    try:
+        scope = symbol_table.last_scope()
+    except:
+        pass
+
+    gen: Node_Return = after_enter(parse_tree, symbol_table, children_return)
+    gen.scope = scope
+    return gen
 
 
 def before_enter(parse_tree, symbol_table):
@@ -38,9 +46,11 @@ def after_enter(parse_tree, symbol_table, children):
     """ variable: type ident """
     if parse_tree.data == "type":
         return Node_Return(code="", type=Type(children[0].text))
-    if parse_tree.data == "ident":
+    elif parse_tree.data == "ident":
         return Node_Return(code="", type=None, text=children[0].text)
-    if parse_tree.data == "constant_token":
+    elif parse_tree.data == "null":
+        return Node_Return(code="", type=None, text="")
+    elif parse_tree.data == "constant_token":
         return Node_Return(code="", type=children[0].type, text=children[0].text)
     elif parse_tree.data == "variable":
         variable = Variable(children[1].text, children[0].type)
@@ -165,7 +175,7 @@ def after_enter(parse_tree, symbol_table, children):
         return Node_Return(code=code, type=Type())
 
     elif parse_tree.data == "ifstmt":
-        label = children[0].scope.end_labe
+        label = children[1].scope.end_label
         symbol_table.last_scope().pop_variable()
         expr_code = children[0].code
         stmt_if_code = children[1].code
@@ -175,13 +185,12 @@ def after_enter(parse_tree, symbol_table, children):
                 \taddi $sp, $sp, 4
                 \tsub $t1, $t1, $t1
                 \tbeq $t0, $t1, {label}
-                {stmt_if_code}
-                {label}:            
+                {stmt_if_code}          
             '''
             return Node_Return(code=code, type=Type())
         else:
             stmt_else_code = children[2].code
-            label_end = children[2].scope.end_labele
+            label_end = children[2].scope.end_label
             code = f'''{expr_code}
                             \tlw $t0, {children[1].type.size}($sp)
                             \taddi $sp, $sp, 4
@@ -189,9 +198,7 @@ def after_enter(parse_tree, symbol_table, children):
                             \tbeq $t0, $t1, {label}
                             {stmt_if_code}
                             \tj {label_end}
-                            {label}:
-                            {stmt_else_code}  
-                            {label_end}:          
+                            {stmt_else_code}         
                         '''
             return Node_Return(code=code, type=Type())
 
@@ -297,24 +304,21 @@ def after_enter(parse_tree, symbol_table, children):
 
     elif parse_tree.data == "stmtblock":
         code = f'''
-        \t{symbol_table.last_scope().begin_lable}:
+        \t{symbol_table.last_scope().begin_label}:
         '''
 
         for child in children:
             code += child.code
         code += f'''
-        \t{symbol_table.last_scope().end_labele}:
+        \t{symbol_table.last_scope().end_label}:
         '''
         symbol_table.pop_scope()
         return Node_Return(code=code, type=Type())
     else:
-        try:
-            code = ''
-            for child in children:
-                try:
-                    code += child.code
-                except:
-                    code += child.text
-            return Node_Return(code=code, type=Type())
-        except:
-            print("FUCK" * 40, parse_tree.data)
+        code = ''
+        for child in children:
+            if child.code is not None:
+                code += child.code
+            else:
+                code += child.text
+        return Node_Return(code=code, type=Type())

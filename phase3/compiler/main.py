@@ -10,8 +10,16 @@ def run(input_file_address: str) -> bool:
     input_content = """
     int main() {
         int a;
-        a=2;
-        Print(a,5);     
+        int b;
+        a=5;
+        b=6;
+        a*=b;
+        if(a<30){
+            Print(4);
+        }else{
+            Print(8);
+        }
+        Print(9);
     }"""
     try:
         print(input_content)
@@ -19,7 +27,7 @@ def run(input_file_address: str) -> bool:
         print(parse_tree.pretty())
         # print(parse_tree)
         try:
-            mips_code= cgen(parse_tree, SymbolTable()).code
+            mips_code = cgen(parse_tree, SymbolTable()).code
             print(mips_code)
             return mips_code
         except Exception:
