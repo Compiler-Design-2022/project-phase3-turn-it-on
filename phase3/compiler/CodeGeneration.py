@@ -3,15 +3,15 @@ import lark
 
 
 class Node_Return:
-    def __init__(self, code, type, scope, name=None):
+    def __init__(self, code=None, type=None, scope=None, text=None):
         self.code = code
         self.type = type
         self.scope = scope
-        self.name = name
+        self.text = text
 
 
 def cgen_token(token: lark.Token, symboltable: SymbolTable):
-    return token.value, Type()
+    return Node_Return(text=token.value, type=Type())
 
 
 def cgen(parse_tree, symbol_table: SymbolTable):
@@ -21,13 +21,11 @@ def cgen(parse_tree, symbol_table: SymbolTable):
     print("^" * 60, parse_tree.data, parse_tree._meta)
     before_enter(parse_tree, symbol_table)
     children_return = []
-    children_type = []
     for child in parse_tree.children:
-        child_code, child_type = cgen(child, symbol_table)
-        children_type.append(child_type)
-        children_return.append(child_code)
+        child_return = cgen(child, symbol_table)
+        children_return.append(child_return)
 
-    mips_code, result_type = after_enter(parse_tree, symbol_table, children_return, children_type)
+    mips_code, result_type = after_enter(parse_tree, symbol_table, children_return)
     return mips_code, result_type
 
 
@@ -37,10 +35,10 @@ def before_enter(parse_tree, symbol_table):
     return
 
 
-def after_enter(parse_tree, symbol_table, children_return, children_type):
+def after_enter(parse_tree, symbol_table, children):
     """ variable: type ident """
     if parse_tree.data == "variable":
-        variable = Variable(children_return[1], Type(children_return[0]))
+        variable = Variable(children[1].text, Type(children[0].text))
         symbol_table.last_scope().push_variable(variable)
         return f'''
         addi $sp, $sp, -{variable.type.size}
@@ -48,8 +46,8 @@ def after_enter(parse_tree, symbol_table, children_return, children_type):
 
     """ lvalue: ident |  class_val | array_val """
     if parse_tree.data == "lvalue":  # DOTO array, class
-        diff = symbol_table.get_address_diff(children_return[0])
-        var = symbol_table.get_variable(children_return[0])
+        diff = symbol_table.get_address_diff(children[0].text)
+        var = symbol_table.get_variable(children[0].code)
         symbol_table.last_scope().push_variable(Variable("__IGNORE", var.type))
         return f'''
         \taddi $t0, $sp, {diff}
@@ -59,15 +57,15 @@ def after_enter(parse_tree, symbol_table, children_return, children_type):
 
     # assignment_expr_empty: lvalue "=" expr
     elif parse_tree.data == "assignment_expr_empty":
-        variable_code = children_return[0]
-        expr_code = children_return[1]
+        variable_code = children[0].code
+        expr_code = children[1].code
         symbol_table.last_scope().pop_variable()
         symbol_table.last_scope().pop_variable()
         return f'''{variable_code} {expr_code}
-            \tlw $t0, {children_type[1].size}($sp)
-            \tlw $t1, {children_type[1].size + children_type[0].size}($sp)
+            \tlw $t0, {children[1].type.size}($sp)
+            \tlw $t1, {children[1].type.size + children[0].type.size}($sp)
             \tsw $t0, 0($t1)
-            \taddi $sp, $sp, {children_type[1].size + children_type[0].size}
+            \taddi $sp, $sp, {children[1].type.size + children[0].type.size}
         ''', Type()
 
     # assignment_expr_with_plus: lvalue "+=" expr
