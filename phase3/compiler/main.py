@@ -10,15 +10,19 @@ def run(input_file_address: str) -> bool:
     input_content = """
     int main() {
         int a;
-        int b;
-        int c;
-        a=6;
-        b=3;
-        b*=a;
+        a=2;
+        if(a<3){
+            int b;
+            b=2;
+        }else{
+            int d;
+            d=2;
+            d=a/b;
+        }
+        
     }"""
     try:
         print(input_content)
-        input_content=input_content.replace("/", " / ")
         parse_tree, code = parser(input_content)
         print(parse_tree.pretty())
         # print(parse_tree)
