@@ -192,6 +192,33 @@ def after_enter(parse_tree, symbol_table, children_return, children_type):
                     \taddi $sp, $sp, -4
                 ''', Type()
     # math_expr_minus: expr "-" expr
+    elif parse_tree.data == "printstmt":
+        code = "".join(children_return)
+        sum = 0
+        for t in children_type:
+            sum += t.size
+
+        for child_type in reversed(children_type):
+            symbol_table.last_scope().pop_variable()
+            code += f'''
+            \t lw $t0, {sum}($sp)
+            \t li $v0, 1
+            \t move $a0, $t0
+            \t syscall
+            \tli $a0, 32
+            \tli $v0, 11  
+            \tsyscall
+            '''
+            sum -= child_type.size
+        code += f'''
+            \taddi $sp, $sp, {sum}
+            \tli $a0, 10
+            \tli $v0, 11  
+            \tsyscall
+        '''
+        return code, Type()
+
+
     elif parse_tree.data == "math_expr_minus":
         left_expr_code = children_return[0]
         right_expr_code = children_return[1]
