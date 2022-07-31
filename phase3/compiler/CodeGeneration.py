@@ -35,6 +35,7 @@ def middle_enter(children_code, children_type, parse_tree, symbol_table):
 
 
 def after_enter(parse_tree, symbol_table, children_return, children_type):
+    """ variable: type ident """
     if parse_tree.data == "variable":
         variable = Variable(children_return[1], Type(children_return[0]))
         symbol_table.last_scope().push_variable(variable)
@@ -42,7 +43,8 @@ def after_enter(parse_tree, symbol_table, children_return, children_type):
         addi $sp, $sp, -{variable.type.size}
         ''', Type()
 
-    if parse_tree.data == "lvalue":  # DOTO array class
+    """ lvalue: ident |  class_val | array_val """
+    if parse_tree.data == "lvalue":  # DOTO array, class
         diff = symbol_table.get_address_diff(children_return[0])
         var = symbol_table.get_variable(children_return[0])
         symbol_table.last_scope().push_variable(Variable("__IGNORE", var.type))
@@ -51,7 +53,8 @@ def after_enter(parse_tree, symbol_table, children_return, children_type):
         \tsw $t0, 0($sp)
         \taddi $sp, $sp, -4
         ''', Type()
-
+    
+    # assignment_expr_empty: lvalue "=" expr
     elif parse_tree.data == "assignment_expr_empty":
         variable_code = children_return[0]
         expr_code = children_return[1]
@@ -64,6 +67,7 @@ def after_enter(parse_tree, symbol_table, children_return, children_type):
             \taddi $sp, $sp, {children_type[1].size + children_type[0].size}
         ''', Type()
     
+    # assignment_expr_with_plus: lvalue "+=" expr
     elif parse_tree.data == "assignment_expr_with_plus":
         variable_code = children_return[0]
         expr_code = children_return[1]
@@ -78,6 +82,7 @@ def after_enter(parse_tree, symbol_table, children_return, children_type):
             \taddi $sp, $sp, {children_type[1].size + children_type[0].size}
         ''', Type()
     
+    # assignment_expr_with_min: lvalue "-=" expr
     elif parse_tree.data == "assignment_expr_with_min":
         variable_code = children_return[0]
         expr_code = children_return[1]
@@ -92,6 +97,7 @@ def after_enter(parse_tree, symbol_table, children_return, children_type):
             \taddi $sp, $sp, {children_type[1].size + children_type[0].size}
         ''', Type()
     
+    # assignment_expr_with_mul: lvalue "*=" expr
     elif parse_tree.data == "assignment_expr_with_mul":
         variable_code = children_return[0]
         expr_code = children_return[1]
@@ -106,6 +112,7 @@ def after_enter(parse_tree, symbol_table, children_return, children_type):
             \taddi $sp, $sp, {children_type[1].size + children_type[0].size}
         ''', Type()
 
+    # assignment_expr_with_div: lvalue "/=" expr
     elif parse_tree.data == "assignment_expr_with_div":
         variable_code = children_return[0]
         expr_code = children_return[1]
@@ -120,6 +127,7 @@ def after_enter(parse_tree, symbol_table, children_return, children_type):
             \taddi $sp, $sp, {children_type[1].size + children_type[0].size}
         ''', Type()
 
+    # constant: doubleconstant | constant_token | boolconstant  
     elif parse_tree.data == "constant":  # TODO only int
         symbol_table.last_scope().push_variable(Variable("__IGNORE", children_type[0]))
         return f''' \tsub $t0, $t0, $t0
@@ -127,6 +135,8 @@ def after_enter(parse_tree, symbol_table, children_return, children_type):
                     \tsw $t0, 0($sp)
                     \taddi $sp, $sp, -{children_type[0].size}
                 ''', Type()
+
+    # math_expr_sum: expr "+" expr
     elif parse_tree.data == "math_expr_sum":
         left_expr_code = children_return[0]
         right_expr_code = children_return[1]
@@ -140,6 +150,7 @@ def after_enter(parse_tree, symbol_table, children_return, children_type):
                     \taddi $sp, $sp, -4
                 ''', Type()
     
+    # math_expr_minus: expr "-" expr
     elif parse_tree.data == "math_expr_minus":
         left_expr_code = children_return[0]
         right_expr_code = children_return[1]
@@ -153,6 +164,7 @@ def after_enter(parse_tree, symbol_table, children_return, children_type):
                     \taddi $sp, $sp, -4
                 ''', Type()
 
+    # math_expr_minus: expr "*" expr
     elif parse_tree.data == "math_expr_mul":
         left_expr_code = children_return[0]
         right_expr_code = children_return[1]
@@ -166,6 +178,7 @@ def after_enter(parse_tree, symbol_table, children_return, children_type):
                     \taddi $sp, $sp, -4
                 ''', Type()
     
+    # math_expr_div: expr "/" expr
     elif parse_tree.data == "math_expr_div":
         left_expr_code = children_return[0]
         right_expr_code = children_return[1]
@@ -180,7 +193,7 @@ def after_enter(parse_tree, symbol_table, children_return, children_type):
                 ''', Type()
     
     
-
+    # lvalue_exp: lvalue
     elif parse_tree.data == "lvalue_exp":
         return f'''{children_return[0]}
                             \tlw $t0, 4($sp)

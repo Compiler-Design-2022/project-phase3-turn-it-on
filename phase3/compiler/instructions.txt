@@ -1,0 +1,50 @@
+addi $sp, $sp, -4
+
+addi $sp, $sp, -4
+
+addi $sp, $sp, -4
+
+addi $t0, $sp, 12
+sw $t0, 0($sp)
+addi $sp, $sp, -4
+sub $t0, $t0, $t0
+addi $t0, $t0, 6
+sw $t0, 0($sp)
+addi $sp, $sp, -4
+
+lw $t0, 4($sp)
+lw $t1, 8($sp)
+sw $t0, 0($t1)
+addi $sp, $sp, 8
+
+addi $t0, $sp, 8
+sw $t0, 0($sp)
+addi $sp, $sp, -4
+sub $t0, $t0, $t0
+addi $t0, $t0, 3
+sw $t0, 0($sp)
+addi $sp, $sp, -4
+
+lw $t0, 4($sp)
+lw $t1, 8($sp)
+sw $t0, 0($t1)
+addi $sp, $sp, 8
+
+addi $t0, $sp, 8
+sw $t0, 0($sp)
+addi $sp, $sp, -4
+
+addi $t0, $sp, 16
+sw $t0, 0($sp)
+addi $sp, $sp, -4
+
+lw $t0, 4($sp)
+lw $t1, 0($t0)
+sw $t1, 4($sp)
+
+lw $t0, 4($sp)
+lw $t1, 8($sp)
+lw $t2, 0($t1)
+mul $t0, $t2, $t0
+sw $t0, 0($t1)
+addi $sp, $sp, 8
