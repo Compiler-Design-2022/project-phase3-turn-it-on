@@ -145,6 +145,10 @@ def linker_add_imports(string):
     return ans
 
 def parser(string):
+    string = string.replace("/=", "$^$")
+    string = string.replace("/", " / ")
+    string = string.replace("$^$", "/=")
+
     string = replace_defines(string + ' ')
     string = remove_comment(string)
     string = string.replace(");", ") ;")
