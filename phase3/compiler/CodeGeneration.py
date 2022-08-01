@@ -238,13 +238,13 @@ def after_enter(parse_tree, symbol_table, children):
 
     # printstmt: "Print" "(" expr ("," expr)* ")" ";"
     elif parse_tree.data == "printstmt":
-        codes = []
-        for i in range(len(children)):
-            codes.append(children[i].code)
-        code = "".join(codes)
+        child_codes_list = []
         sum = 0
-        for t in children:
-            sum += t.type.size
+        for i in range(len(children)):
+            child_codes_list.append(children[i].code)
+            sum += children[i].type.size
+
+        code = "".join(child_codes_list)
 
         for child in reversed(children):
             symbol_table.last_scope().pop_variable()
