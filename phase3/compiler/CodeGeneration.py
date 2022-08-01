@@ -246,14 +246,14 @@ def after_enter(parse_tree, symbol_table, children):
         return Node_Return(code=code, type=Type())
     elif parse_tree.data == "breakstmt":
         jlabel = None
-        pop_size=0
+        pop_size = 0
         for scope in reversed(symbol_table.scope_stack):
             scope: Scope
             if scope.for_scope:
                 jlabel = scope.end_label
                 break
             else:
-                pop_size+=scope.size()
+                pop_size += scope.size()
 
         if jlabel is None:
             raise ValueError
@@ -262,17 +262,17 @@ def after_enter(parse_tree, symbol_table, children):
             \tj {jlabel}
                             '''
         return Node_Return(code=code, type=Type())
-        
+
     elif parse_tree.data == "continuestmt":
         jlabel = None
-        pop_size=0
+        pop_size = 0
         for scope in reversed(symbol_table.scope_stack):
             scope: Scope
             if scope.for_scope:
                 jlabel = scope.begin_label
                 break
             else:
-                pop_size+=scope.size()
+                pop_size += scope.size()
 
         if jlabel is None:
             raise ValueError
