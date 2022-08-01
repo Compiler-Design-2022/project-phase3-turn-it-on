@@ -327,6 +327,7 @@ def after_enter(parse_tree, symbol_table, children):
         for child in children:
             code += child.code
         code += f'''
+        \taddi $sp, $sp, {symbol_table.last_scope().size()}
         \t{symbol_table.last_scope().end_label}:
         '''
         symbol_table.pop_scope()

@@ -11,8 +11,14 @@ def run(input_file_address: str) -> bool:
     int main() {
         int a;
         a=3;
-        if(a<2){
-            Print(a);
+        if(a<4){
+           int b;
+           b=8;
+           if(a*b<20){
+                Print(8);
+           }else{
+                Print(10);
+           }
         }
         Print(a);
     }"""
