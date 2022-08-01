@@ -15,6 +15,10 @@ def run(input_file_address: str) -> bool:
         i = 0;
         while(i<2)
         {
+            if (3<a)
+            {
+                break; 
+            }
             a = a + 1;
             i = i + 1; 
         }

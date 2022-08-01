@@ -244,7 +244,25 @@ def after_enter(parse_tree, symbol_table, children):
         '''
         symbol_table.pop_scope()
         return Node_Return(code=code, type=Type())
+    elif parse_tree.data == "breakstmt":
+        jlabel = None
+        pop_size=0
+        for scope in reversed(symbol_table.scope_stack):
+            scope: Scope
+            if scope.for_scope:
+                jlabel = scope.end_label
+                break
+            else:
+                pop_size+=scope.size()
 
+        if jlabel is None:
+            raise ValueError
+        code = f'''
+            \taddi $sp, $sp, {pop_size}
+            \tj {jlabel}
+                            '''
+        return Node_Return(code=code, type=Type())
+        
 
     # condition_expr_less: expr "<" expr
     elif parse_tree.data == "condition_expr_less":
