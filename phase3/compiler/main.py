@@ -13,13 +13,7 @@ def run(input_file_address: str) -> bool:
         int b;
         a=5;
         b=6;
-        a*=b;
-        if(a<30){
-            Print(4);
-        }else{
-            Print(8);
-        }
-        Print(9);
+        Print(a, b);
     }"""
     try:
         print(input_content)
