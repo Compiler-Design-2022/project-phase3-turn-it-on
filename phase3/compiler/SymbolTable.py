@@ -83,7 +83,11 @@ class Scope():
         self.for_scope = for_scope
         self.method_scope = method_scope
 
+    def __str__(self):
+        return self.begin_label + "(*)" + self.end_label
+
     def push_variable(self, variable: Variable):
+        assert (variable.__class__ == Variable)
         self.variables.append(variable)
 
     def last_variable(self):
@@ -109,7 +113,7 @@ class Scope():
     def size(self):
         ans = 0
         for variable in self.variables:
-            ans += variable.size()
+            ans += variable.type.size
         return ans
 
 
@@ -117,13 +121,9 @@ class SymbolTable():
     def __init__(self):
         self.scope_stack: [Scope] = []
         self.vtable: [Method] = []
-        self.all_defined_scope = []
 
     def push_scope(self, scope: Scope):
         self.scope_stack.append(scope)
-
-    def push_all_defined_scope(self, scope: Scope):
-        self.all_defined_scope.append(scope)
 
     def get_method(self, name, input_types=None):
         pass
@@ -146,8 +146,6 @@ class SymbolTable():
         return self.scope_stack[len(self.scope_stack) - 1]
 
     def pop_scope(self):
-        #del self.scope_stack[-1]
-        #self.scope_stack = self.scope_stack[:-1]
         self.scope_stack.pop()
 
     def last_all_defined_scope(self) -> Scope:

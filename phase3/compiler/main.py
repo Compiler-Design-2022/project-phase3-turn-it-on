@@ -1,7 +1,7 @@
 from os import listdir
 from parserC import parser
 from CodeGeneration import cgen
-from SymbolTable import SymbolTable
+from SymbolTable import SymbolTable, Scope
 
 
 def run(input_file_address: str) -> bool:
@@ -11,12 +11,10 @@ def run(input_file_address: str) -> bool:
     int main() {
         int a;
         a=3;
-        int b;
-        b=5;
+        if(a<2){
+            Print(a);
+        }
         Print(a);
-        Print(b);
-        Print(a,b);
-        Print(b,a);
     }"""
     try:
         print(input_content)
@@ -24,7 +22,9 @@ def run(input_file_address: str) -> bool:
         print(parse_tree.pretty())
         # print(parse_tree)
         try:
-            mips_code = cgen(parse_tree, SymbolTable()).code
+            symbol_table = SymbolTable()
+            symbol_table.push_scope(Scope())
+            mips_code = cgen(parse_tree, symbol_table).code
             print(mips_code)
             return mips_code
         except Exception:
