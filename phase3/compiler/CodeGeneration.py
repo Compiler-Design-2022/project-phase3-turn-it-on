@@ -37,6 +37,9 @@ def before_enter(parse_tree, symbol_table):
     if parse_tree.data == "stmt":
         new_scope = Scope()
         symbol_table.push_scope(new_scope)
+    elif parse_tree.data == "whilestmt":
+        new_scope = Scope(for_scope=True)
+        symbol_table.push_scope(new_scope)
     return
 
 
@@ -225,19 +228,23 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.last_scope().pop_variable()
         expr_code = children[0].code
         stmt_while_code = children[1].code
-        before_while_label = "BeforeWhile"+ get_label()
-        if len(children) == 2:
-            code = f'''
-                {before_while_label} : 
-                {expr_code}
-                \tlw $t0, {children[0].type.size}($sp)
-                \tsub $t1, $t1, $t1
-                \tbeq $t0, $t1, {label}
-                {stmt_while_code}
-                \taddi $sp, $sp, 4
-                \tj {before_while_label}  
-            '''
-            return Node_Return(code=code, type=Type())
+
+        code = f'''
+            \t{symbol_table.last_scope().begin_label}:
+            {expr_code}
+            \tlw $t0, {children[0].type.size}($sp)
+            \tsub $t1, $t1, $t1
+            \tbeq $t0, $t1, {symbol_table.last_scope().end_label}
+            {stmt_while_code}
+            \taddi $sp, $sp, 4
+            \tj {symbol_table.last_scope().begin_label}  
+            \t{symbol_table.last_scope().end_label}:
+            \taddi $sp, $sp, 4
+            \taddi $sp, $sp, {symbol_table.last_scope().size()}
+        '''
+        symbol_table.pop_scope()
+        return Node_Return(code=code, type=Type())
+
 
     # condition_expr_less: expr "<" expr
     elif parse_tree.data == "condition_expr_less":

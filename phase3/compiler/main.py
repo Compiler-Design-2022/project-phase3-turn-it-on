@@ -13,7 +13,7 @@ def run(input_file_address: str) -> bool:
         int i;
         a=3;
         i = 0;
-        while(i<3)
+        while(i<2)
         {
             a = a + 1;
             i = i + 1; 
