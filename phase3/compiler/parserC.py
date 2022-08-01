@@ -119,7 +119,7 @@ def reprep(string):
 
 
 def replace_ident(string):
-    stopWords = ['.', ' ', '\n', ']', '[', '(', ')', ';', '!', '-', '\t', '*', '+', '=', '<', '>', '/', '%']
+    stopWords = ['.', ' ', '\n', ']', '[', '(', ')', ';', '!', '-', '\t', '*', '+', '=', '<', '>', '/', '%', ',']
     ans = ""
     current = ""
     for i in range(len(string)):
@@ -151,7 +151,7 @@ def parser(string):
     # linker_add_imports(string)
     string = replace_ident(string)
     string = re.sub("\[[ ]+\]", '[]', string)
-    # print(string)
+    print(string)
     return json_parser.parse(string), string
 
 
