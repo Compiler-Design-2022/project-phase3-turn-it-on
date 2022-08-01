@@ -117,9 +117,13 @@ class SymbolTable():
     def __init__(self):
         self.scope_stack: [Scope] = []
         self.vtable: [Method] = []
+        self.all_defined_scope = []
 
     def push_scope(self, scope: Scope):
         self.scope_stack.append(scope)
+
+    def push_all_defined_scope(self, scope: Scope):
+        self.all_defined_scope.append(scope)
 
     def get_method(self, name, input_types=None):
         pass
@@ -142,4 +146,9 @@ class SymbolTable():
         return self.scope_stack[len(self.scope_stack) - 1]
 
     def pop_scope(self):
+        #del self.scope_stack[-1]
+        #self.scope_stack = self.scope_stack[:-1]
         self.scope_stack.pop()
+
+    def last_all_defined_scope(self) -> Scope:
+        return self.all_defined_scope[len(self.all_defined_scope) - 1]

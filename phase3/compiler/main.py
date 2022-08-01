@@ -19,6 +19,8 @@ def run(input_file_address: str) -> bool:
         }else{
             Print(8);
         }
+        a = a / b;
+        Print(a);
         Print(9);
     }"""
     try:
