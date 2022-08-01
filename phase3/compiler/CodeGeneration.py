@@ -2,6 +2,7 @@ from SymbolTable import SymbolTable, Scope, Variable, Type, get_label
 import lark
 import copy
 
+
 class Node_Return:
     def __init__(self, code=None, type=None, scope=None, text=None):
         self.code = code
@@ -24,11 +25,8 @@ def cgen(parse_tree, symbol_table: SymbolTable):
     for child in parse_tree.children:
         child_return = cgen(child, symbol_table)
         children_return.append(child_return)
-    scope = None
-    try:
-        scope = symbol_table.last_all_defined_scope()
-    except:
-        pass
+
+    scope = symbol_table.last_scope()
 
     gen: Node_Return = after_enter(parse_tree, symbol_table, children_return)
     gen.scope = scope
@@ -36,10 +34,9 @@ def cgen(parse_tree, symbol_table: SymbolTable):
 
 
 def before_enter(parse_tree, symbol_table):
-    if parse_tree.data == "stmtblock":
+    if parse_tree.data == "stmt":
         new_scope = Scope()
         symbol_table.push_scope(new_scope)
-        symbol_table.push_all_defined_scope(new_scope)
     return
 
 
@@ -199,11 +196,11 @@ def after_enter(parse_tree, symbol_table, children):
         stmt_if_code = children[1].code
         if len(children) == 2:
             code = f'''{expr_code}
-                \tlw $t0, {children[1].type.size}($sp)
-                \taddi $sp, $sp, 4
+                \tlw $t0, {children[0].type.size}($sp)
                 \tsub $t1, $t1, $t1
                 \tbeq $t0, $t1, {label}
-                {stmt_if_code}          
+                {stmt_if_code} 
+                \taddi $sp, $sp, 4         
             '''
             return Node_Return(code=code, type=Type())
         else:
@@ -211,14 +208,35 @@ def after_enter(parse_tree, symbol_table, children):
             label_end = children[2].scope.end_label
             label_else_begin = children[2].scope.begin_label
             code = f'''{expr_code}
-                            \tlw $t0, {children[1].type.size}($sp)
-                            \taddi $sp, $sp, 4
+                            \tlw $t0, {children[0].type.size}($sp)
+                            
                             \tsub $t1, $t1, $t1
                             \tbeq $t0, $t1, {label_else_begin}
                             {stmt_if_code}
                             \tj {label_end}
-                            {stmt_else_code}         
+                            {stmt_else_code} 
+                            \taddi $sp, $sp, 4        
                         '''
+            return Node_Return(code=code, type=Type())
+
+    # whilestmt: "while""(" expr ")" stmt
+    elif parse_tree.data == "whilestmt":
+        label = children[1].scope.end_label
+        symbol_table.last_scope().pop_variable()
+        expr_code = children[0].code
+        stmt_while_code = children[1].code
+        before_while_label = "BeforeWhile"+ get_label()
+        if len(children) == 2:
+            code = f'''
+                {before_while_label} : 
+                {expr_code}
+                \tlw $t0, {children[0].type.size}($sp)
+                \tsub $t1, $t1, $t1
+                \tbeq $t0, $t1, {label}
+                {stmt_while_code}
+                \taddi $sp, $sp, 4
+                \tj {before_while_label}  
+            '''
             return Node_Return(code=code, type=Type())
 
     # condition_expr_less: expr "<" expr
@@ -245,7 +263,7 @@ def after_enter(parse_tree, symbol_table, children):
             sum += children[i].type.size
 
         code = "".join(child_codes_list)
-        org_sum=sum
+        org_sum = sum
         for child in reversed(children):
             symbol_table.last_scope().pop_variable()
             code += f'''
@@ -322,7 +340,7 @@ def after_enter(parse_tree, symbol_table, children):
                         '''
         return Node_Return(code=code, type=Type())
 
-    elif parse_tree.data == "stmtblock":
+    elif parse_tree.data == "stmt":
         code = f'''
         \t{symbol_table.last_scope().begin_label}:
         '''
@@ -330,9 +348,15 @@ def after_enter(parse_tree, symbol_table, children):
         for child in children:
             code += child.code
         code += f'''
+        \taddi $sp, $sp, {symbol_table.last_scope().size()}
         \t{symbol_table.last_scope().end_label}:
         '''
         symbol_table.pop_scope()
+        return Node_Return(code=code, type=Type())
+    elif parse_tree.data == "stmtblock":
+        code = ""
+        for child in children:
+            code += child.code
         return Node_Return(code=code, type=Type())
     else:
         code = ''

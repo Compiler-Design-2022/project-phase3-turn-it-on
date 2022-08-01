@@ -1,7 +1,7 @@
 import re
 from lark import Lark
 
-grammer=r"""
+grammer = r"""
     program: macro* decl+
     macro: "import" ESCAPED_STRING
     decl: variable_decl | function_decl | class_decl | interface_decl
@@ -15,8 +15,7 @@ grammer=r"""
     access_mode: /private/ | /public/ | /protected/ | null
     interface_decl: "interface" ident "{" prototype* "}"
     prototype: type ident "(" formals ")"";" | /void/ ident "(" formals ")" ";" 
-    stmtblock: "{" variable_decl* stmt* "}"
-    linestmtblock: variable_decl | stmt 
+    stmtblock: "{" variable_decl* stmt* "}" 
     stmt: expr? ";" | ifstmt | whilestmt | whilestmt | forstmt | breakstmt | continuestmt | returnstmt | printstmt | stmtblock     
     ifstmt: "if""(" expr ")" stmt ("else" stmt)?
     whilestmt: "while""(" expr ")" stmt
@@ -112,7 +111,7 @@ def reprep(string):
         ", ")
     if string not in keywords and (
             re.match("[a-zA-Z][a-zA-Z0-9_]*", string) or re.match("__func__[a-zA-Z0-9_]*", string) or re.match(
-            "__line__[a-zA-Z0-9_]*", string)):
+        "__line__[a-zA-Z0-9_]*", string)):
         return "@" + string
     else:
         return string
@@ -144,7 +143,11 @@ def linker_add_imports(string):
             parser(open(sp_line[1][1:-1]).read())
     return ans
 
+
 def parser(string):
+    if string.find("print") != -1:
+        print("RIDI")
+        raise ValueError
     string = replace_defines(string + ' ')
     string = remove_comment(string)
     string = string.replace(");", ") ;")

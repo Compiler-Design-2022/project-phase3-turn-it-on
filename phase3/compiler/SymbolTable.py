@@ -83,7 +83,11 @@ class Scope():
         self.for_scope = for_scope
         self.method_scope = method_scope
 
+    def __str__(self):
+        return self.begin_label + "(*)" + self.end_label
+
     def push_variable(self, variable: Variable):
+        print("push variable : ", variable.name, variable.type.size)
         self.variables.append(variable)
 
     def last_variable(self):
@@ -98,8 +102,9 @@ class Scope():
         return None
 
     def pop_variable(self):
-        self.variables.pop()
-
+        variable = self.variables.pop()
+        print("pop variable : ", variable.name, variable.type.size)
+        
     def get_variable(self, name):
         for i in range(len(self.variables) - 1, -1, -1):
             if self.variables[i].name == name:
@@ -109,7 +114,7 @@ class Scope():
     def size(self):
         ans = 0
         for variable in self.variables:
-            ans += variable.size()
+            ans += variable.type.size
         return ans
 
 
@@ -117,13 +122,10 @@ class SymbolTable():
     def __init__(self):
         self.scope_stack: [Scope] = []
         self.vtable: [Method] = []
-        self.all_defined_scope = []
 
     def push_scope(self, scope: Scope):
+        print("push scope ")
         self.scope_stack.append(scope)
-
-    def push_all_defined_scope(self, scope: Scope):
-        self.all_defined_scope.append(scope)
 
     def get_method(self, name, input_types=None):
         pass
@@ -132,6 +134,7 @@ class SymbolTable():
         offset = 0
         for i in range(len(self.scope_stack) - 1, -1, -1):
             if self.scope_stack[i].get_address_diff(name) is not None:
+                print("LOL" , name, offset + self.scope_stack[i].get_address_diff(name), offset)
                 return offset + self.scope_stack[i].get_address_diff(name)
             offset += self.scope_stack[i].size()
         raise ValueError  # value doesn't declared
@@ -146,8 +149,7 @@ class SymbolTable():
         return self.scope_stack[len(self.scope_stack) - 1]
 
     def pop_scope(self):
-        #del self.scope_stack[-1]
-        #self.scope_stack = self.scope_stack[:-1]
+        print("pop scope ")
         self.scope_stack.pop()
 
     def last_all_defined_scope(self) -> Scope:
