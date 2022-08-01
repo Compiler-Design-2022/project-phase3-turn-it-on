@@ -10,10 +10,13 @@ def run(input_file_address: str) -> bool:
     input_content = """
     int main() {
         int a;
+        a=3;
         int b;
-        a=5;
-        b=6;
-        Print(a, b);
+        b=5;
+        Print(a);
+        Print(b);
+        Print(a,b);
+        Print(b,a);
     }"""
     try:
         print(input_content)
