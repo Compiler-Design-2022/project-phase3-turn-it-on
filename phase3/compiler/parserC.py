@@ -19,9 +19,8 @@ grammer = r"""
     stmt: expr? ";" | ifstmt | whilestmt | whilestmt | forstmt | breakstmt | continuestmt | returnstmt | printstmt | stmtblock     
     ifstmt: "if""(" expr ")" stmt ("else" stmt)?
     whilestmt: "while""(" expr ")" stmt
-    forstmt: "for" "(" first_forstmt_part ";" second_forstmt_part ";" third_forstmt_part ")" stmt
+    forstmt: "for" "(" first_forstmt_part ";" expr ";" third_forstmt_part ")" stmt
     first_forstmt_part: expr?
-    second_forstmt_part: expr
     third_forstmt_part: expr?
     returnstmt: "return" expr? ";"
     breakstmt: "break" ";"

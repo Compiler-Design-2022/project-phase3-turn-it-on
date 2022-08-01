@@ -45,8 +45,13 @@ class Type():
         self.name = name
         self.length = None
         self.inside_type = None
-        if name == "int":
+        if name == "bool":
             self.size = 4
+        elif name == "int":
+            self.size = 4
+        elif name == "ref":
+            self.size = 4
+            self.inside_type = inside_type
         elif name == "double":
             self.size = 8
         elif name == "string":
@@ -66,6 +71,9 @@ class Type():
         if self.length != other.length:
             return False
         return self.inside_type == other.inside_type
+
+    def merge_type(self, other):
+        return self  # TODO
 
 
 class Variable():
@@ -104,7 +112,7 @@ class Scope():
     def pop_variable(self):
         variable = self.variables.pop()
         print("pop variable : ", variable.name, variable.type.size)
-        
+
     def get_variable(self, name):
         for i in range(len(self.variables) - 1, -1, -1):
             if self.variables[i].name == name:
@@ -134,7 +142,7 @@ class SymbolTable():
         offset = 0
         for i in range(len(self.scope_stack) - 1, -1, -1):
             if self.scope_stack[i].get_address_diff(name) is not None:
-                print("LOL" , name, offset + self.scope_stack[i].get_address_diff(name), offset)
+                print("LOL", name, offset + self.scope_stack[i].get_address_diff(name), offset)
                 return offset + self.scope_stack[i].get_address_diff(name)
             offset += self.scope_stack[i].size()
         raise ValueError  # value doesn't declared
