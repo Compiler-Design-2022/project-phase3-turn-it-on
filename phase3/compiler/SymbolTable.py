@@ -78,8 +78,8 @@ class Scope():
     def __init__(self, for_scope=False, method_scope=False):
         self.variables = []
         scope_name = get_label()
-        self.begin_lable = scope_name + "_start"
-        self.end_labele = scope_name + "_end"
+        self.begin_label = scope_name + "_start"
+        self.end_label = scope_name + "_end"
         self.for_scope = for_scope
         self.method_scope = method_scope
 
@@ -136,8 +136,7 @@ class SymbolTable():
         for i in range(len(self.scope_stack) - 1, -1, -1):
             if self.scope_stack[i].get_variable(name) is not None:
                 return self.scope_stack[i].get_variable(name)
-        print("NAME", name)
-        raise ValueError  # value doesn't declared
+        raise ValueError(name)  # value doesn't declared
 
     def last_scope(self) -> Scope:
         return self.scope_stack[len(self.scope_stack) - 1]
