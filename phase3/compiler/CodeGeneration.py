@@ -245,7 +245,7 @@ def after_enter(parse_tree, symbol_table, children):
             sum += children[i].type.size
 
         code = "".join(child_codes_list)
-
+        org_sum=sum
         for child in reversed(children):
             symbol_table.last_scope().pop_variable()
             code += f'''
@@ -259,7 +259,7 @@ def after_enter(parse_tree, symbol_table, children):
             '''
             sum -= child.type.size
         code += f'''
-            \taddi $sp, $sp, {sum}
+            \taddi $sp, $sp, {org_sum}
             \tli $a0, 10
             \tli $v0, 11  
             \tsyscall
