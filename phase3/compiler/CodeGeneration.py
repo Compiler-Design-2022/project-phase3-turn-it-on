@@ -49,6 +49,8 @@ def before_enter(parse_tree, symbol_table):
 def after_enter(parse_tree, symbol_table, children):
     """ variable: type ident """
     if parse_tree.data == "type":
+        if children[0].text == None: 
+            return children[0]
         return Node_Return(code="", type=Type(children[0].text))
     elif parse_tree.data == "ident":
         return Node_Return(code="", type=None, text=children[0].text)
@@ -63,6 +65,53 @@ def after_enter(parse_tree, symbol_table, children):
         addi $sp, $sp, -{variable.type.size}
         '''
         return Node_Return(code=code, type=None)
+
+    if parse_tree.data == "lvalue":  # DOTO array, class
+        if parse_tree.children[0].data != "ident":
+            return children[0]
+        diff = symbol_table.get_address_diff(children[0].text)
+        var = symbol_table.get_variable(children[0].text)
+        symbol_table.last_scope().push_variable(Variable("__IGNORE", var.type))
+        code = f'''
+        \taddi $t0, $sp, {diff}
+        \tsw $t0, 0($sp)
+        \taddi $sp, $sp, -4
+        '''
+        return Node_Return(code=code, type=Type("ref", inside_type=var.type))
+
+    elif parse_tree.data == "new_array_expr": #TODO differrent type different code 
+        expr_code = children[0].code
+
+        code = f'''
+            \t{expr_code}
+            \t lw $t0, {children[0].type.size}($sp)
+            \t sub $t1, $t1, $t1 
+            \t addi $t1, $t1, {children[1].type.size}
+            \t mul $t0, $t0, $t1
+            \t move $a0, $t0
+            \t li $v0, 9 
+            \t syscall
+            \t sw $v0, {children[0].type.size}($sp)
+
+        '''
+        return Node_Return(code=code, type=Type("ref", inside_type=children[1].type))
+
+    # array_val: expr "[" expr "]"
+    elif parse_tree.data == "array_val": 
+        left_expr_code = children[0].code
+        right_expr_code = children[1].code
+        symbol_table.last_scope().pop_variable()
+        code = f'''{left_expr_code} {right_expr_code}
+                    \tlw $t0, {children[1].type.size}($sp)
+                    \tlw $t1, {children[1].type.size + children[0].type.size}($sp)
+                    \tli $t2, {children[0].type.size}
+                    \tmul $t0, $t0, $t2 
+                    \tadd $t0, $t0, $t1
+                    \taddi $sp, $sp, {children[1].type.size + children[0].type.size}
+                    \tsw $t0, 0($sp)
+                    \taddi $sp, $sp, -4
+                '''
+        return Node_Return(code=code, type=children[0].type)
 
     # assignment_expr_empty: lvalue "=" expr
     elif parse_tree.data == "assignment_expr_empty":
@@ -407,56 +456,6 @@ def after_enter(parse_tree, symbol_table, children):
                 '''
         return Node_Return(code=code, type=Type())
 
-    # new_array_expr: "NewArray" "(" expr "," type ")"
-    elif parse_tree.data == "new_array_expr":
-        #symbol_table.last_scope().pop_variable()
-        number_of_elements = children[0].code
-        size_of_each_element = children[1].type.size
-        mem_need = number_of_elements * size_of_each_element 
-
-        variable = Variable(symbol_table.last_name_array()+"_0", children[1].type)
-        symbol_table.last_scope().push_variable(variable)
-        for i in range(number_of_elements):
-            var = Variable(symbol_table.last_name_array()+f'_{i+1}', children[1].type)
-            symbol_table.last_scope().push_variable(var)
-        code = f'''
-        addi $sp, $sp, -{mem_need}
-        '''
-        #code = f'''
-        #    \t.data
-        #    \t\t{symbol_table.last_name_array()}: .space {mem_need}
-        #    \t.text
-        #'''
-        #symbol_table.pop_scope()
-        return Node_Return(code=code, type=None)
-
-    # lvalue: ident |  class_val | array_val
-    if parse_tree.data == "lvalue":  # DOTO array, class
-        if len(childre) == 1: # ident
-            diff = symbol_table.get_address_diff(children[0].text)
-            var = symbol_table.get_variable(children[0].text)
-            symbol_table.last_scope().push_variable(Variable("__IGNORE", var.type))
-            code = f'''
-            \taddi $t0, $sp, {diff}
-            \tsw $t0, 0($sp)
-            \taddi $sp, $sp, -4
-            '''
-        elif len(children) == 2: # array_val
-            # array_val: expr "[" expr "]" 
-            # if lvalue is array_val:
-            diff = symbol_table.get_address_diff(children[0].text)
-            element_number = children[0].code
-            var = symbol_table.get_variable(children[0].text+"_0")
-            size = var.type.size
-            diff -= size * element_number
-            symbol_table.last_scope().push_variable(Variable("__IGNORE", var.type))
-            code = f'''
-            \taddi $t0, $sp, {diff}
-            \tsw $t0, 0($sp)
-            \taddi $sp, $sp, -4
-            '''
-
-        return Node_Return(code=code, type=Type("ref", inside_type=var.type))
 
     # lvalue_exp: lvalue
     elif parse_tree.data == "lvalue_exp":
