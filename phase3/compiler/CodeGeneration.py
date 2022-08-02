@@ -66,6 +66,7 @@ def after_enter(parse_tree, symbol_table, children):
         '''
         return Node_Return(code=code, type=None)
 
+    # lvalue: ident |  class_val | array_val
     if parse_tree.data == "lvalue":  # DOTO array, class
         if parse_tree.children[0].data != "ident":
             return children[0]
@@ -79,6 +80,7 @@ def after_enter(parse_tree, symbol_table, children):
         '''
         return Node_Return(code=code, type=Type("ref", inside_type=var.type))
 
+    # new_array_expr: "NewArray" "(" expr "," type ")"
     elif parse_tree.data == "new_array_expr": #TODO differrent type different code 
         expr_code = children[0].code
 
@@ -285,6 +287,7 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.pop_scope()
         return Node_Return(code=code, type=None)
 
+    # forstmt: "for" "(" first_forstmt_part ";" expr ";" third_forstmt_part ")" stmt
     elif parse_tree.data == "forstmt":
         first_part_code_type_size, third_part_code_type_size, id = 0, 0, 0
         first_part_code, increment_code = "", ""
@@ -327,6 +330,7 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.pop_scope()
         return Node_Return(code=code, type=None)
 
+    # breakstmt: "break" ";"
     elif parse_tree.data == "breakstmt":
         jlabel = None
         pop_size = 0
@@ -346,6 +350,7 @@ def after_enter(parse_tree, symbol_table, children):
                             '''
         return Node_Return(code=code, type=None)
 
+    # continuestmt: "continue" ";"
     elif parse_tree.data == "continuestmt":
         jlabel = None
         pop_size = 0
@@ -466,6 +471,7 @@ def after_enter(parse_tree, symbol_table, children):
                         '''
         return Node_Return(code=code, type=children[0].type.inside_type)
 
+    # stmt: expr? ";" | ifstmt | whilestmt | whilestmt | forstmt | breakstmt | continuestmt | returnstmt | printstmt | stmtblock  
     elif parse_tree.data == "stmt":
         code = f'''
         \t{symbol_table.last_scope().begin_label}:
@@ -479,6 +485,8 @@ def after_enter(parse_tree, symbol_table, children):
         '''
         symbol_table.pop_scope()
         return Node_Return(code=code, type=None)
+
+    # stmtblock: "{" variable_decl* stmt* "}" 
     elif parse_tree.data == "stmtblock":
         code = ""
         for child in children:
