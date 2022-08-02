@@ -18,7 +18,7 @@ def cgen_token(token: lark.Token, symboltable: SymbolTable):
 def cgen(parse_tree, symbol_table: SymbolTable):
     if parse_tree.__class__ is lark.Token:
         return cgen_token(parse_tree, symbol_table)
-
+    
     print("^" * 60, parse_tree.data, parse_tree._meta)
     before_enter(parse_tree, symbol_table)
     children_return = []
@@ -27,7 +27,7 @@ def cgen(parse_tree, symbol_table: SymbolTable):
         children_return.append(child_return)
 
     scope = symbol_table.last_scope()
-
+    print(len(symbol_table.scope_stack))
     gen: Node_Return = after_enter(parse_tree, symbol_table, children_return)
     gen.scope = scope
     return gen
@@ -61,8 +61,12 @@ def after_enter(parse_tree, symbol_table, children):
     elif parse_tree.data == "variable":
         variable = Variable(children[1].text, children[0].type)
         symbol_table.last_scope().push_variable(variable)
+        
+        # init value is 0 for int #TODO  string double ... 
         code = f'''
-        addi $sp, $sp, -{variable.type.size}
+            sub $t1, $t1, $t1
+            sw $t0, 0($sp)
+            addi $sp, $sp, -{variable.type.size}
         '''
         return Node_Return(code=code, type=None)
 
@@ -127,7 +131,7 @@ def after_enter(parse_tree, symbol_table, children):
             \tsw $t0, 0($t1)
             \taddi $sp, $sp, {children[1].type.size + children[0].type.size}
         '''
-        return Node_Return(code=code, type=children[1].type)
+        return Node_Return(code=code, type=children[1].type, text="assignment_expr_empty")
 
     # assignment_expr_with_plus: lvalue "+=" expr
     elif parse_tree.data == "assignment_expr_with_plus":
@@ -292,7 +296,7 @@ def after_enter(parse_tree, symbol_table, children):
         first_part_code_type_size, third_part_code_type_size, id = 0, 0, 0
         first_part_code, increment_code = "", ""
         if parse_tree.children[id].data == "first_forstmt_part":
-            symbol_table.last_scope().pop_variable()
+            #symbol_table.last_scope().pop_variable()
             first_part_code_type_size = children[id].type.size
             first_part_code += children[id].code
             id += 1
@@ -303,23 +307,25 @@ def after_enter(parse_tree, symbol_table, children):
         id += 1
 
         if parse_tree.children[id].data == "third_forstmt_part":
-            symbol_table.last_scope().pop_variable()
+            #symbol_table.last_scope().pop_variable()
             third_part_code_type_size += children[id].type.size
             increment_code += children[id].code
             id += 1
 
         stmt_for_code = children[id].code
 
+        # remove \taddi $sp, $sp, {first_part_code_type_size} from second line
+        # remove \taddi $sp, $sp, 4 from line below stmt_for_code
         code = f'''
             {first_part_code}
-            \taddi $sp, $sp, {first_part_code_type_size}
+            
             \t{symbol_table.last_scope().begin_label}:
             {condition_code}
             \tlw $t0, {condition_child.type.size}($sp)
             \tsub $t1, $t1, $t1
             \tbeq $t0, $t1, {symbol_table.last_scope().end_label}
             {stmt_for_code}
-            \taddi $sp, $sp, 4
+            
             {increment_code}
             \taddi $sp, $sp, {third_part_code_type_size}
             \tj {symbol_table.last_scope().begin_label}  
@@ -370,6 +376,22 @@ def after_enter(parse_tree, symbol_table, children):
                             '''
         return Node_Return(code=code, type=None)
 
+    # condition_expr_equal: expr "==" expr
+    elif parse_tree.data == "condition_expr_equal":
+        left_expr_code = children[0].code
+        right_expr_code = children[1].code
+        symbol_table.last_scope().pop_variable()  # t0 right t1 left
+        # seq $t0, $t0, $t1 ------>>>>> $t0 will be 1 if $t0 and $t1 are equal, and zero otherwise
+        code = f'''{left_expr_code} {right_expr_code} 
+                    \tlw $t0, {children[1].type.size}($sp)
+                    \tlw $t1, {children[1].type.size + children[0].type.size}($sp)
+                    \tseq $t0, $t0, $t1
+                    \taddi $sp, $sp, {children[1].type.size + children[0].type.size}
+                    \tsw $t0, 0($sp)
+                    \taddi $sp, $sp, -4
+                '''
+        return Node_Return(code=code, type=Type("bool"))
+
     # condition_expr_less: expr "<" expr
     elif parse_tree.data == "condition_expr_less":
         left_expr_code = children[0].code
@@ -379,6 +401,21 @@ def after_enter(parse_tree, symbol_table, children):
                     \tlw $t0, {children[1].type.size}($sp)
                     \tlw $t1, {children[1].type.size + children[0].type.size}($sp)
                     \tslt $t0, $t1, $t0
+                    \taddi $sp, $sp, {children[1].type.size + children[0].type.size}
+                    \tsw $t0, 0($sp)
+                    \taddi $sp, $sp, -4
+                '''
+        return Node_Return(code=code, type=Type("bool"))
+
+    # condition_expr_greater: expr ">" expr
+    elif parse_tree.data == "condition_expr_greater":
+        left_expr_code = children[0].code
+        right_expr_code = children[1].code
+        symbol_table.last_scope().pop_variable()  # t0 right t1 left
+        code = f'''{left_expr_code} {right_expr_code} 
+                    \tlw $t0, {children[1].type.size}($sp)
+                    \tlw $t1, {children[1].type.size + children[0].type.size}($sp)
+                    \tslt $t0, $t0, $t1
                     \taddi $sp, $sp, {children[1].type.size + children[0].type.size}
                     \tsw $t0, 0($sp)
                     \taddi $sp, $sp, -4
@@ -396,7 +433,8 @@ def after_enter(parse_tree, symbol_table, children):
         code = "".join(child_codes_list)
         org_sum = sum
         for child in reversed(children):
-            symbol_table.last_scope().pop_variable()
+            if len(symbol_table.last_scope().variables) > 0:
+                symbol_table.last_scope().pop_variable()
             code += f'''
             \t lw $t0, {sum}($sp)
             \t li $v0, 1
@@ -407,6 +445,10 @@ def after_enter(parse_tree, symbol_table, children):
             \tsyscall
             '''
             sum -= child.type.size
+
+        # org_sum must be 0 if expr in printstmt rule is assignment_expr
+        if len(children) == 1 and children[0].text == "assignment_expr_empty":
+            org_sum = 0;
         code += f'''
             \taddi $sp, $sp, {org_sum}
             \tli $a0, 10
@@ -453,7 +495,7 @@ def after_enter(parse_tree, symbol_table, children):
         code = f'''{left_expr_code} {right_expr_code}
                     \tlw $t0, {children[1].type.size}($sp)
                     \tlw $t1, {children[1].type.size + children[0].type.size}($sp)
-                    \tdiv $t1, $t0
+                    \tdivu $t1, $t0
                     \tmfhi $t0       # temp for the mod
                     \taddi $sp, $sp, {children[1].type.size + children[0].type.size}
                     \tsw $t0, 0($sp)
@@ -484,7 +526,7 @@ def after_enter(parse_tree, symbol_table, children):
         \t{symbol_table.last_scope().end_label}:
         '''
         symbol_table.pop_scope()
-        return Node_Return(code=code, type=None)
+        return Node_Return(code=code, type=None, text=children[0].text)
 
     # stmtblock: "{" variable_decl* stmt* "}" 
     elif parse_tree.data == "stmtblock":
@@ -492,6 +534,14 @@ def after_enter(parse_tree, symbol_table, children):
         for child in children:
             code += child.code
         return Node_Return(code=code, type=None)
+    elif parse_tree.data == "expr" or parse_tree.data == "assignment_expr":
+        code = ''
+        for child in children:
+            if child.code is not None:
+                code += child.code
+            else:
+                code += child.text
+        return Node_Return(code=code, type=Type(), text=children[0].text)  # TODO: not good!
     else:
         code = ''
         for child in children:

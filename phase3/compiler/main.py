@@ -8,24 +8,16 @@ def run(input_file_address: str) -> bool:
     # input_file = open(input_file_address)
     # input_content = input_file.read()
     input_content = """
-    int main(){
+    int main() {
+    int i;
 
-    int[][] a;
-	
-    a = NewArray(2, int[]);
-	a[0] = NewArray(3, int);
-	a[1] = NewArray(1, int);
-	
-	a[0][0] = 10;
-	a[0][1] = 20;
-	a[0][2] = 30;
-	a[1][0] = 40;
-	
-	Print(a[0][0]);
-	Print(a[0][1]);
-	Print(a[0][2]);
-	Print(a[1][0]);
+    i = 10;
+    while (i > 0) {
+        Print (i = i - 1);
+        i = i - 1;
+        if (i == 5) break;
     }
+}
     """
     try:
         print(input_content)
