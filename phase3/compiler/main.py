@@ -8,23 +8,25 @@ def run(input_file_address: str) -> bool:
     # input_file = open(input_file_address)
     # input_content = input_file.read()
     input_content = """
-    int main() {
-        int a;
-        int i;
-        a=3;
-        i = 0;
-        for(i=0;i<2;i+=1)
-        {
-            if (3<a)
-            {
-                continue; 
-            }
-            a = a + 1;
-            i = i + 1; 
-        }
+    int main(){
 
-        Print(a);
-    }"""
+    int[][] a;
+	
+    a = NewArray(2, int[]);
+	a[0] = NewArray(3, int);
+	a[1] = NewArray(1, int);
+	
+	a[0][0] = 10;
+	a[0][1] = 20;
+	a[0][2] = 30;
+	a[1][0] = 40;
+	
+	Print(a[0][0]);
+	Print(a[0][1]);
+	Print(a[0][2]);
+	Print(a[1][0]);
+    }
+    """
     try:
         print(input_content)
         parse_tree, code = parser(input_content)
