@@ -58,6 +58,10 @@ def after_enter(parse_tree, symbol_table, children):
         return Node_Return(code="", type=None, text="")
     elif parse_tree.data == "constant_token":
         return Node_Return(code="", type=children[0].type, text=children[0].text)
+    elif parse_tree.data == "boolconstant_true":
+        return Node_Return(code="", type=Type(), text=1)
+    elif parse_tree.data == "boolconstant_false":
+        return Node_Return(code="", type=Type(), text=0)
     elif parse_tree.data == "variable":
         variable = Variable(children[1].text, children[0].type)
         symbol_table.last_scope().push_variable(variable)
@@ -206,6 +210,10 @@ def after_enter(parse_tree, symbol_table, children):
                     \taddi $sp, $sp, -{children[0].type.size}
                 '''
         return Node_Return(code=code, type=children[0].type)
+
+     # boolconstant: boolconstant_true | boolconstant_false 
+    elif parse_tree.data == "boolconstant":  # TODO only int
+        return Node_Return(code="", type=children[0].type, text=children[0].text)
 
     # math_expr_sum: expr "+" expr
     elif parse_tree.data == "math_expr_sum":
@@ -526,8 +534,10 @@ def after_enter(parse_tree, symbol_table, children):
         \t{symbol_table.last_scope().end_label}:
         '''
         symbol_table.pop_scope()
-        return Node_Return(code=code, type=None, text=children[0].text)
+        if len(children) > 0:
+            return Node_Return(code=code, type=None, text=children[0].text)
 
+        return Node_Return(code=code, type=None)
     # stmtblock: "{" variable_decl* stmt* "}" 
     elif parse_tree.data == "stmtblock":
         code = ""

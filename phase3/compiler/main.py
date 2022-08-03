@@ -9,14 +9,7 @@ def run(input_file_address: str) -> bool:
     # input_content = input_file.read()
     input_content = """
     int main() {
-    int i;
-
-    i = 10;
-    while (i > 0) {
-        Print (i = i - 1);
-        i = i - 1;
-        if (i == 5) break;
-    }
+    for ( ; false ; ) ;
 }
     """
     try:
