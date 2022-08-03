@@ -355,7 +355,7 @@ def after_enter(parse_tree, symbol_table, children):
                 break
             else:
                 pop_size += scope.size()
-
+        
         if jlabel is None:
             raise ValueError
         code = f'''
@@ -376,6 +376,8 @@ def after_enter(parse_tree, symbol_table, children):
             else:
                 pop_size += scope.size()
 
+        breakstmt_label = symbol_table.last_scope().begin_label
+        jlabel = "LABEL" + str(int(breakstmt_label[breakstmt_label.index("LABEL")+5 : breakstmt_label.index("_start")]) + 1) + "_end"
         if jlabel is None:
             raise ValueError
         code = f'''
@@ -394,6 +396,22 @@ def after_enter(parse_tree, symbol_table, children):
                     \tlw $t0, {children[1].type.size}($sp)
                     \tlw $t1, {children[1].type.size + children[0].type.size}($sp)
                     \tseq $t0, $t0, $t1
+                    \taddi $sp, $sp, {children[1].type.size + children[0].type.size}
+                    \tsw $t0, 0($sp)
+                    \taddi $sp, $sp, -4
+                '''
+        return Node_Return(code=code, type=Type("bool"))
+
+    # condition_expr_equal: expr "<=" expr
+    elif parse_tree.data == "condition_expr_less_equal":
+        left_expr_code = children[0].code
+        right_expr_code = children[1].code
+        symbol_table.last_scope().pop_variable()  # t0 right t1 left
+        # sle $t0, $t0, $t1 ------>>>>> $t0 will be 1 if $t0 <= $t1 , and zero otherwise
+        code = f'''{left_expr_code} {right_expr_code} 
+                    \tlw $t0, {children[1].type.size}($sp)
+                    \tlw $t1, {children[1].type.size + children[0].type.size}($sp)
+                    \tsle $t0, $t1, $t0
                     \taddi $sp, $sp, {children[1].type.size + children[0].type.size}
                     \tsw $t0, 0($sp)
                     \taddi $sp, $sp, -4
