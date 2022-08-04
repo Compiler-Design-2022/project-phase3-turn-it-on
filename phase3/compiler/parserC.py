@@ -81,7 +81,7 @@ grammer = r"""
     
     actuals: expr ("," expr)* | null
     constant: doubleconstant | constant_token | boolconstant  
-    constant_token: INT | ESCAPED_STRING | base16 | "null"
+    constant_token: INT | STRING | base16 | "null"
     null:
     ident: /@[a-zA-Z][a-zA-Z0-9_]*/ | /@__func__[a-zA-Z0-9_]*/ | /@__line__[a-zA-Z0-9_]*/ 
     doubleconstant: /[0-9]+/"."/[0-9]+/ | /[0-9]+/"." | /[0-9]+/"."/[0-9]*[Ee][+-]?[0-9]+/
@@ -90,7 +90,7 @@ grammer = r"""
     boolconstant_false: "false"
     base16: /0[xX][0-9a-fA-F]+/
     INT: /[0-9]+/
-    
+    STRING : /"[^"]*"/
     
     %import common.ESCAPED_STRING
     %import common.WS
@@ -157,6 +157,8 @@ def parser(string):
     string = replace_ident(string)
     string = re.sub("\[[ ]+\]", '[]', string)
     print(string)
+    for x in string: 
+        print(x, end="---") 
     return json_parser.parse(string), string
 
 

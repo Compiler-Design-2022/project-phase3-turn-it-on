@@ -1,4 +1,4 @@
-from SymbolTable import SymbolTable, Scope, Variable, Type, get_label
+from SymbolTable import SymbolTable, Scope, Variable, Type, get_label, get_string_number
 import lark
 import copy
 
@@ -12,7 +12,13 @@ class Node_Return:
 
 
 def cgen_token(token: lark.Token, symboltable: SymbolTable):
-    return Node_Return(text=token.value, type=Type())
+    type = Type()
+    if token.value[0] == "\"" :
+        token.value = token.value.replace("@", "")
+        type = Type("string")     
+        token.value = token.value.replace("\n", "\\n")
+        print("salam salam", token.value)
+    return Node_Return(text=token.value, type=type)
 
 
 def cgen(parse_tree, symbol_table: SymbolTable):
@@ -59,7 +65,19 @@ def after_enter(parse_tree, symbol_table, children):
     elif parse_tree.data == "null":
         return Node_Return(code="", type=None, text="")
     elif parse_tree.data == "constant_token":
-        return Node_Return(code="", type=children[0].type, text=children[0].text)
+        code = ""
+        if children[0].type.name == "string":
+            string_name = f"{symbol_table.last_scope().begin_label}_{get_string_number()}"
+            code += f'''
+                .data
+                \t {string_name}: .asciiz      {children[0].text}
+                .text
+                \tla $t0, {string_name}
+                \tsw $t0, 0($sp)
+                \taddi $sp, $sp, -4
+            '''
+            symbol_table.last_scope().push_variable(Variable("__IGNORE", children[0].type))
+        return Node_Return(code=code, type=children[0].type, text=children[0].text)
     elif parse_tree.data == "boolconstant_true":
         return Node_Return(code="", type=Type("bool"), text=1)
     elif parse_tree.data == "boolconstant_false":
@@ -206,6 +224,8 @@ def after_enter(parse_tree, symbol_table, children):
 
     # constant: doubleconstant | constant_token | boolconstant
     elif parse_tree.data == "constant":  # TODO only int
+        if children[0].type.name == "string":
+            return Node_Return(code=children[0].code, type=children[0].type)
         symbol_table.last_scope().push_variable(Variable("__IGNORE", children[0].type))
         code = f''' \tsub $t0, $t0, $t0
                     \taddi $t0, $t0, {children[0].text}
@@ -467,15 +487,26 @@ def after_enter(parse_tree, symbol_table, children):
         for child in reversed(children):
             if len(symbol_table.last_scope().variables) > 0:
                 symbol_table.last_scope().pop_variable()
-            code += f'''
-            \t lw $t0, {sum}($sp)
-            \t li $v0, 1
-            \t move $a0, $t0
-            \t syscall
-            \tli $a0, 32
-            \tli $v0, 11  
-            \tsyscall
-            '''
+            if child.type.name == "string":
+                code += f'''
+                \t lw $t0, {sum}($sp)
+                \t li $v0, 4
+                \t move $a0, $t0
+                \t syscall
+                \tli $a0, 32
+                \tli $v0, 11  
+                \tsyscall
+                '''
+            else:
+                code += f'''
+                \t lw $t0, {sum}($sp)
+                \t li $v0, 1
+                \t move $a0, $t0
+                \t syscall
+                \tli $a0, 32
+                \tli $v0, 11  
+                \tsyscall
+                '''
             sum -= child.type.size
 
         # org_sum must be 0 if expr in printstmt rule is assignment_expr

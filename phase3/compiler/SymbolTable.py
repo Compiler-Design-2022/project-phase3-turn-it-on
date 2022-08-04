@@ -27,6 +27,11 @@ def get_label():
     scope_counter += 1
     return "LABEL" + str(scope_counter)
 
+string_number_counter = 0 
+def get_string_number():
+    global string_number_counter
+    string_number_counter += 1
+    return "String" + str(string_number_counter)
 
 class Method():
     def __int__(self, name, output_type, input_variables):
