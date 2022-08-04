@@ -2,7 +2,8 @@ import random
 import string
 
 scope_counter = 0
-
+string_number_counter = 0 
+function_number_counter = 0 
 
 class Class:
     def __init__(self, classname, superclass):
@@ -27,11 +28,15 @@ def get_label():
     scope_counter += 1
     return "LABEL" + str(scope_counter)
 
-string_number_counter = 0 
 def get_string_number():
     global string_number_counter
     string_number_counter += 1
     return "String" + str(string_number_counter)
+
+def get_function_number():
+    global function_number_counter
+    function_number_counter += 1
+    return "FUNCTION_" + str(string_number_counter)
 
 class Method():
     def __int__(self, name, output_type, input_variables):
@@ -95,13 +100,14 @@ class Variable():
 
 
 class Scope():
-    def __init__(self, for_scope=False, method_scope=False):
+    def __init__(self, scope_name=get_label(), for_scope=False, method_scope=False):
         self.variables = []
-        scope_name = get_label()
+        self.scope_name = scope_name
         self.begin_label = scope_name + "_start"
         self.end_label = scope_name + "_end"
         self.for_scope = for_scope
         self.method_scope = method_scope
+        self.mehod_input_types = []
         self.continue_label = scope_name + "_continue"
 
     def __str__(self):
@@ -143,6 +149,7 @@ class SymbolTable():
     def __init__(self):
         self.scope_stack: [Scope] = []
         self.vtable: [Method] = []
+        self.scope_function_declared: [Scope] = []
 
     def push_scope(self, scope: Scope):
         print("push scope ")
@@ -175,3 +182,8 @@ class SymbolTable():
 
     def last_all_defined_scope(self) -> Scope:
         return self.all_defined_scope[len(self.all_defined_scope) - 1]
+
+    def get_function_with_types(self, types):
+        for scope in self.scope_function_declared:
+            if scope.method_scope and types = scope.mehod_input_types:
+                return scope.scope_name, scope

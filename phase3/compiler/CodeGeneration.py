@@ -92,7 +92,7 @@ def after_enter(parse_tree, symbol_table, children):
             sw $t0, 0($sp)
             addi $sp, $sp, -{variable.type.size}
         '''
-        return Node_Return(code=code, type=None)
+        return Node_Return(code=code, type=children[0].type, text=children[1].text)
 
     # lvalue: ident |  class_val | array_val
     if parse_tree.data == "lvalue":  # DOTO array, class
@@ -599,6 +599,39 @@ def after_enter(parse_tree, symbol_table, children):
         for child in children:
             code += child.code
         return Node_Return(code=code, type=None)
+
+    # normal_function_call: ident "(" actuals ")"
+    elif parse_tree.data == "normal_function_call":
+        function_name = children[0].text
+        # jal to correct function with correct input types 
+        mips_function_name = self.symbol_table.get_function_with_types(children[1].type)[0]
+        code = f'''
+            \tjal {mips_function_name}
+        '''
+
+    # formals: variable ("," variable)+ |  variable | null
+    elif parse_tree.data == "formals":
+        code = ""
+        child_codes_list = []
+        sum = 0
+        for i in range(len(children)):
+            child_codes_list.append(children[i].code)
+            sum += children[i].type.size
+
+        # in function call inputs stored in stack, only change name of inputs by pushing variables into scope 
+        for child in children:
+            variable = Variable(child.text, child.type)
+            symbol_table.last_scope().push_variable(variable)
+
+    # actuals: expr ("," expr)* | null
+    elif parse_tree.data == "actuals":
+        code = ''
+        for child in children:
+            if child.code is not None:
+                code += child.code
+            else:
+                code += child.text
+        return Node_Return(code=code, type=[children[i].type for i in range(len(children))])
     elif parse_tree.data == "expr" or parse_tree.data == "assignment_expr":
         code = ''
         for child in children:

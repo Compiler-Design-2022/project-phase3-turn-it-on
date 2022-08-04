@@ -8,18 +8,14 @@ def run(input_file_address: str) -> bool:
     # input_file = open(input_file_address)
     # input_content = input_file.read()
     input_content = '''  
-    int f(int a){
-        int a = sar stack;
+    int f(int a, int b){
         a = a+2; 
         return  a; 
     }  
   int main() {
     int a;
-    if (){
-        int b
-        
-    }
-    f(a);
+    int b;
+    f(a,b);
 }
 
 
