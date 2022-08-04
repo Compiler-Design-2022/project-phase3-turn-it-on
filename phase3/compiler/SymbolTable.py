@@ -90,6 +90,7 @@ class Scope():
         self.end_label = scope_name + "_end"
         self.for_scope = for_scope
         self.method_scope = method_scope
+        self.continue_label = scope_name + "_continue"
 
     def __str__(self):
         return self.begin_label + "(*)" + self.end_label

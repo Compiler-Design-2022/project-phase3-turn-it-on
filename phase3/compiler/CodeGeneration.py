@@ -285,6 +285,7 @@ def after_enter(parse_tree, symbol_table, children):
 
         code = f'''
             \t{symbol_table.last_scope().begin_label}:
+            \t{symbol_table.last_scope().continue_label}:
             {expr_code}
             \tlw $t0, {children[0].type.size}($sp)
             \tsub $t1, $t1, $t1
@@ -333,7 +334,7 @@ def after_enter(parse_tree, symbol_table, children):
             \tsub $t1, $t1, $t1
             \tbeq $t0, $t1, {symbol_table.last_scope().end_label}
             {stmt_for_code}
-            
+            \t{symbol_table.last_scope().continue_label}:
             {increment_code}
             \taddi $sp, $sp, {third_part_code_type_size}
             \tj {symbol_table.last_scope().begin_label}  
@@ -371,13 +372,11 @@ def after_enter(parse_tree, symbol_table, children):
         for scope in reversed(symbol_table.scope_stack):
             scope: Scope
             if scope.for_scope:
-                jlabel = scope.begin_label
+                jlabel = scope.continue_label
                 break
             else:
                 pop_size += scope.size()
 
-        breakstmt_label = symbol_table.last_scope().begin_label
-        jlabel = "LABEL" + str(int(breakstmt_label[breakstmt_label.index("LABEL")+5 : breakstmt_label.index("_start")]) + 1) + "_end"
         if jlabel is None:
             raise ValueError
         code = f'''

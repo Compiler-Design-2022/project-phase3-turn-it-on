@@ -13,7 +13,8 @@ int main(){
     int j;
     int k;
     int[][][] a;
-
+    int y;
+    y=9;
     a = NewArray(3, int[][]);
     for(i = 0; i < 3; i = i+1){
         a[i] = NewArray(i+1, int[]);
@@ -28,15 +29,19 @@ int main(){
     }
 
     for(i = 0; i < 3; i = i+1){
-        Print(i);
         for(j = 0; j <= i; j = j+1){
-            Print(j);
             for(k = 0; k < 3; k = k+1){
-                Print(a[i][j][k]);
+                Print(i, j, j, j, k, a[i][j][k]);
+                if(k<2){
+                    int u;
+                    continue;
+                }else{
+                    break;
+                }
             }
         }
     }
-
+    Print(y);
 
 }
     """
