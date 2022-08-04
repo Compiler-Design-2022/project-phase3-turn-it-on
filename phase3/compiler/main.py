@@ -9,22 +9,13 @@ def run(input_file_address: str) -> bool:
     # input_content = input_file.read()
     input_content = """
     int main(){
-
-    int[][] a;
-	
-    a = NewArray(2, int[]);
-	a[0] = NewArray(3, int);
-	a[1] = NewArray(1, int);
-	
-	a[0][0] = 10;
-	a[0][1] = 20;
-	a[0][2] = 30;
-	a[1][0] = 40;
-	
-	Print(a[0][0]);
-	Print(a[0][1]);
-	Print(a[0][2]);
-	Print(a[1][0]);
+    int i;
+    int j;
+    i = 3; 
+    j = 2; 
+    i += j; 
+    
+    Print(i);
     }
     """
     try:
