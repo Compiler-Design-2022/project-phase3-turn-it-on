@@ -72,7 +72,14 @@ class Type():
             return False
         return self.inside_type == other.inside_type
 
+    def __str__(self):
+        return "TYPE" * 40+" "+self.name
+
     def merge_type(self, other):
+        if self.size != other.size:
+            raise ValueError
+        if self != other:
+            raise ValueError
         return self  # TODO
 
 
@@ -90,6 +97,7 @@ class Scope():
         self.end_label = scope_name + "_end"
         self.for_scope = for_scope
         self.method_scope = method_scope
+        self.continue_label = scope_name + "_continue"
 
     def __str__(self):
         return self.begin_label + "(*)" + self.end_label
