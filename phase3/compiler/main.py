@@ -7,44 +7,15 @@ from SymbolTable import SymbolTable, Scope
 def run(input_file_address: str) -> bool:
     # input_file = open(input_file_address)
     # input_content = input_file.read()
-    input_content = """
-int main(){
+    input_content = '''    int main(){
     int i;
     int j;
     int k;
-    int[][][] a;
-    int y;
-    y=9;
-    a = NewArray(3, int[][]);
-    for(i = 0; i < 3; i = i+1){
-        a[i] = NewArray(i+1, int[]);
-    }
-    for(i = 0; i < 3; i = i+1){
-        for(j = 0; j <= i; j = j+1){
-            a[i][j] = NewArray(3, int);
-            for(k = 0; k < 3; k = k+1){
-                a[i][j][k] = k;
-            }
-        }
-    }
+    bool b;
+    i=0;
+    j=1.2;
+     }'''
 
-    for(i = 0; i < 3; i = i+1){
-        for(j = 0; j <= i; j = j+1){
-            for(k = 0; k < 3; k = k+1){
-                Print(i, j, j, j, k, a[i][j][k]);
-                if(k<2){
-                    int u;
-                    continue;
-                }else{
-                    break;
-                }
-            }
-        }
-    }
-    Print(y);
-
-}
-    """
     try:
         print(input_content)
         parse_tree, code = parser(input_content)
@@ -108,3 +79,42 @@ run(None)
 # # print("name=", name)
 # # print("answer=", answer)
 # # print(parser(text).pretty())
+
+# """
+# int main(){
+#     int i;
+#     int j;
+#     int k;
+#     int[][][] a;
+#     int y;
+#     y=9;
+#     a = NewArray(3, int[][]);
+#     for(i = 0; i < 3; i = i+1){
+#         a[i] = NewArray(i+1, int[]);
+#     }
+#     for(i = 0; i < 3; i = i+1){
+#         for(j = 0; j <= i; j = j+1){
+#             a[i][j] = NewArray(3, int);
+#             for(k = 0; k < 3; k = k+1){
+#                 a[i][j][k] = k;
+#             }
+#         }
+#     }
+#
+#     for(i = 0; i < 3; i = i+1){
+#         for(j = 0; j <= i; j = j+1){
+#             for(k = 0; k < 3; k = k+1){
+#                 Print(i, j, j, j, k, a[i][j][k]);
+#                 if(k<2){
+#                     int u;
+#                     continue;
+#                 }else{
+#                     break;
+#                 }
+#             }
+#         }
+#     }
+#     Print(y);
+#
+# }
+#     """

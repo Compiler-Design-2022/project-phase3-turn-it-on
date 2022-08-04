@@ -72,7 +72,14 @@ class Type():
             return False
         return self.inside_type == other.inside_type
 
+    def __str__(self):
+        return "TYPE" * 40+" "+self.name
+
     def merge_type(self, other):
+        if self.size != other.size:
+            raise ValueError
+        if self != other:
+            raise ValueError
         return self  # TODO
 
 
