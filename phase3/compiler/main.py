@@ -7,13 +7,19 @@ from SymbolTable import SymbolTable, Scope
 def run(input_file_address: str) -> bool:
     # input_file = open(input_file_address)
     # input_content = input_file.read()
-    input_content = '''    
+    input_content = '''  
+    int f(int a){
+        int a = sar stack;
+        a = a+2; 
+        return  a; 
+    }  
   int main() {
-    string s;
-    s = "tab \t";
-    Print(s);
-    s = "newline \n";
-    Print(s);
+    int a;
+    if (){
+        int b
+        
+    }
+    f(a);
 }
 
 
