@@ -1,3 +1,4 @@
+import copy
 import random
 import string
 
@@ -42,16 +43,24 @@ def get_function_number():
     return str(function_number_counter)
 
 
-class Method():
-    def __int__(self, name, output_type, input_variables):
-        self.name = name
+class Method:
+    def __init__(self, name, output_type, input_variables):
+        self.name = name.replace("@", "")
         self.label = get_label() + "FUNC"
         self.output_type = output_type
-        self.input_variables = input_variables
+        self.input_variables = copy.deepcopy(input_variables)
 
-    def input_size(self):
+    def __str__(self):
+        ans= f"name:{self.name}  label:{self.label} output_type:{self.output_type} input_types:"
+        for var in self.input_variables:
+            ans+=str(var)
+        return ans
+
+    def get_method_inputs_size(self):
         ans = 0
-        # for input_type in inp
+        for variable in self.input_variables:
+            ans += variable.type.size
+        return ans
 
 
 class Type():
@@ -76,6 +85,8 @@ class Type():
             self.inside_type = inside_type
         elif name == "char":
             self.size = 4
+        elif name == "void":
+            self.size = 0
         else:
             raise ValueError  # type not found
 
@@ -105,24 +116,22 @@ class Variable():
         self.name = name
         self.type = type
 
+    def __str__(self):
+        return f" vn:{self.name} {self.type}"
 
 class Scope():
-    def __init__(self, scope_name="", for_scope=False, method_scope=False, method_output_type=None):
+    def __init__(self, for_scope=False, method_scope=False):
         self.variables = []
-        if scope_name == "":
-            self.scope_name = get_label()
-        else:
-            self.scope_name = scope_name
-        self.begin_label = self.scope_name + "_start"
-        self.end_label = self.scope_name + "_end"
+        scope_name = get_label()
+        self.begin_label = scope_name + "_start"
+        self.end_label = scope_name + "_end"
+        if for_scope:
+            self.continue_label = scope_name + "_continue"
         self.for_scope = for_scope
         self.method_scope = method_scope
-        self.method_input_types = []
-        self.method_output_type = method_output_type
-        self.continue_label = self.scope_name + "_continue"
+        if method_scope:
+            self.push_variable(Variable("$RA", Type("int")))
 
-    def __str__(self):
-        return self.begin_label + "(*)" + self.end_label
 
     def push_variable(self, variable: Variable):
         print("push variable : ", variable.name, variable.type.size)
@@ -155,21 +164,16 @@ class Scope():
             ans += variable.type.size
         return ans
 
-    def get_method_inputs_size(self):
-        ans = 0
-        for type in self.method_input_types:
-            ans += type.size
-        return ans
-
-    def add_method_input_type(self, type):
-        self.method_input_types.append(type)
-
 
 class SymbolTable():
     def __init__(self):
         self.scope_stack: [Scope] = []
         self.vtable: [Method] = []
         self.scope_function_declared: [Scope] = []
+
+    def push_method(self, method: Method):
+        print("push method", method)
+        self.vtable.append(method)
 
     def push_scope(self, scope: Scope):
         print("push scope ")
@@ -178,7 +182,19 @@ class SymbolTable():
             self.scope_function_declared.append(scope)
 
     def get_method(self, name, input_types=None):
-        pass
+        name = name.replace("@", "")
+        print(name, input_types)
+        for method in self.vtable:
+            print(method)
+            if method.name == name and len(input_types) == len(method.input_variables):
+                good = True
+                for var1, type2 in zip(method.input_variables, input_types):
+                    if var1.type != type2:
+                        good = False
+                        break
+                if good:
+                    return method
+        raise ValueError
 
     def get_address_diff(self, name):
         offset = 0
@@ -201,10 +217,3 @@ class SymbolTable():
         print("pop scope ")
         self.scope_stack.pop()
 
-    def last_function_scope(self) -> Scope:
-        return self.scope_function_declared[len(self.scope_function_declared) - 1]
-
-    def get_function_with_name_types(self, name, types):
-        for scope in self.scope_function_declared:
-            if scope.scope_name == name.replace("@", "") and scope.method_scope and types == scope.method_input_types:
-                return scope.scope_name, scope

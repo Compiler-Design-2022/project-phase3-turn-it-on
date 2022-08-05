@@ -1,12 +1,13 @@
 from os import listdir
 from parserC import parser
-from CodeGeneration import cgen
-from SymbolTable import SymbolTable, Scope
+from CodeGeneration import cgen, function_declaration
+from SymbolTable import SymbolTable, Scope, Method, Type
 
 
 def run(input_file_address: str) -> bool:
     # input_file = open(input_file_address)
     # input_content = input_file.read()
+<<<<<<< HEAD
     input_content = '''  
 
     void main()
@@ -15,6 +16,48 @@ def run(input_file_address: str) -> bool:
         a="salam";
         Print(a);
     }
+=======
+    input_content = ''' 
+int ReadChar(){
+    ~mips
+    li $v0, 12           #read_char 
+    syscall             #ReadChar 
+    lw $t0, 4($sp) 
+    sw $v0, 0($sp) 
+    addi $sp, $sp, -4
+    jr $t0
+    ~
+}
+ 
+int ReadIngeger(){
+        int res; 
+        int inp; 
+        int sign; 
+        sign = 1; 
+        res = 0; 
+        while(true){ 
+            inp = ReadChar(); 
+            Print(res, inp);
+            if (inp == 10){ 
+                break; 
+            }
+            if (inp != 43 && inp != 13){ 
+                if (inp == 45){ 
+                    sign = -1; 
+                }else{  
+                    res = res * 10 + inp - 48; 
+                } 
+            } 
+        } 
+        return res * sign; 
+}
+
+int main() {
+    Print(ReadIngeger());
+}
+
+
+>>>>>>> 5413e0610ab8ee72e2e50213154b9df92f3e5161
     '''
 
     try:
@@ -25,7 +68,11 @@ def run(input_file_address: str) -> bool:
         try:
             symbol_table = SymbolTable()
             symbol_table.push_scope(Scope())
+            function_declaration(parse_tree, symbol_table)
+            symbol_table.push_method(Method("ReadChar", Type("char"), []))
             mips_code = cgen(parse_tree, symbol_table).code
+            with open("OUTPUT.txt", mode="w") as f:
+                f.write(mips_code)
             print(mips_code)
             return mips_code
         except Exception:
