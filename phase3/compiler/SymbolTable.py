@@ -184,7 +184,6 @@ class SymbolTable():
         offset = 0
         for i in range(len(self.scope_stack) - 1, -1, -1):
             if self.scope_stack[i].get_address_diff(name) is not None:
-                print("LOL", name, offset + self.scope_stack[i].get_address_diff(name), offset)
                 return offset + self.scope_stack[i].get_address_diff(name)
             offset += self.scope_stack[i].size()
         raise ValueError  # value doesn't declared
@@ -201,9 +200,6 @@ class SymbolTable():
     def pop_scope(self):
         print("pop scope ")
         self.scope_stack.pop()
-
-    def last_all_defined_scope(self) -> Scope:
-        return self.all_defined_scope[len(self.all_defined_scope) - 1]
 
     def last_function_scope(self) -> Scope:
         return self.scope_function_declared[len(self.scope_function_declared) - 1]

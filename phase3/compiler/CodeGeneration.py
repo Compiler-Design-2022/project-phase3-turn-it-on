@@ -75,13 +75,27 @@ def after_enter(parse_tree, symbol_table, children):
         return Node_Return(code="", type=None, text=children[0].text)
     elif parse_tree.data == "null":
         return Node_Return(code="", type=None, text="")
+    elif parse_tree.data =="len_expr":
+        inside_code = children[0].code
+        symbol_table.last_scope().pop_variable()
+        symbol_table.last_scope().push_variable(Variable("__IGNORE", Type("int")))
+        code = f'''{inside_code}
+                    \tlw $t1, {children[0].type.size}($sp)
+                    \taddi $sp, $sp, {children[0].type.size}
+                    \tlw $t1, 0($t1)
+                    \tsw $t1, 0($sp)
+                    \taddi $sp, $sp, -4
+                '''
+        return Node_Return(code=code, type=Type("int"))
+
+
     elif parse_tree.data == "constant_token":
         code = ""
         if children[0].type.name == "string":
             string_name = f"{symbol_table.last_scope().begin_label}_{get_string_number()}"
             code += f'''
                 .data
-                \t {string_name}: .word {len(children[0].text)}
+                \t {string_name}: .word {(len(children[0].text)-2)//4}
                 \t IGNORE__{get_label()}: .asciiz  {children[0].text}
                 .text
                 \tla $t0, {string_name}
@@ -516,7 +530,7 @@ def after_enter(parse_tree, symbol_table, children):
                 \t lw $t0, {sum}($sp)
                 \t lw $t2, 0($t0)
                 \t addi $t0, $t0, 4
-                \t sub $t3, $t3, $t3
+                \t li $t3, -1
                 \t addi $t2,$t2, -1
                 {label}:
                 \t lb $t1, 0($t0)
