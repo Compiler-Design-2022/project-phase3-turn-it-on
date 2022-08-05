@@ -1,3 +1,5 @@
+import random
+
 from SymbolTable import SymbolTable, Scope, Variable, Type, get_label, get_string_number, get_function_number
 import lark
 import copy
@@ -79,7 +81,8 @@ def after_enter(parse_tree, symbol_table, children):
             string_name = f"{symbol_table.last_scope().begin_label}_{get_string_number()}"
             code += f'''
                 .data
-                \t {string_name}: .asciiz      {children[0].text}
+                \t {string_name}: .word {len(children[0].text)}
+                \t IGNORE__{random.randint(0, 1000)}: .asciiz  {children[0].text}
                 .text
                 \tla $t0, {string_name}
                 \tsw $t0, 0($sp)
@@ -127,6 +130,7 @@ def after_enter(parse_tree, symbol_table, children):
             \t sub $t1, $t1, $t1 
             \t addi $t1, $t1, {children[1].type.size}
             \t mul $t0, $t0, $t1
+            \t addi $t0, $t0, {Type("int").size}
             \t move $a0, $t0
             \t li $v0, 9 
             \t syscall
@@ -137,16 +141,17 @@ def after_enter(parse_tree, symbol_table, children):
 
     # array_val: expr "[" expr "]"
     elif parse_tree.data == "array_val":
-        left_expr_code = children[0].code
-        right_expr_code = children[1].code
+        array_expr_code = children[0].code
+        index_expr_code = children[1].code
         symbol_table.last_scope().pop_variable()
-        code = f'''{left_expr_code} {right_expr_code}
+        code = f'''{array_expr_code} {index_expr_code}
                     \tlw $t0, {children[1].type.size}($sp)
                     \tlw $t1, {children[1].type.size + children[0].type.size}($sp)
                     \tli $t2, {children[0].type.size}
                     \tmul $t0, $t0, $t2
                     \tadd $t0, $t0, $t1
                     \taddi $sp, $sp, {children[1].type.size + children[0].type.size}
+                    \taddi $t0, $t0, {Type("int").size}
                     \tsw $t0, 0($sp)
                     \taddi $sp, $sp, -4
                 '''
@@ -506,15 +511,26 @@ def after_enter(parse_tree, symbol_table, children):
             if len(symbol_table.last_scope().variables) > 0:
                 symbol_table.last_scope().pop_variable()
             if child.type.name == "string":
+                label="PRINT_"+str(random.randint(0,10000000))
                 code += f'''
                 \t lw $t0, {sum}($sp)
-                \t li $v0, 4
-                \t move $a0, $t0
+                \t lw $t2, 0($t0)
+                \t addi $t0, $t0, 4
+                \t sub $t3, $t3, $t3
+                \t addi $t2,$t2, -1
+                {label}:
+                \t lb $t1, 0($t0)
+                \t li $v0, 11
+                \t move $a0, $t1
                 \t syscall
+                \t addi $t2,$t2, -1
+                \t addi $t0, $t0, 4
+                \t bne $t2, $t3, {label}
                 \tli $a0, 32
                 \tli $v0, 11  
                 \tsyscall
                 '''
+
             elif child.type.name == "int":
                 code += f'''
                 \t lw $t0, {sum}($sp)
@@ -539,7 +555,7 @@ def after_enter(parse_tree, symbol_table, children):
 
         # org_sum must be 0 if expr in printstmt rule is assignment_expr
         if len(children) == 1 and children[0].text == "assignment_expr_empty":
-            org_sum = 0;
+            org_sum = 0
         code += f'''
             \taddi $sp, $sp, {org_sum}
             \tli $a0, 10

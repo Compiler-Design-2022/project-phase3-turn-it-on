@@ -10,9 +10,9 @@ def run(input_file_address: str) -> bool:
     input_content = '''  
     void main()
     {
-        string s;
-        s="salam";
-        Print(s[17]);
+        string a;
+        a="salam";
+        Print(a);
     }
     '''
 
