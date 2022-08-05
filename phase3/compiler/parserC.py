@@ -8,14 +8,15 @@ grammer = r"""
     variable_decl: variable ";"
     variable: type ident
     type: /int/ | /double/ | /bool/ | /string/ | ident | type "[]" 
-    function_decl: type ident "(" formals ")" stmtblock | /void/ ident "(" formals ")" stmtblock
+    function_decl: type ident "(" formals ")" stmtblock | /void/ ident "(" formals ")" stmtblock 
     formals: variable ("," variable)+ |  variable | null
     class_decl: "class" ident ("extends" ident)? ("implements" ident ("," ident)*)? "{" field* "}"
     field: access_mode variable_decl | access_mode function_decl
     access_mode: /private/ | /public/ | /protected/ | null
     interface_decl: "interface" ident "{" prototype* "}"
     prototype: type ident "(" formals ")"";" | /void/ ident "(" formals ")" ";" 
-    stmtblock: "{" variable_decl* stmt* "}" 
+    stmtblock: "{" variable_decl* stmt* "}" | mipscode
+    mipscode: "~"/[^~]+/"~"
     stmt: expr? ";" | ifstmt | whilestmt | whilestmt | forstmt | breakstmt | continuestmt | returnstmt | printstmt | stmtblock     
     ifstmt: "if""(" expr ")" stmt ("else" stmt)?
     whilestmt: "while""(" expr ")" stmt

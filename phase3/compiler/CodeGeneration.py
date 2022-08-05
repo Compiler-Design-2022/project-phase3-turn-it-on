@@ -26,6 +26,10 @@ def cgen_token(token: lark.Token, symboltable: SymbolTable):
             else:
                 ans += '"'
         token.value = ans
+    if token.value.startswith("mips"):
+        token.value = token.value.lstrip("mips").replace("@", "")
+        return Node_Return(code=token.value, type=None)
+
     return Node_Return(text=token.value, type=type)
 
 
@@ -668,6 +672,8 @@ def after_enter(parse_tree, symbol_table, children):
 
         return Node_Return(code=code, type=None)
 
+    elif parse_tree.data == "mipscode":
+        return Node_Return(code=children[0].code)
 
     # normal_function_call: ident "(" actuals ")"
     elif parse_tree.data == "normal_function_call":
@@ -768,7 +774,7 @@ def after_enter(parse_tree, symbol_table, children):
 
     # actuals: expr ("," expr)* | null
     elif parse_tree.data == "actuals":
-        if len(children)==1 and parse_tree.children[0].data == "null":
+        if len(children) == 1 and parse_tree.children[0].data == "null":
             return Node_Return(code="", type=[])
         code = ''
         for child in children:

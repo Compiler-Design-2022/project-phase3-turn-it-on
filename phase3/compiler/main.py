@@ -1,68 +1,49 @@
 from os import listdir
 from parserC import parser
 from CodeGeneration import cgen, function_declaration
-from SymbolTable import SymbolTable, Scope
+from SymbolTable import SymbolTable, Scope, Method, Type
 
 
 def run(input_file_address: str) -> bool:
     # input_file = open(input_file_address)
     # input_content = input_file.read()
-    input_content = '''  
-
-void sort(int[] items) {
-    
-    /* implementation of bubble sort */
-    int i;
-    int j;
-
-    int n;
-    Print(items[0], items[1], items[2], items[3]);
-    n = 4;
-    for (i = 0; i < n-1; i = i + 1){
-        for (j = 0; j < (n - i) - 1; j = j + 1){
-            if (items[j] > items[j + 1]) {
-                int t;
-                t = items[j];
-                items[j] = items[j + 1];
-                items[j + 1] = t;
+    input_content = ''' 
+int ReadChar(){
+    ~mips
+    li $v0, 12           #read_char 
+    syscall             #ReadChar 
+    lw $t0, 4($sp) 
+    sw $v0, 0($sp) 
+    addi $sp, $sp, -4
+    jr $t0
+    ~
+}
+ 
+int ReadIngeger(){
+        int res; 
+        int inp; 
+        int sign; 
+        sign = 1; 
+        res = 0; 
+        while(true){ 
+            inp = ReadChar(); 
+            Print(res, inp);
+            if (inp == 10){ 
+                break; 
             }
-        }
-    }
-
-
+            if (inp != 43 && inp != 13){ 
+                if (inp == 45){ 
+                    sign = -1; 
+                }else{  
+                    res = res * 10 + inp - 48; 
+                } 
+            } 
+        } 
+        return res * sign; 
 }
 
 int main() {
-    int i;
-    int j;
-    int[] rawitems;
-    int[] items;
-
-    Print("Please enter the numbers (max count: 100, enter -1 to end sooner): ");
-
-    rawitems = NewArray(4, int);
-    for (i = 0; i < 4; i = i + 1) {
-        int x;
-        x = 100-i;
-        if (x == -1) break;
-
-        rawitems[i] = x;
-    }
-    items = NewArray(i, int);
-
-    // copy to a more convenient location
-    for (j = 0; j < i; j = j + 1) {
-        items[j] = rawitems[j];
-    }
-
-    sort(items);
-
-
-    Print("After sort: ");
-
-    for (i = 0; i < 4 ; i = i + 1) {
-        Print(items[i]);
-    }
+    Print(ReadIngeger());
 }
 
 
@@ -77,6 +58,7 @@ int main() {
             symbol_table = SymbolTable()
             symbol_table.push_scope(Scope())
             function_declaration(parse_tree, symbol_table)
+            symbol_table.push_method(Method("ReadChar", Type("char"), []))
             mips_code = cgen(parse_tree, symbol_table).code
             with open("OUTPUT.txt", mode="w") as f:
                 f.write(mips_code)
