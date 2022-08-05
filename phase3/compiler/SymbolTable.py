@@ -213,9 +213,6 @@ class SymbolTable():
     def last_scope(self) -> Scope:
         return self.scope_stack[len(self.scope_stack) - 1]
 
-    def last_method(self) -> Method:
-        return self.vtable[len(self.vtable) - 1]
-
     def pop_scope(self):
         print("pop scope ")
         self.scope_stack.pop()

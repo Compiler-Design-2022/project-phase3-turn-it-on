@@ -29,6 +29,25 @@ def cgen_token(token: lark.Token, symboltable: SymbolTable):
     return Node_Return(text=token.value, type=type)
 
 
+def function_declaration(parse_tree, symbol_table: SymbolTable):
+    if parse_tree.__class__ is lark.Token:
+        return
+    if parse_tree.data == "function_decl":
+        symbol_table1 = SymbolTable()
+        symbol_table1.push_scope(Scope())
+        type_child = cgen(parse_tree.children[0], symbol_table1)
+        symbol_table1 = SymbolTable()
+        symbol_table1.push_scope(Scope())
+        name_child = cgen(parse_tree.children[1], symbol_table1)
+        symbol_table1 = SymbolTable()
+        symbol_table1.push_scope(Scope())
+        input_child = cgen(parse_tree.children[2], symbol_table1)
+        symbol_table.push_method(Method(name_child.text, type_child.type, input_child.type))
+    for child in parse_tree.children:
+        function_declaration(child, symbol_table)
+    return
+
+
 def cgen(parse_tree, symbol_table: SymbolTable):
     if parse_tree.__class__ is lark.Token:
         return cgen_token(parse_tree, symbol_table)
@@ -58,17 +77,7 @@ def before_enter(parse_tree, symbol_table):
         new_scope = Scope(for_scope=True)
         symbol_table.push_scope(new_scope)
     elif parse_tree.data == "function_decl":
-        symbol_table1 = SymbolTable()
-        symbol_table1.push_scope(Scope())
-        type_child = cgen(parse_tree.children[0], symbol_table1)
-        symbol_table1 = SymbolTable()
-        symbol_table1.push_scope(Scope())
-        name_child = cgen(parse_tree.children[1], symbol_table1)
-        symbol_table1 = SymbolTable()
-        symbol_table1.push_scope(Scope())
-        input_child = cgen(parse_tree.children[2], symbol_table1)
         symbol_table.push_scope(Scope(method_scope=True))
-        symbol_table.push_method(Method(name_child.text, type_child.type, input_child.type))
     elif parse_tree.data == "normal_function_call":
         symbol_table.last_scope().push_variable(Variable("__IGNORE_RA", Type("int")))
 
@@ -678,10 +687,10 @@ def after_enter(parse_tree, symbol_table, children):
             \tsw $t0, 0($sp)
             \taddi $sp, $sp, -{method.output_type.size}
         '''
-        print("&"*40)
+        print("&" * 40)
         for var in symbol_table.last_scope().variables:
             print(var)
-        print("*"*40)
+        print("*" * 40)
         for var in method.input_variables:
             symbol_table.last_scope().pop_variable()
         symbol_table.last_scope().pop_variable()
@@ -701,9 +710,23 @@ def after_enter(parse_tree, symbol_table, children):
         '''
         if function_name != "main":
             code += f'''
-        \truntimeError{function_name}:
-        \tj runtimeError{function_name}
-        '''
+                           \tlw $t1, {symbol_table.get_address_diff("$RA")}($sp)'''
+            pop_size = 0
+            for scope in reversed(symbol_table.scope_stack):
+                scope: Scope
+                if scope.method_scope:
+                    break
+                else:
+                    pop_size += scope.size()
+            code += f'''
+                           \taddi $sp, $sp, {pop_size}
+                           \tjr $t1
+                                   '''
+        else:
+            code += f'''
+                      \tj ENDPROGRAM
+                      '''
+
         symbol_table.pop_scope()
         return Node_Return(code=code, type=None)
 
@@ -745,6 +768,8 @@ def after_enter(parse_tree, symbol_table, children):
 
     # actuals: expr ("," expr)* | null
     elif parse_tree.data == "actuals":
+        if len(children)==1 and parse_tree.children[0].data == "null":
+            return Node_Return(code="", type=[])
         code = ''
         for child in children:
             if child.code is not None:
@@ -767,6 +792,9 @@ def after_enter(parse_tree, symbol_table, children):
                 code += child.code
             else:
                 code += child.text
+        code += '''
+        \tENDPROGRAM:
+        '''
         return Node_Return(code=code, type=children[0].type, text=children[0].text)
     else:
         code = ''

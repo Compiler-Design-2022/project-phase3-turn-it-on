@@ -1,6 +1,6 @@
 from os import listdir
 from parserC import parser
-from CodeGeneration import cgen
+from CodeGeneration import cgen, function_declaration
 from SymbolTable import SymbolTable, Scope
 
 
@@ -8,16 +8,64 @@ def run(input_file_address: str) -> bool:
     # input_file = open(input_file_address)
     # input_content = input_file.read()
     input_content = '''  
-    int f(int a){
-        if(a<2){
-            return 1;
+
+void sort(int[] items) {
+    
+    /* implementation of bubble sort */
+    int i;
+    int j;
+
+    int n;
+    Print(items[0], items[1], items[2], items[3]);
+    n = 4;
+    for (i = 0; i < n-1; i = i + 1){
+        for (j = 0; j < (n - i) - 1; j = j + 1){
+            if (items[j] > items[j + 1]) {
+                int t;
+                t = items[j];
+                items[j] = items[j + 1];
+                items[j + 1] = t;
+            }
         }
-        return f(a-1)+f(a-2);
-    }   
-    void main()
-    {
-        Print(f(5));
     }
+
+
+}
+
+int main() {
+    int i;
+    int j;
+    int[] rawitems;
+    int[] items;
+
+    Print("Please enter the numbers (max count: 100, enter -1 to end sooner): ");
+
+    rawitems = NewArray(4, int);
+    for (i = 0; i < 4; i = i + 1) {
+        int x;
+        x = 100-i;
+        if (x == -1) break;
+
+        rawitems[i] = x;
+    }
+    items = NewArray(i, int);
+
+    // copy to a more convenient location
+    for (j = 0; j < i; j = j + 1) {
+        items[j] = rawitems[j];
+    }
+
+    sort(items);
+
+
+    Print("After sort: ");
+
+    for (i = 0; i < 4 ; i = i + 1) {
+        Print(items[i]);
+    }
+}
+
+
     '''
 
     try:
@@ -28,7 +76,10 @@ def run(input_file_address: str) -> bool:
         try:
             symbol_table = SymbolTable()
             symbol_table.push_scope(Scope())
+            function_declaration(parse_tree, symbol_table)
             mips_code = cgen(parse_tree, symbol_table).code
+            with open("OUTPUT.txt", mode="w") as f:
+                f.write(mips_code)
             print(mips_code)
             return mips_code
         except Exception:
