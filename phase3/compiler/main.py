@@ -8,11 +8,15 @@ def run(input_file_address: str) -> bool:
     # input_file = open(input_file_address)
     # input_content = input_file.read()
     input_content = '''  
+    int f(int a){
+        if(a<2){
+            return 1;
+        }
+        return f(a-1)+f(a-2);
+    }   
     void main()
     {
-        string a;
-        a="salam";
-        Print(a);
+        Print(f(5));
     }
     '''
 

@@ -1,6 +1,6 @@
 import random
 
-from SymbolTable import SymbolTable, Scope, Variable, Type, get_label, get_string_number, get_function_number
+from SymbolTable import SymbolTable, Scope, Variable, Type, get_label, get_string_number, get_function_number, Method
 import lark
 import copy
 
@@ -48,7 +48,7 @@ def cgen(parse_tree, symbol_table: SymbolTable):
 
 
 def before_enter(parse_tree, symbol_table):
-    if parse_tree.data == "stmt":
+    if parse_tree.data == "stmt" or parse_tree.data == "stmtblock":
         new_scope = Scope()
         symbol_table.push_scope(new_scope)
     elif parse_tree.data == "whilestmt":
@@ -58,9 +58,19 @@ def before_enter(parse_tree, symbol_table):
         new_scope = Scope(for_scope=True)
         symbol_table.push_scope(new_scope)
     elif parse_tree.data == "function_decl":
-        new_scope = Scope(method_scope=True)
-        symbol_table.push_scope(new_scope)
-    return
+        symbol_table1 = SymbolTable()
+        symbol_table1.push_scope(Scope())
+        type_child = cgen(parse_tree.children[0], symbol_table1)
+        symbol_table1 = SymbolTable()
+        symbol_table1.push_scope(Scope())
+        name_child = cgen(parse_tree.children[1], symbol_table1)
+        symbol_table1 = SymbolTable()
+        symbol_table1.push_scope(Scope())
+        input_child = cgen(parse_tree.children[2], symbol_table1)
+        symbol_table.push_scope(Scope(method_scope=True))
+        symbol_table.push_method(Method(name_child.text, type_child.type, input_child.type))
+    elif parse_tree.data == "normal_function_call":
+        symbol_table.last_scope().push_variable(Variable("__IGNORE_RA", Type("int")))
 
 
 def after_enter(parse_tree, symbol_table, children):
@@ -68,14 +78,12 @@ def after_enter(parse_tree, symbol_table, children):
     if parse_tree.data == "type":
         if children[0].text == None:
             return Node_Return(type=Type("ref", inside_type=children[0].type))
-        typee = Type(children[0].text)
-        print(typee)
-        return Node_Return(code="", type=typee)
+        return Node_Return(code="", type=Type(children[0].text))
     elif parse_tree.data == "ident":
         return Node_Return(code="", type=None, text=children[0].text)
     elif parse_tree.data == "null":
         return Node_Return(code="", type=None, text="")
-    elif parse_tree.data =="len_expr":
+    elif parse_tree.data == "len_expr":
         inside_code = children[0].code
         symbol_table.last_scope().pop_variable()
         symbol_table.last_scope().push_variable(Variable("__IGNORE", Type("int")))
@@ -95,7 +103,7 @@ def after_enter(parse_tree, symbol_table, children):
             string_name = f"{symbol_table.last_scope().begin_label}_{get_string_number()}"
             code += f'''
                 .data
-                \t {string_name}: .word {(len(children[0].text)-2)//4}
+                \t {string_name}: .word {(len(children[0].text) - 2) // 4}
                 \t IGNORE__{get_label()}: .asciiz  {children[0].text}
                 .text
                 \tla $t0, {string_name}
@@ -525,7 +533,7 @@ def after_enter(parse_tree, symbol_table, children):
             if len(symbol_table.last_scope().variables) > 0:
                 symbol_table.last_scope().pop_variable()
             if child.type.name == "string":
-                label="PRINT_"+get_label()
+                label = "PRINT_" + get_label()
                 code += f'''
                 \t lw $t0, {sum}($sp)
                 \t lw $t2, 0($t0)
@@ -635,11 +643,10 @@ def after_enter(parse_tree, symbol_table, children):
         return Node_Return(code=code, type=children[0].type.inside_type)
 
     # stmt: expr? ";" | ifstmt | whilestmt | whilestmt | forstmt | breakstmt | continuestmt | returnstmt | printstmt | stmtblock  
-    elif parse_tree.data == "stmt":
+    elif parse_tree.data == "stmt" or parse_tree.data == "stmtblock":
         code = f'''
         \t{symbol_table.last_scope().begin_label}:
         '''
-
         for child in children:
             code += child.code
         code += f'''
@@ -652,102 +659,88 @@ def after_enter(parse_tree, symbol_table, children):
 
         return Node_Return(code=code, type=None)
 
-    # stmtblock: "{" variable_decl* stmt* "}" 
-    elif parse_tree.data == "stmtblock":
-        code = ""
-        for child in children:
-            code += child.code
-        return Node_Return(code=code, type=None)
 
     # normal_function_call: ident "(" actuals ")"
     elif parse_tree.data == "normal_function_call":
-        code = ""
+        code = f'''
+        \taddi $sp, $sp, -{Type("int").size}
+        '''
         for child in children:
             code += child.code
 
-        function_name = children[0].text
-        mips_function_name = symbol_table.get_function_with_name_types(children[0].text, children[1].type)[0]
-        function_scope = symbol_table.get_function_with_name_types(children[0].text, children[1].type)[1]
+        function_name = children[0].text.replace("@", "")
+        method: Method = symbol_table.get_method(function_name, children[1].type)
         code += f'''
-            \tjal {mips_function_name}
-            \taddi $sp, $sp, {function_scope.get_method_inputs_size()}
-            \tsw $v0, 0($sp)
-            \taddi $sp, $sp, -{function_scope.method_output_type.size}
+            \tjal {function_name}
+            \tlw $t0, {method.output_type.size}($sp)
+            \taddi $sp, $sp, {method.output_type.size}
+            \taddi $sp, $sp, {method.get_method_inputs_size() + Type("int").size}
+            \tsw $t0, 0($sp)
+            \taddi $sp, $sp, -{method.output_type.size}
         '''
-        return Node_Return(code=code, type=None)
+        print("&"*40)
+        for var in symbol_table.last_scope().variables:
+            print(var)
+        print("*"*40)
+        for var in method.input_variables:
+            symbol_table.last_scope().pop_variable()
+        symbol_table.last_scope().pop_variable()
+        symbol_table.last_scope().push_variable(Variable("__IGNORE_function_output", method.output_type))
+        return Node_Return(code=code, type=method.output_type)
 
     # function_decl: type ident "(" formals ")" stmtblock | /void/ ident "(" formals ")" stmtblock
     elif parse_tree.data == "function_decl":
-        if children[1].text == "@main":
-            symbol_table.last_function_scope().scope_name = "FUNCTION_MAIN"
-            symbol_table.last_function_scope().begin_label = "FUNCTION_MAIN_start"
-            symbol_table.last_function_scope().end_label = "FUNCTION_MAIN_end"
-            symbol_table.last_function_scope().continue_label = "FUNCTION_MAIN_continue_label"
-            symbol_table.last_function_scope().method_output_type = Type()
-        else:
-            name = children[1].text.replace("@", "")
-            symbol_table.last_function_scope().scope_name = name
-            symbol_table.last_function_scope().begin_label = name + "_start"
-            symbol_table.last_function_scope().end_label = name + "_end"
-            symbol_table.last_function_scope().continue_label = name + "_continue_label"
-            symbol_table.last_function_scope().method_output_type = children[0].type
-
-        function_name = symbol_table.last_function_scope().scope_name
+        function_name = children[1].text.replace("@", "")
         stmtblock_code = children[3].code
-        code = ""
-        if function_name == "FUNCTION_MAIN":
+        save_ra = "" if function_name == "main" else f'''sw $ra {symbol_table.get_address_diff("$RA")}($sp)'''
+
+        code = f'''
+        {function_name}:
+        {save_ra}
+        {stmtblock_code}
+        '''
+        if function_name != "main":
             code += f'''
-            {function_name}:
-            \t{stmtblock_code}
-            '''
-        else:
-            code += f'''
-            {function_name}:
-            \t{stmtblock_code}
-            \tjr $ra
-            '''
+        \truntimeError{function_name}:
+        \tj runtimeError{function_name}
+        '''
         symbol_table.pop_scope()
         return Node_Return(code=code, type=None)
 
     # formals: variable ("," variable)+ |  variable | null
     elif parse_tree.data == "formals":
-        code = ""
-        if children[0].text == "":  # it is null
-            return Node_Return(code=code, type=None)
+        type_list = []
+        variable_count = 0 if parse_tree.children[0].data == "null" else len(children)
+        for i in range(variable_count):
+            type_list.append(symbol_table.last_scope().variables[-(i + 1)])
 
-        child_codes_list = []
-        sum = 0
-        for i in range(len(children)):
-            child_codes_list.append(children[i].code)
-            sum += children[i].type.size
-
-        # in function call inputs stored in stack, only change name of inputs by pushing variables into scope 
-        for child in children:
-            symbol_table.last_function_scope().add_method_input_type(child.type)
-            variable = Variable(child.text, child.type)
-            symbol_table.last_function_scope().push_variable(variable)
-
-        code = "".join(child_codes_list)
-        return Node_Return(code=code, type=None)
+        return Node_Return(code=None, type=type_list)
 
     # returnstmt: "return" expr? ";"
     elif parse_tree.data == "returnstmt":
-        code = ""
-        for child in children:
-            code += child.code
+        code = f'''
+            {children[0].code}
+            \tlw $t1, {symbol_table.get_address_diff("$RA")}($sp)'''
 
-        # remove \taddi $sp, $sp, {children[0].type.size} from second line because we handle it in stmt
+        pop_size = 0
+        function_scope = None
+        for scope in reversed(symbol_table.scope_stack):
+            scope: Scope
+            if scope.method_scope:
+                function_scope = scope
+                break
+            else:
+                pop_size += scope.size()
+
+        if function_scope is None:
+            raise ValueError
         code += f'''
-        \tlw $v0, {children[0].type.size}($sp)
-        
-        '''
-
-        # to handle two value return 
-        # code += f'''
-        #    \tsw $v0, {children[0].type.size+children[1].type.size}($sp)
-        #    \tsw $v1, {children[1].type.size}($sp)
-        #    \taddi $sp, $sp, {children[0].type.size+children[1].type.size}
-        #    '''
+            \tlw $t0, {children[0].type.size}($sp)
+            \taddi $sp, $sp, {pop_size}
+            \tsw $t0, 0($sp)
+            \taddi $sp, $sp, -{children[0].type.size}
+            \tjr $t1
+                    '''
         return Node_Return(code=code, type=None)
 
     # actuals: expr ("," expr)* | null
@@ -756,11 +749,7 @@ def after_enter(parse_tree, symbol_table, children):
         for child in children:
             if child.code is not None:
                 code += child.code
-            else:
-                code += child.text
 
-        if len(children) == 1 and children[0].type == None:
-            return Node_Return(code=code, type=[])
         return Node_Return(code=code, type=[children[i].type for i in range(len(children))])
     elif parse_tree.data == "expr" or parse_tree.data == "assignment_expr":
         code = ''
@@ -771,7 +760,7 @@ def after_enter(parse_tree, symbol_table, children):
                 code += child.text
         return Node_Return(code=code, type=children[0].type, text=children[0].text)
     elif parse_tree.data == "program":
-        code = '''j FUNCTION_MAIN
+        code = '''j main
         '''
         for child in children:
             if child.code is not None:
