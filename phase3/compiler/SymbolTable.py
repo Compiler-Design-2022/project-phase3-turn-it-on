@@ -76,6 +76,8 @@ class Type():
             raise ValueError  # type not found
 
     def __eq__(self, other):
+        if other is None:
+            return False
         if self.inside_type is None:
             return self.name == other.name
         if self.length != other.length:
@@ -110,7 +112,7 @@ class Scope():
         self.end_label = self.scope_name + "_end"
         self.for_scope = for_scope
         self.method_scope = method_scope
-        self.mehod_input_types = []
+        self.method_input_types = []
         self.method_output_type = method_output_type
         self.continue_label = self.scope_name + "_continue"
 
@@ -150,12 +152,12 @@ class Scope():
 
     def get_method_inputs_size(self):
         ans = 0
-        for type in self.mehod_input_types:
+        for type in self.method_input_types:
             ans += type.size
         return ans
 
     def add_method_input_type(self, type):
-        self.mehod_input_types.append(type)
+        self.method_input_types.append(type)
 
 class SymbolTable():
     def __init__(self):
@@ -197,7 +199,10 @@ class SymbolTable():
     def last_all_defined_scope(self) -> Scope:
         return self.all_defined_scope[len(self.all_defined_scope) - 1]
 
+    def last_function_scope(self) -> Scope:
+        return self.scope_function_declared[len(self.scope_function_declared) - 1]
+
     def get_function_with_types(self, types):
         for scope in self.scope_function_declared:
-            if scope.method_scope and types == scope.mehod_input_types:
+            if scope.method_scope and types == scope.method_input_types:
                 return scope.scope_name, scope

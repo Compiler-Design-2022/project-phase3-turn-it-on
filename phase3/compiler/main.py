@@ -8,12 +8,14 @@ def run(input_file_address: str) -> bool:
     # input_file = open(input_file_address)
     # input_content = input_file.read()
     input_content = '''  
-    int test() {
-        return 3;
+    int func1(int x) {
+    return x * 2;
     }
 
     int main() {
-        Print(test());
+        int i;
+        i = 2;
+        Print(func1(i));
     }
     '''
 

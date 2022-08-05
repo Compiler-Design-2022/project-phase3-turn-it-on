@@ -49,6 +49,9 @@ def before_enter(parse_tree, symbol_table):
     elif parse_tree.data == "forstmt":
         new_scope = Scope(for_scope=True)
         symbol_table.push_scope(new_scope)
+    elif parse_tree.data == "function_decl":
+        new_scope = Scope(method_scope=True)
+        symbol_table.push_scope(new_scope)
     return
 
 
@@ -618,16 +621,18 @@ def after_enter(parse_tree, symbol_table, children):
     # function_decl: type ident "(" formals ")" stmtblock | /void/ ident "(" formals ")" stmtblock
     elif parse_tree.data == "function_decl":
         if children[1].text == "@main":
-            scope_name = "FUNCTION_MAIN"
+            symbol_table.last_function_scope().scope_name = "FUNCTION_MAIN"
+            symbol_table.last_function_scope().begin_label = "FUNCTION_MAIN_start"
+            symbol_table.last_function_scope().end_label = "FUNCTION_MAIN_end"
+            symbol_table.last_function_scope().continue_label = "FUNCTION_MAIN_continue_label"
+            symbol_table.last_function_scope().method_output_type = Type()
         else:
-            scope_name = get_function_number()
-        new_scope = Scope(scope_name=scope_name, method_scope=True, method_output_type=children[0].type)
-        symbol_table.push_scope(new_scope)
-        
-        function_name = new_scope.scope_name
+            symbol_table.last_function_scope().method_output_type = children[0].type
+
+        function_name = symbol_table.last_function_scope().scope_name
         stmtblock_code = children[3].code
         code = ""
-        if scope_name == "FUNCTION_MAIN":
+        if function_name == "FUNCTION_MAIN":
             code += f'''
             {function_name}:
             \t{stmtblock_code}
@@ -655,9 +660,9 @@ def after_enter(parse_tree, symbol_table, children):
         
         # in function call inputs stored in stack, only change name of inputs by pushing variables into scope 
         for child in children:
-            symbol_table.last_scope().add_method_input_type(child.type)
+            symbol_table.last_function_scope().add_method_input_type(child.type)
             variable = Variable(child.text, child.type)
-            symbol_table.last_scope().push_variable(variable)
+            symbol_table.last_function_scope().push_variable(variable)
 
         code = "".join(child_codes_list)
         return Node_Return(code=code, type=None)
@@ -690,6 +695,7 @@ def after_enter(parse_tree, symbol_table, children):
                 code += child.code
             else:
                 code += child.text
+        
         if len(children) == 1 and children[0].type == None:
             return Node_Return(code=code, type=[])
         return Node_Return(code=code, type=[children[i].type for i in range(len(children))])
