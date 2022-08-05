@@ -532,6 +532,55 @@ def after_enter(parse_tree, symbol_table, children):
                 '''
         return Node_Return(code=code, type=Type("bool"))
 
+    #condition_expr_greater_equal: expr ">=" expr
+    elif parse_tree.data == "condition_expr_greater_equal":
+            left_expr_code = children[0].code
+            right_expr_code = children[1].code
+            symbol_table.last_scope().pop_variable()  # t0 right t1 left
+            code = f'''{left_expr_code} {right_expr_code} 
+                        \tlw $t0, {children[1].type.size}($sp)
+                        \tlw $t1, {children[1].type.size + children[0].type.size}($sp)
+                        \tsle $t0, $t0, $t1
+                        \taddi $sp, $sp, {children[1].type.size + children[0].type.size}
+                        \tsw $t0, 0($sp)
+                        \taddi $sp, $sp, -4
+                    '''
+            return Node_Return(code=code, type=Type("bool"))
+    
+    #condition_expr_equal: expr "==" expr
+    elif parse_tree.data == "condition_expr_equal":
+            left_expr_code = children[0].code
+            right_expr_code = children[1].code
+            symbol_table.last_scope().pop_variable()  # t0 right t1 left
+            code = f'''{left_expr_code} {right_expr_code} 
+                        \tlw $t0, {children[1].type.size}($sp)
+                        \tlw $t1, {children[1].type.size + children[0].type.size}($sp)
+                        \tsubu $t2, $t0, $t1
+                        \tsltu $t2, $zero, $t2
+                        \txori $t2, $t2, 1
+                        \taddi $sp, $sp, {children[1].type.size + children[0].type.size}
+                        \tsw $t2, 0($sp)
+                        \taddi $sp, $sp, -4
+                    '''
+            return Node_Return(code=code, type=Type("bool"))
+    
+    #condition_expr_not_equal: expr "!=" expr
+    elif parse_tree.data == "condition_expr_not_equal":
+            left_expr_code = children[0].code
+            right_expr_code = children[1].code
+            symbol_table.last_scope().pop_variable()  # t0 right t1 left
+            code = f'''{left_expr_code} {right_expr_code} 
+                        \tlw $t0, {children[1].type.size}($sp)
+                        \tlw $t1, {children[1].type.size + children[0].type.size}($sp)
+                        \tsubu $t2, $t0, $t1
+                        \tsltu $t2, $zero, $t2
+                        \taddi $sp, $sp, {children[1].type.size + children[0].type.size}
+                        \tsw $t2, 0($sp)
+                        \taddi $sp, $sp, -4
+                    '''
+            return Node_Return(code=code, type=Type("bool"))
+    
+    
     # printstmt: "Print" "(" expr ("," expr)* ")" ";"
     elif parse_tree.data == "printstmt":
         child_codes_list = []
