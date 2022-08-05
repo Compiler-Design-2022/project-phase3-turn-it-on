@@ -17,7 +17,13 @@ def cgen_token(token: lark.Token, symboltable: SymbolTable):
         token.value = token.value.replace("@", "")
         type = Type("string")
         token.value = token.value.replace("\n", "\\n")
-        print("salam salam", token.value)
+        ans = ""
+        for c in token.value:
+            if c != '"':
+                ans += c + "***"
+            else:
+                ans += '"'
+        token.value = ans
     return Node_Return(text=token.value, type=type)
 
 
@@ -138,12 +144,13 @@ def after_enter(parse_tree, symbol_table, children):
                     \tlw $t0, {children[1].type.size}($sp)
                     \tlw $t1, {children[1].type.size + children[0].type.size}($sp)
                     \tli $t2, {children[0].type.size}
-                    \tmul $t0, $t0, $t2 
+                    \tmul $t0, $t0, $t2
                     \tadd $t0, $t0, $t1
                     \taddi $sp, $sp, {children[1].type.size + children[0].type.size}
                     \tsw $t0, 0($sp)
                     \taddi $sp, $sp, -4
                 '''
+        assert children[1].type == Type("int")
         return Node_Return(code=code, type=children[0].type)
 
     # assignment_expr_empty: lvalue "=" expr
@@ -161,10 +168,10 @@ def after_enter(parse_tree, symbol_table, children):
         try:
             assert children[0].type.inside_type == children[1].type
         except:
-            print("*"*40)
+            print("*" * 40)
             print(children[0].type.inside_type)
             print(children[1].type)
-            print("#"*40)
+            print("#" * 40)
             raise ValueError
 
         return Node_Return(code=code, type=children[1].type, text="assignment_expr_empty")
@@ -508,7 +515,7 @@ def after_enter(parse_tree, symbol_table, children):
                 \tli $v0, 11  
                 \tsyscall
                 '''
-            else:
+            elif child.type.name == "int":
                 code += f'''
                 \t lw $t0, {sum}($sp)
                 \t li $v0, 1
@@ -518,6 +525,16 @@ def after_enter(parse_tree, symbol_table, children):
                 \tli $v0, 11  
                 \tsyscall
                 '''
+            elif child.type.name == "char":
+                code += f'''
+                    \t lw $t0, {sum}($sp)
+                    \t li $v0, 11
+                    \t move $a0, $t0
+                    \t syscall
+                    \tli $a0, 32
+                    \tli $v0, 11  
+                    \tsyscall
+                    '''
             sum -= child.type.size
 
         # org_sum must be 0 if expr in printstmt rule is assignment_expr

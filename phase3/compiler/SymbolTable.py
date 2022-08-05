@@ -70,7 +70,7 @@ class Type():
             self.size = 8
         elif name == "string":
             self.size = 4  # its a pointer
-            self.inside_type = "char"
+            self.inside_type = Type("char")
         elif name == "array":
             self.size = 4  # its a pointer
             self.inside_type = inside_type

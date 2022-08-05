@@ -10,11 +10,9 @@ def run(input_file_address: str) -> bool:
     input_content = '''  
     void main()
     {
-       int[][] a;
-       a=NewArray(7, int[]);
-       a[1]=NewArray(7, int);
-       a[1][5]= a[2][5]*8;
-       Print(a[1][5]);
+        string s;
+        s="salam";
+        Print(s[17]);
     }
     '''
 
