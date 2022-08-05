@@ -8,17 +8,17 @@ def run(input_file_address: str) -> bool:
     # input_file = open(input_file_address)
     # input_content = input_file.read()
     input_content = '''  
-    int func1(int x) {
-    return x * 2;
+    int factorial(int n)
+    {
+      if (n <=1 ) return 1;
+      return n*factorial(n-1);
     }
 
-    int func2(int x) {
-    return x + 1;
-    }
-
-    int main() {
-        Print(func1(2));
-        Print(func2(6));
+    void main()
+    {
+       int n;
+       n = 2;
+       Print(factorial(n));
     }
     '''
 
