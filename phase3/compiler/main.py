@@ -8,12 +8,19 @@ def run(input_file_address: str) -> bool:
     # input_file = open(input_file_address)
     # input_content = input_file.read()
     input_content = '''  
-    void main()
-    {
-        string s;
-        s="salam";
-        Print(s[17]);
-    }
+    
+
+
+
+void test() {
+    Print("test successful!");
+}
+
+int main() {
+    test();
+}
+
+
     '''
 
     try:
