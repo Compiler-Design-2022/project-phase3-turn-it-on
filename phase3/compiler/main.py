@@ -8,17 +8,13 @@ def run(input_file_address: str) -> bool:
     # input_file = open(input_file_address)
     # input_content = input_file.read()
     input_content = '''  
-    int factorial(int n)
-    {
-      if (n <=1 ) return 1;
-      return n*factorial(n-1);
-    }
-
     void main()
     {
-       int n;
-       n = 2;
-       Print(factorial(n));
+       int[][] a;
+       a=NewArray(7, int[]);
+       a[1]=NewArray(7, int);
+       a[1][5]= a[2][5]*8;
+       Print(a[1][5]);
     }
     '''
 

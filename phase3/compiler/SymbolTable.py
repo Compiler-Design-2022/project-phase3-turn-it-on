@@ -2,8 +2,9 @@ import random
 import string
 
 scope_counter = 0
-string_number_counter = 0 
-function_number_counter = 0 
+string_number_counter = 0
+function_number_counter = 0
+
 
 class Class:
     def __init__(self, classname, superclass):
@@ -28,15 +29,18 @@ def get_label():
     scope_counter += 1
     return "LABEL" + str(scope_counter)
 
+
 def get_string_number():
     global string_number_counter
     string_number_counter += 1
     return "String" + str(string_number_counter)
 
+
 def get_function_number():
     global function_number_counter
     function_number_counter += 1
     return str(function_number_counter)
+
 
 class Method():
     def __int__(self, name, output_type, input_variables):
@@ -51,7 +55,7 @@ class Method():
 
 
 class Type():
-    def __init__(self, name="int", array_length=0, inside_type=None):
+    def __init__(self, name="int", inside_type=None):
         self.name = name
         self.length = None
         self.inside_type = None
@@ -66,12 +70,12 @@ class Type():
             self.size = 8
         elif name == "string":
             self.size = 4  # its a pointer
-            self.length = array_length
             self.inside_type = "char"
         elif name == "array":
             self.size = 4  # its a pointer
-            self.length = array_length
             self.inside_type = inside_type
+        elif name == "char":
+            self.size = 4
         else:
             raise ValueError  # type not found
 
@@ -80,17 +84,18 @@ class Type():
             return False
         if self.inside_type is None:
             return self.name == other.name
-        if self.length != other.length:
-            return False
         return self.inside_type == other.inside_type
 
     def __str__(self):
-        return "TYPE" * 40+" "+self.name
+        return "TYPE " + self.name + (str(self.inside_type) if self.inside_type is not None else " ")
 
-    def merge_type(self, other):
+    def merge_type(self, other, limit=None):
         if self.size != other.size:
             raise ValueError
         if self != other:
+            raise ValueError
+
+        if limit is not None and other.name not in limit:
             raise ValueError
         return self  # TODO
 
@@ -159,6 +164,7 @@ class Scope():
     def add_method_input_type(self, type):
         self.method_input_types.append(type)
 
+
 class SymbolTable():
     def __init__(self):
         self.scope_stack: [Scope] = []
@@ -169,7 +175,7 @@ class SymbolTable():
         print("push scope ")
         self.scope_stack.append(scope)
         if scope.method_scope:
-             self.scope_function_declared.append(scope)
+            self.scope_function_declared.append(scope)
 
     def get_method(self, name, input_types=None):
         pass
