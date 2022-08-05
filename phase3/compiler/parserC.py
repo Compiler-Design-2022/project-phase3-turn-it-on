@@ -27,8 +27,9 @@ grammer = r"""
     continuestmt: "continue" ";"
     printstmt: "Print" "(" expr ("," expr)* ")" ";"
     expr: assignment_expr | constant | lvalue_exp | this_expr | call | "(" expr ")" | math_expr_minus | math_expr_sum | math_expr_mul | math_expr_div | math_expr_mod  | sign_expr | condition_expr | bool_math_expr
-         | input_expr | new_expr | new_array_expr | type_change_expr 
+         | input_expr | new_expr | new_array_expr | type_change_expr | len_expr
     
+    len_expr: "@len" "(" expr ")"
     lvalue_exp: lvalue
     this_expr: "this"
     new_expr: "new" ident
