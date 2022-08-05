@@ -36,7 +36,7 @@ def get_string_number():
 def get_function_number():
     global function_number_counter
     function_number_counter += 1
-    return "FUNCTION_" + str(function_number_counter)
+    return str(function_number_counter)
 
 class Method():
     def __int__(self, name, output_type, input_variables):
@@ -202,7 +202,7 @@ class SymbolTable():
     def last_function_scope(self) -> Scope:
         return self.scope_function_declared[len(self.scope_function_declared) - 1]
 
-    def get_function_with_types(self, types):
+    def get_function_with_name_types(self, name, types):
         for scope in self.scope_function_declared:
-            if scope.method_scope and types == scope.method_input_types:
+            if scope.scope_name == name.replace("@", "") and scope.method_scope and types == scope.method_input_types:
                 return scope.scope_name, scope

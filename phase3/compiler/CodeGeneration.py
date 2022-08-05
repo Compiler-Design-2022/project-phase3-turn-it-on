@@ -606,11 +606,14 @@ def after_enter(parse_tree, symbol_table, children):
 
     # normal_function_call: ident "(" actuals ")"
     elif parse_tree.data == "normal_function_call":
+        code = ""
+        for child in children:
+            code += child.code
+
         function_name = children[0].text
-        
-        mips_function_name = symbol_table.get_function_with_types(children[1].type)[0]
-        function_scope = symbol_table.get_function_with_types(children[1].type)[1]
-        code = f'''
+        mips_function_name = symbol_table.get_function_with_name_types(children[0].text, children[1].type)[0]
+        function_scope = symbol_table.get_function_with_name_types(children[0].text, children[1].type)[1]
+        code += f'''
             \tjal {mips_function_name}
             \taddi $sp, $sp, {function_scope.get_method_inputs_size()}
             \tsw $v0, 0($sp)
@@ -627,6 +630,11 @@ def after_enter(parse_tree, symbol_table, children):
             symbol_table.last_function_scope().continue_label = "FUNCTION_MAIN_continue_label"
             symbol_table.last_function_scope().method_output_type = Type()
         else:
+            name = children[1].text.replace("@","")
+            symbol_table.last_function_scope().scope_name = name
+            symbol_table.last_function_scope().begin_label = name+"_start"
+            symbol_table.last_function_scope().end_label = name+"_end"
+            symbol_table.last_function_scope().continue_label = name+"_continue_label"
             symbol_table.last_function_scope().method_output_type = children[0].type
 
         function_name = symbol_table.last_function_scope().scope_name

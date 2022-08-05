@@ -12,10 +12,13 @@ def run(input_file_address: str) -> bool:
     return x * 2;
     }
 
+    int func2(int x) {
+    return x + 1;
+    }
+
     int main() {
-        int i;
-        i = 2;
-        Print(func1(i));
+        Print(func1(2));
+        Print(func2(6));
     }
     '''
 
