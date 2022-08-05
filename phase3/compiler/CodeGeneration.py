@@ -82,7 +82,7 @@ def after_enter(parse_tree, symbol_table, children):
             code += f'''
                 .data
                 \t {string_name}: .word {len(children[0].text)}
-                \t IGNORE__{random.randint(0, 1000)}: .asciiz  {children[0].text}
+                \t IGNORE__{get_label()}: .asciiz  {children[0].text}
                 .text
                 \tla $t0, {string_name}
                 \tsw $t0, 0($sp)
