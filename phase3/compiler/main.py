@@ -3,11 +3,7 @@ from parserC import parser
 from CodeGeneration import cgen, function_declaration
 from SymbolTable import SymbolTable, Scope, Method, Type
 
-
-def run(input_file_address: str) -> bool:
-    # input_file = open(input_file_address)
-    # input_content = input_file.read()
-    input_content = ''' 
+code_predified_functions = '''
 int ReadChar(){
     ~mips
     li $v0, 12           #read_char 
@@ -19,7 +15,7 @@ int ReadChar(){
     ~
 }
  
-int ReadIngeger(){
+int ReadInteger(){
         int res; 
         int inp; 
         int sign; 
@@ -27,30 +23,34 @@ int ReadIngeger(){
         res = 0; 
         while(true){ 
             inp = ReadChar(); 
-            Print(res, inp);
             if (inp == 10){ 
                 break; 
             }
-            if (inp != 43 && inp != 13){ 
+            if (inp != 43){ 
                 if (inp == 45){ 
                     sign = -1; 
                 }else{  
-                    res = res * 10 + inp - 48; 
+                    res = (res * 10) + (inp - 48); 
                 } 
             } 
         } 
         return res * sign; 
 }
+'''
 
-int main() {
-    Print(ReadIngeger());
-}
 
+def run(input_file_address: str) -> bool:
+    # input_file = open(input_file_address)
+    # input_content = input_file.read()
+    input_content = ''' 
+        int main() {
+            Print(ReadInteger());
+        }
     '''
 
     try:
         print(input_content)
-        parse_tree, code = parser(input_content)
+        parse_tree, code = parser(code_predified_functions + input_content)
         print(parse_tree.pretty())
         # print(parse_tree)
         try:

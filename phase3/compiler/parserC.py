@@ -28,7 +28,7 @@ grammer = r"""
     continuestmt: "continue" ";"
     printstmt: "Print" "(" expr ("," expr)* ")" ";"
     expr: assignment_expr | constant | lvalue_exp | this_expr | call | "(" expr ")" | math_expr_minus | math_expr_sum | math_expr_mul | math_expr_div | math_expr_mod  | sign_expr | condition_expr | bool_math_expr
-         | input_expr | new_expr | new_array_expr | type_change_expr | len_expr
+          | new_expr | new_array_expr | type_change_expr | len_expr
     
     len_expr: "@len" "(" expr ")"
     lvalue_exp: lvalue
@@ -41,7 +41,6 @@ grammer = r"""
     condition_expr: condition_expr_less | condition_expr_less_equal | condition_expr_greater | condition_expr_greater_equal | condition_expr_equal | condition_expr_not_equal
     bool_math_expr: bool_math_expr_and | bool_math_expr_or
     type_change_expr: type_change_expr_itod | type_change_expr_dtoi | type_change_expr_itob | type_change_expr_btoi
-    input_expr: input_expr_readint | input_expr_readline
     
     assignment_expr_empty: lvalue "=" expr
     assignment_expr_with_plus: lvalue "+=" expr
@@ -70,9 +69,7 @@ grammer = r"""
     type_change_expr_itob: "itob(" expr ")"
     type_change_expr_btoi: "btoi(" expr ")"
 
-    input_expr_readint: "ReadInteger()"
-    input_expr_readline: "ReadLine()"
-    
+
     lvalue: ident |  class_val | array_val
     class_val: expr "." ident
     array_val: expr "[" expr "]" 
@@ -111,7 +108,7 @@ def remove_comment(s):
 
 
 def reprep(string):
-    keywords = "define, true, false, return, void, int, double, bool, string, class, interface, null, this, extends, implements, for, while, if, else, return, break, continue, new, NewArray, Print, ReadInteger, ReadLine, dtoi, itod, btoi, itob, private, protected, public, import".split(
+    keywords = "define, true, false, return, void, int, double, bool, string, class, interface, null, this, extends, implements, for, while, if, else, return, break, continue, new, NewArray, Print, dtoi, itod, btoi, itob, private, protected, public, import".split(
         ", ")
     if string not in keywords and (
             re.match("[a-zA-Z][a-zA-Z0-9_]*", string) or re.match("__func__[a-zA-Z0-9_]*", string) or re.match(

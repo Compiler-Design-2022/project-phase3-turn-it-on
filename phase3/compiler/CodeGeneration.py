@@ -821,6 +821,34 @@ def after_enter(parse_tree, symbol_table, children):
                     '''
         return Node_Return(code=code, type=None)
 
+    elif parse_tree.data == "bool_math_expr_and":
+        left_expr_code = children[0].code
+        right_expr_code = children[1].code
+        symbol_table.last_scope().pop_variable()
+        code = f'''{left_expr_code} {right_expr_code}
+                            \tlw $t0, {children[1].type.size}($sp)
+                            \tlw $t1, {children[1].type.size + children[0].type.size}($sp)
+                            \tand $t0, $t1, $t0
+                            \taddi $sp, $sp, {children[1].type.size + children[0].type.size}
+                            \tsw $t0, 0($sp)
+                            \taddi $sp, $sp, -4
+                        '''
+        return Node_Return(code=code, type=children[0].type.merge_type(children[1].type, ["bool"]))
+
+    elif parse_tree.data == "bool_math_expr_or":
+        left_expr_code = children[0].code
+        right_expr_code = children[1].code
+        symbol_table.last_scope().pop_variable()
+        code = f'''{left_expr_code} {right_expr_code}
+                            \tlw $t0, {children[1].type.size}($sp)
+                            \tlw $t1, {children[1].type.size + children[0].type.size}($sp)
+                            \tor $t0, $t1, $t0
+                            \taddi $sp, $sp, {children[1].type.size + children[0].type.size}
+                            \tsw $t0, 0($sp)
+                            \taddi $sp, $sp, -4
+                        '''
+        return Node_Return(code=code, type=children[0].type.merge_type(children[1].type, ["bool"]))
+
     # actuals: expr ("," expr)* | null
     elif parse_tree.data == "actuals":
         if len(children) == 1 and parse_tree.children[0].data == "null":
