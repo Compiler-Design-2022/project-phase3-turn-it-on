@@ -28,7 +28,7 @@ class Class:
 def get_label():
     global scope_counter
     scope_counter += 1
-    return "LABEL" + str(scope_counter)
+    return "LABL" + str(scope_counter)
 
 
 def get_string_number():

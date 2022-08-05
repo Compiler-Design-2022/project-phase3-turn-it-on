@@ -90,7 +90,7 @@ def after_enter(parse_tree, symbol_table, children):
     """ variable: type ident """
     if parse_tree.data == "type":
         if children[0].text == None:
-            return Node_Return(type=Type("ref", inside_type=children[0].type))
+            return Node_Return(type=Type("array", inside_type=children[0].type))
         return Node_Return(code="", type=Type(children[0].text))
     elif parse_tree.data == "ident":
         return Node_Return(code="", type=None, text=children[0].text)
@@ -159,8 +159,7 @@ def after_enter(parse_tree, symbol_table, children):
     elif parse_tree.data == "new_array_expr":  # TODO differrent type different code
         expr_code = children[0].code
 
-        code = f'''
-            \t{expr_code}
+        code = f'''{expr_code}
             \t lw $t0, {children[0].type.size}($sp)
             \t move $t8, $t0
             \t sub $t1, $t1, $t1 
@@ -173,9 +172,8 @@ def after_enter(parse_tree, symbol_table, children):
             \t lw $t0, {children[0].type.size}($sp)
             \t sw $t0 ,0($v0)
             \t sw $v0, {children[0].type.size}($sp)
-
         '''
-        return Node_Return(code=code, type=Type("ref", inside_type=children[1].type))
+        return Node_Return(code=code, type=Type("array", inside_type=children[1].type))
 
     # array_val: expr "[" expr "]"
     elif parse_tree.data == "array_val":
@@ -307,16 +305,33 @@ def after_enter(parse_tree, symbol_table, children):
     elif parse_tree.data == "math_expr_sum":
         left_expr_code = children[0].code
         right_expr_code = children[1].code
-        symbol_table.last_scope().pop_variable()
-        code = f'''{left_expr_code} {right_expr_code}
-                    \tlw $t0, {children[1].type.size}($sp)
-                    \tlw $t1, {children[1].type.size + children[0].type.size}($sp)
-                    \tadd $t0, $t0, $t1
-                    \taddi $sp, $sp, {children[1].type.size + children[0].type.size}
-                    \tsw $t0, 0($sp)
-                    \taddi $sp, $sp, -4
-                '''
-        return Node_Return(code=code, type=children[0].type.merge_type(children[1].type, ["int", "double"]))
+        if children[0].type.name == "string" or children[0].type.name == "array":
+            symbol_table.last_scope().pop_variable()
+            code = f'''{left_expr_code} {right_expr_code}
+                                    \tlw $t0, 4($sp)
+                                    \tlw $t1, 8($sp)
+                                    \taddi $sp, $sp, -12
+                                    \tsw $t0, 4($sp)
+                                    \tsw $t1, 8($sp)
+                                    \tjal math_expr_sum_4
+                                    \tlw $t0, 4($sp)
+                                    \taddi $sp, $sp, 16
+                                    \tsw $t0, 0($sp)
+                                    \taddi $sp, $sp, -4
+                                '''
+            assert  children[0].type==children[1].type
+            return Node_Return(code=code, type=children[0].type.merge_type(children[1].type))
+        else:
+            symbol_table.last_scope().pop_variable()
+            code = f'''{left_expr_code} {right_expr_code}
+                        \tlw $t0, {children[1].type.size}($sp)
+                        \tlw $t1, {children[1].type.size + children[0].type.size}($sp)
+                        \tadd $t0, $t0, $t1
+                        \taddi $sp, $sp, {children[1].type.size + children[0].type.size}
+                        \tsw $t0, 0($sp)
+                        \taddi $sp, $sp, -4
+                    '''
+            return Node_Return(code=code, type=children[0].type.merge_type(children[1].type, ["int", "double"]))
 
     # math_expr_minus: expr "-" expr
     elif parse_tree.data == "math_expr_minus":
@@ -535,12 +550,12 @@ def after_enter(parse_tree, symbol_table, children):
                 '''
         return Node_Return(code=code, type=Type("bool"))
 
-    #condition_expr_greater_equal: expr ">=" expr
+    # condition_expr_greater_equal: expr ">=" expr
     elif parse_tree.data == "condition_expr_greater_equal":
-            left_expr_code = children[0].code
-            right_expr_code = children[1].code
-            symbol_table.last_scope().pop_variable()  # t0 right t1 left
-            code = f'''{left_expr_code} {right_expr_code} 
+        left_expr_code = children[0].code
+        right_expr_code = children[1].code
+        symbol_table.last_scope().pop_variable()  # t0 right t1 left
+        code = f'''{left_expr_code} {right_expr_code} 
                         \tlw $t0, {children[1].type.size}($sp)
                         \tlw $t1, {children[1].type.size + children[0].type.size}($sp)
                         \tsle $t0, $t0, $t1
@@ -548,14 +563,14 @@ def after_enter(parse_tree, symbol_table, children):
                         \tsw $t0, 0($sp)
                         \taddi $sp, $sp, -4
                     '''
-            return Node_Return(code=code, type=Type("bool"))
-    
-    #condition_expr_equal: expr "==" expr
+        return Node_Return(code=code, type=Type("bool"))
+
+    # condition_expr_equal: expr "==" expr
     elif parse_tree.data == "condition_expr_equal":
-            left_expr_code = children[0].code
-            right_expr_code = children[1].code
-            symbol_table.last_scope().pop_variable()  # t0 right t1 left
-            code = f'''{left_expr_code} {right_expr_code} 
+        left_expr_code = children[0].code
+        right_expr_code = children[1].code
+        symbol_table.last_scope().pop_variable()  # t0 right t1 left
+        code = f'''{left_expr_code} {right_expr_code} 
                         \tlw $t0, {children[1].type.size}($sp)
                         \tlw $t1, {children[1].type.size + children[0].type.size}($sp)
                         \tsubu $t2, $t0, $t1
@@ -565,14 +580,14 @@ def after_enter(parse_tree, symbol_table, children):
                         \tsw $t2, 0($sp)
                         \taddi $sp, $sp, -4
                     '''
-            return Node_Return(code=code, type=Type("bool"))
-    
-    #condition_expr_not_equal: expr "!=" expr
+        return Node_Return(code=code, type=Type("bool"))
+
+    # condition_expr_not_equal: expr "!=" expr
     elif parse_tree.data == "condition_expr_not_equal":
-            left_expr_code = children[0].code
-            right_expr_code = children[1].code
-            symbol_table.last_scope().pop_variable()  # t0 right t1 left
-            code = f'''{left_expr_code} {right_expr_code} 
+        left_expr_code = children[0].code
+        right_expr_code = children[1].code
+        symbol_table.last_scope().pop_variable()  # t0 right t1 left
+        code = f'''{left_expr_code} {right_expr_code} 
                         \tlw $t0, {children[1].type.size}($sp)
                         \tlw $t1, {children[1].type.size + children[0].type.size}($sp)
                         \tsubu $t2, $t0, $t1
@@ -581,9 +596,9 @@ def after_enter(parse_tree, symbol_table, children):
                         \tsw $t2, 0($sp)
                         \taddi $sp, $sp, -4
                     '''
-            return Node_Return(code=code, type=Type("bool"))
-    
-    
+        return Node_Return(code=code, type=Type("bool"))
+
+
     # printstmt: "Print" "(" expr ("," expr)* ")" ";"
     elif parse_tree.data == "printstmt":
         child_codes_list = []
@@ -891,7 +906,7 @@ def after_enter(parse_tree, symbol_table, children):
                 code += child.code
             else:
                 code += child.text
-        return Node_Return(code=code, type=children[0].type if len(children)>0 else Type())  # TODO: not good!
+        return Node_Return(code=code, type=children[0].type if len(children) > 0 else Type())  # TODO: not good!
 
 
 all_node = '''
