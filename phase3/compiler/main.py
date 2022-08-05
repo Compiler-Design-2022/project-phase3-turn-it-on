@@ -3,9 +3,7 @@ from parserC import parser
 from CodeGeneration import cgen, function_declaration
 from SymbolTable import SymbolTable, Scope, Method, Type
 
-code_predified_functions = '''
-
-char itoc(int a){
+type_change_function_inside4to4 = '''
     ~mips
     lw $t0, 8($sp) 
     lw $t1, 4($sp)
@@ -13,8 +11,26 @@ char itoc(int a){
     addi $sp, $sp, -4
     jr $t0
     ~
+'''
+code_predified_functions = '''
+char itoc(int a){
+    ''' + type_change_function_inside4to4 + '''
 }
-
+bool itob(int a){
+    ''' + type_change_function_inside4to4 + '''
+}
+int btoi(bool a){
+    ''' + type_change_function_inside4to4 + '''
+}
+int ctoi(char a){
+    ''' + type_change_function_inside4to4 + '''
+}
+int dtoi(double a){
+    ''' + type_change_function_inside4to4 + '''
+}
+double itod(int a){
+    ''' + type_change_function_inside4to4 + '''
+}''' + '''
 int ReadChar(){
     ~mips
     li $v0, 12           #read_char 
