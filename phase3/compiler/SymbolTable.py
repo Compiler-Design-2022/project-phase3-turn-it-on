@@ -88,6 +88,7 @@ class Type():
         elif name == "void":
             self.size = 0
         else:
+            print(name)
             raise ValueError  # type not found
 
     def __eq__(self, other):

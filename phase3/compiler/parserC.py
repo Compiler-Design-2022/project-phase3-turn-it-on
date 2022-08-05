@@ -7,7 +7,7 @@ grammer = r"""
     decl: variable_decl | function_decl | class_decl | interface_decl
     variable_decl: variable ";"
     variable: type ident
-    type: /int/ | /double/ | /bool/ | /string/ | ident | type "[]" 
+    type: /int/ | /char/ | /double/ | /bool/ | /string/ | ident | type "[]" 
     function_decl: type ident "(" formals ")" stmtblock | /void/ ident "(" formals ")" stmtblock 
     formals: variable ("," variable)+ |  variable | null
     class_decl: "class" ident ("extends" ident)? ("implements" ident ("," ident)*)? "{" field* "}"
@@ -108,7 +108,7 @@ def remove_comment(s):
 
 
 def reprep(string):
-    keywords = "define, true, false, return, void, int, double, bool, string, class, interface, null, this, extends, implements, for, while, if, else, return, break, continue, new, NewArray, Print, dtoi, itod, btoi, itob, private, protected, public, import".split(
+    keywords = "char, define, true, false, return, void, int, double, bool, string, class, interface, null, this, extends, implements, for, while, if, else, return, break, continue, new, NewArray, Print, dtoi, itod, btoi, itob, private, protected, public, import".split(
         ", ")
     if string not in keywords and (
             re.match("[a-zA-Z][a-zA-Z0-9_]*", string) or re.match("__func__[a-zA-Z0-9_]*", string) or re.match(

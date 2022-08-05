@@ -162,6 +162,7 @@ def after_enter(parse_tree, symbol_table, children):
         code = f'''
             \t{expr_code}
             \t lw $t0, {children[0].type.size}($sp)
+            \t move $t8, $t0
             \t sub $t1, $t1, $t1 
             \t addi $t1, $t1, {children[1].type.size}
             \t mul $t0, $t0, $t1
@@ -169,6 +170,8 @@ def after_enter(parse_tree, symbol_table, children):
             \t move $a0, $t0
             \t li $v0, 9 
             \t syscall
+            \t lw $t0, {children[0].type.size}($sp)
+            \t sw $t0 ,0($v0)
             \t sw $v0, {children[0].type.size}($sp)
 
         '''
@@ -594,7 +597,7 @@ def after_enter(parse_tree, symbol_table, children):
         for child in reversed(children):
             if len(symbol_table.last_scope().variables) > 0:
                 symbol_table.last_scope().pop_variable()
-            if child.type.name == "string":
+            if child.type.name == "string" or child.type == Type("array", Type("char")):
                 label = "PRINT_" + get_label()
                 code += f'''
                 \t lw $t0, {sum}($sp)
@@ -879,6 +882,8 @@ def after_enter(parse_tree, symbol_table, children):
         \tENDPROGRAM:
         '''
         return Node_Return(code=code, type=children[0].type, text=children[0].text)
+    elif parse_tree.data == "call":
+        return Node_Return(code=children[0].code, type=children[0].type)
     else:
         code = ''
         for child in children:
@@ -886,7 +891,7 @@ def after_enter(parse_tree, symbol_table, children):
                 code += child.code
             else:
                 code += child.text
-        return Node_Return(code=code, type=Type())  # TODO: not good!
+        return Node_Return(code=code, type=children[0].type if len(children)>0 else Type())  # TODO: not good!
 
 
 all_node = '''

@@ -4,6 +4,17 @@ from CodeGeneration import cgen, function_declaration
 from SymbolTable import SymbolTable, Scope, Method, Type
 
 code_predified_functions = '''
+
+char itoc(int a){
+    ~mips
+    lw $t0, 8($sp) 
+    lw $t1, 4($sp)
+    sw $t1, 0($sp) 
+    addi $sp, $sp, -4
+    jr $t0
+    ~
+}
+
 int ReadChar(){
     ~mips
     li $v0, 12           #read_char 
@@ -14,7 +25,27 @@ int ReadChar(){
     jr $t0
     ~
 }
- 
+
+
+char[] ReadLine(){
+        char[] res; 
+        int inp; 
+        int size;
+        
+        size=0;
+        res=NewArray(100, char);                                                                                                   
+        while(true){ 
+            inp = ReadChar(); 
+            if (inp == 10){ 
+                break; 
+            }
+            res[size] = itoc(inp); 
+            size+=1;
+        } 
+        res[-1]=itoc(size);
+        Print(len(res));
+        return res; 
+}
 int ReadInteger(){
         int res; 
         int inp; 
@@ -44,7 +75,7 @@ def run(input_file_address: str) -> bool:
     # input_content = input_file.read()
     input_content = ''' 
         int main() {
-            Print(ReadInteger());
+            Print(ReadLine());
         }
     '''
 
