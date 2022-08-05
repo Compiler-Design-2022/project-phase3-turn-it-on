@@ -1,4 +1,4 @@
-from SymbolTable import SymbolTable, Scope, Variable, Type, get_label, get_string_number
+from SymbolTable import SymbolTable, Scope, Variable, Type, get_label, get_string_number, get_function_number
 import lark
 import copy
 
@@ -593,6 +593,7 @@ def after_enter(parse_tree, symbol_table, children):
             return Node_Return(code=code, type=None, text=children[0].text)
 
         return Node_Return(code=code, type=None)
+
     # stmtblock: "{" variable_decl* stmt* "}" 
     elif parse_tree.data == "stmtblock":
         code = ""
@@ -603,26 +604,73 @@ def after_enter(parse_tree, symbol_table, children):
     # normal_function_call: ident "(" actuals ")"
     elif parse_tree.data == "normal_function_call":
         function_name = children[0].text
-        # jal to correct function with correct input types 
+        
         mips_function_name = self.symbol_table.get_function_with_types(children[1].type)[0]
+        function_scope = self.symbol_table.get_function_with_types(children[1].type)[1]
         code = f'''
             \tjal {mips_function_name}
+            \taddi $sp, $sp, {function_scope.get_method_inputs_size()}
+            \tsw $v0, 0($sp)
+            \taddi $sp, $sp, -{function_scope.method_output_type.size}
         '''
+        return Node_Return(code=code, type=None)
+
+    # function_decl: type ident "(" formals ")" stmtblock | /void/ ident "(" formals ")" stmtblock
+    elif parse_tree.data == "function_decl":
+        new_scope = Scope(scope_name=get_function_number(), method_scope=True, method_output_type=children[0].type)
+        symbol_table.push_scope(new_scope)
+        
+        function_name = new_scope.scope_name
+        stmtblock_code = children[3].code
+        code = ""
+        code += f'''
+        {function_name}:
+        \t{stmtblock_code}
+        \tjr $ra
+        '''
+        symbol_table.pop_scope()
+        return Node_Return(code=code, type=None)
 
     # formals: variable ("," variable)+ |  variable | null
     elif parse_tree.data == "formals":
         code = ""
+        if children[0].text == "": # it is null
+            return Node_Return(code=code, type=None)
+        
         child_codes_list = []
         sum = 0
         for i in range(len(children)):
             child_codes_list.append(children[i].code)
             sum += children[i].type.size
-
+        
         # in function call inputs stored in stack, only change name of inputs by pushing variables into scope 
         for child in children:
+            symbol_table.last_scope().add_method_input_type(child.type)
             variable = Variable(child.text, child.type)
             symbol_table.last_scope().push_variable(variable)
 
+        code = "".join(child_codes_list)
+        return Node_Return(code=code, type=None)
+
+    # returnstmt: "return" expr? ";"
+    elif parse_tree.data == "returnstmt":
+        code = ""
+        for child in children:
+            code += child.code
+ 
+        code += f'''
+        \tsw $v0, {children[0].type.size}($sp)
+        \taddi $sp, $sp, {children[0].type.size}
+        '''
+
+        # to handle two value return 
+        #code += f'''
+        #    \tsw $v0, {children[0].type.size+children[1].type.size}($sp)
+        #    \tsw $v1, {children[1].type.size}($sp)
+        #    \taddi $sp, $sp, {children[0].type.size+children[1].type.size}
+        #    '''
+        return Node_Return(code=code, type=None)
+        
     # actuals: expr ("," expr)* | null
     elif parse_tree.data == "actuals":
         code = ''

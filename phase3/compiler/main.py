@@ -8,17 +8,13 @@ def run(input_file_address: str) -> bool:
     # input_file = open(input_file_address)
     # input_content = input_file.read()
     input_content = '''  
-    int f(int a, int b){
-        a = a+2; 
-        return  a; 
-    }  
-  int main() {
-    int a;
-    int b;
-    f(a,b);
-}
+    double test() {
+        return 3;
+    }
 
-
+    int main() {
+        Print(test());
+    }
     '''
 
     try:

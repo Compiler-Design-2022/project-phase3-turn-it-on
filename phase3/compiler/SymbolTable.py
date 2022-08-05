@@ -108,6 +108,7 @@ class Scope():
         self.for_scope = for_scope
         self.method_scope = method_scope
         self.mehod_input_types = []
+        self.method_output_type = None
         self.continue_label = scope_name + "_continue"
 
     def __str__(self):
@@ -144,6 +145,14 @@ class Scope():
             ans += variable.type.size
         return ans
 
+    def get_method_inputs_size(self):
+        ans = 0
+        for type in self.mehod_input_types:
+            ans += type.size
+        return ans
+
+    def add_method_input_type(self, type):
+        self.mehod_input_types.append(type)
 
 class SymbolTable():
     def __init__(self):
@@ -154,6 +163,8 @@ class SymbolTable():
     def push_scope(self, scope: Scope):
         print("push scope ")
         self.scope_stack.append(scope)
+        if scope.method_scope:
+             self.scope_function_declared.append(scope)
 
     def get_method(self, name, input_types=None):
         pass
@@ -185,5 +196,5 @@ class SymbolTable():
 
     def get_function_with_types(self, types):
         for scope in self.scope_function_declared:
-            if scope.method_scope and types = scope.mehod_input_types:
+            if scope.method_scope and types == scope.mehod_input_types:
                 return scope.scope_name, scope
