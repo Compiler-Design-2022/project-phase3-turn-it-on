@@ -8,7 +8,7 @@ def run(input_file_address: str) -> bool:
     # input_file = open(input_file_address)
     # input_content = input_file.read()
     input_content = '''  
-    double test() {
+    int test() {
         return 3;
     }
 

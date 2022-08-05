@@ -605,8 +605,8 @@ def after_enter(parse_tree, symbol_table, children):
     elif parse_tree.data == "normal_function_call":
         function_name = children[0].text
         
-        mips_function_name = self.symbol_table.get_function_with_types(children[1].type)[0]
-        function_scope = self.symbol_table.get_function_with_types(children[1].type)[1]
+        mips_function_name = symbol_table.get_function_with_types(children[1].type)[0]
+        function_scope = symbol_table.get_function_with_types(children[1].type)[1]
         code = f'''
             \tjal {mips_function_name}
             \taddi $sp, $sp, {function_scope.get_method_inputs_size()}
@@ -617,17 +617,27 @@ def after_enter(parse_tree, symbol_table, children):
 
     # function_decl: type ident "(" formals ")" stmtblock | /void/ ident "(" formals ")" stmtblock
     elif parse_tree.data == "function_decl":
-        new_scope = Scope(scope_name=get_function_number(), method_scope=True, method_output_type=children[0].type)
+        if children[1].text == "@main":
+            scope_name = "FUNCTION_MAIN"
+        else:
+            scope_name = get_function_number()
+        new_scope = Scope(scope_name=scope_name, method_scope=True, method_output_type=children[0].type)
         symbol_table.push_scope(new_scope)
         
         function_name = new_scope.scope_name
         stmtblock_code = children[3].code
         code = ""
-        code += f'''
-        {function_name}:
-        \t{stmtblock_code}
-        \tjr $ra
-        '''
+        if scope_name == "FUNCTION_MAIN":
+            code += f'''
+            {function_name}:
+            \t{stmtblock_code}
+            '''
+        else:
+            code += f'''
+            {function_name}:
+            \t{stmtblock_code}
+            \tjr $ra
+            '''
         symbol_table.pop_scope()
         return Node_Return(code=code, type=None)
 
@@ -657,10 +667,11 @@ def after_enter(parse_tree, symbol_table, children):
         code = ""
         for child in children:
             code += child.code
- 
+        
+        # remove \taddi $sp, $sp, {children[0].type.size} from second line because we handle it in stmt
         code += f'''
-        \tsw $v0, {children[0].type.size}($sp)
-        \taddi $sp, $sp, {children[0].type.size}
+        \tlw $v0, {children[0].type.size}($sp)
+        
         '''
 
         # to handle two value return 
@@ -679,9 +690,20 @@ def after_enter(parse_tree, symbol_table, children):
                 code += child.code
             else:
                 code += child.text
+        if len(children) == 1 and children[0].type == None:
+            return Node_Return(code=code, type=[])
         return Node_Return(code=code, type=[children[i].type for i in range(len(children))])
     elif parse_tree.data == "expr" or parse_tree.data == "assignment_expr":
         code = ''
+        for child in children:
+            if child.code is not None:
+                code += child.code
+            else:
+                code += child.text
+        return Node_Return(code=code, type=children[0].type, text=children[0].text)
+    elif parse_tree.data == "program":
+        code = '''j FUNCTION_MAIN
+        '''
         for child in children:
             if child.code is not None:
                 code += child.code

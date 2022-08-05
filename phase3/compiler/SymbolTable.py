@@ -36,7 +36,7 @@ def get_string_number():
 def get_function_number():
     global function_number_counter
     function_number_counter += 1
-    return "FUNCTION_" + str(string_number_counter)
+    return "FUNCTION_" + str(function_number_counter)
 
 class Method():
     def __int__(self, name, output_type, input_variables):
@@ -100,16 +100,19 @@ class Variable():
 
 
 class Scope():
-    def __init__(self, scope_name=get_label(), for_scope=False, method_scope=False):
+    def __init__(self, scope_name="", for_scope=False, method_scope=False, method_output_type=None):
         self.variables = []
-        self.scope_name = scope_name
-        self.begin_label = scope_name + "_start"
-        self.end_label = scope_name + "_end"
+        if scope_name == "":
+            self.scope_name = get_label()
+        else:
+            self.scope_name = scope_name
+        self.begin_label = self.scope_name + "_start"
+        self.end_label = self.scope_name + "_end"
         self.for_scope = for_scope
         self.method_scope = method_scope
         self.mehod_input_types = []
-        self.method_output_type = None
-        self.continue_label = scope_name + "_continue"
+        self.method_output_type = method_output_type
+        self.continue_label = self.scope_name + "_continue"
 
     def __str__(self):
         return self.begin_label + "(*)" + self.end_label
