@@ -82,7 +82,7 @@ grammer = r"""
     boolconstant_true: "true"
     boolconstant_false: "false"
     base16: /0[xX][0-9a-fA-F]+/
-    INT: /[0-9]+/
+    INT: /-?[0-9]+/
     STRING : /"[^"]*"/
     
     %import common.ESCAPED_STRING

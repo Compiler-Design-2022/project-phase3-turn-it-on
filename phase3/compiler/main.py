@@ -59,7 +59,6 @@ char[] ReadLine(){
             size+=1;
         } 
         res[-1]=itoc(size);
-        Print(len(res));
         return res; 
 }
 int ReadInteger(){
