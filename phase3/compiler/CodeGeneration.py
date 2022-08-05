@@ -511,7 +511,7 @@ def after_enter(parse_tree, symbol_table, children):
             if len(symbol_table.last_scope().variables) > 0:
                 symbol_table.last_scope().pop_variable()
             if child.type.name == "string":
-                label="PRINT_"+str(random.randint(0,10000000))
+                label="PRINT_"+get_label()
                 code += f'''
                 \t lw $t0, {sum}($sp)
                 \t lw $t2, 0($t0)
