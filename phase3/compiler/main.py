@@ -7,16 +7,6 @@ from SymbolTable import SymbolTable, Scope, Method, Type
 def run(input_file_address: str) -> bool:
     # input_file = open(input_file_address)
     # input_content = input_file.read()
-<<<<<<< HEAD
-    input_content = '''  
-
-    void main()
-    {
-        string a;
-        a="salam";
-        Print(a);
-    }
-=======
     input_content = ''' 
 int ReadChar(){
     ~mips
@@ -56,8 +46,6 @@ int main() {
     Print(ReadIngeger());
 }
 
-
->>>>>>> 5413e0610ab8ee72e2e50213154b9df92f3e5161
     '''
 
     try:
