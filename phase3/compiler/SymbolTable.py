@@ -121,7 +121,7 @@ class Variable():
         return f" vn:{self.name} {self.type}"
 
 class Scope():
-    def __init__(self, for_scope=False, method_scope=False):
+    def __init__(self, for_scope=False, method_scope=False, method=None):
         self.variables = []
         scope_name = get_label()
         self.begin_label = scope_name + "_start"
@@ -130,6 +130,7 @@ class Scope():
             self.continue_label = scope_name + "_continue"
         self.for_scope = for_scope
         self.method_scope = method_scope
+        self.method = method
         if method_scope:
             self.push_variable(Variable("$RA", Type("int")))
 

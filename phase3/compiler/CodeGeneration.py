@@ -46,7 +46,10 @@ def function_declaration(parse_tree, symbol_table: SymbolTable):
         symbol_table1 = SymbolTable()
         symbol_table1.push_scope(Scope())
         input_child = cgen(parse_tree.children[2], symbol_table1)
-        symbol_table.push_method(Method(name_child.text, type_child.type, input_child.type))
+        method = Method(name_child.text, type_child.type, input_child.type)
+        symbol_table.push_method(method)
+        parse_tree.method = method
+
     for child in parse_tree.children:
         function_declaration(child, symbol_table)
     return
@@ -81,7 +84,7 @@ def before_enter(parse_tree, symbol_table):
         new_scope = Scope(for_scope=True)
         symbol_table.push_scope(new_scope)
     elif parse_tree.data == "function_decl":
-        symbol_table.push_scope(Scope(method_scope=True))
+        symbol_table.push_scope(Scope(method_scope=True, method=parse_tree.method))
     elif parse_tree.data == "normal_function_call":
         symbol_table.last_scope().push_variable(Variable("__IGNORE_RA", Type("int")))
 
@@ -628,7 +631,7 @@ def after_enter(parse_tree, symbol_table, children):
                     \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
                     \t sw $t2, 0($sp)
                     \t addi $sp, $sp, -4
-                ''' 
+                '''
         return Node_Return(code=code, type=Type("bool"))
 
 
@@ -813,6 +816,7 @@ def after_enter(parse_tree, symbol_table, children):
 
         if function_scope is None:
             raise ValueError
+        assert children[0].type == function_scope.method.output_type
         code += f'''
                     \t lw $t0, {children[0].type.size}($sp)
                     \t addi $sp, $sp, {pop_size}
