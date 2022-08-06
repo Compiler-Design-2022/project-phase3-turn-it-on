@@ -50,9 +50,9 @@ j main
                         .data
                         __IGNORELABL9: .double 69.82413714
                         .text
-                        	 l.s $f0, __IGNORELABL9
-                        	 sw $f0, 0($sp)
-                        	 addi $sp, $sp, -8
+                        	 l.a $t0, __IGNORELABL9
+                        	 sw $t0, 0($sp)
+                        	 addi $sp, $sp, -4
                     
                     	 lw $t0, 8($sp)
                     	 lw $t1, 12($sp)
@@ -71,9 +71,9 @@ j main
                         .data
                         __IGNORELABL11: .double 960.7071281
                         .text
-                        	 l.s $f0, __IGNORELABL11
-                        	 sw $f0, 0($sp)
-                        	 addi $sp, $sp, -8
+                        	 l.a $t0, __IGNORELABL11
+                        	 sw $t0, 0($sp)
+                        	 addi $sp, $sp, -4
                     
                     	 lw $t0, 8($sp)
                     	 lw $t1, 12($sp)
@@ -92,9 +92,9 @@ j main
                         .data
                         __IGNORELABL13: .double 0.5281794697
                         .text
-                        	 l.s $f0, __IGNORELABL13
-                        	 sw $f0, 0($sp)
-                        	 addi $sp, $sp, -8
+                        	 l.a $t0, __IGNORELABL13
+                        	 sw $t0, 0($sp)
+                        	 addi $sp, $sp, -4
                     
                     	 lw $t0, 8($sp)
                     	 lw $t1, 12($sp)
@@ -113,9 +113,9 @@ j main
                         .data
                         __IGNORELABL15: .double 0.5281794697
                         .text
-                        	 l.s $f0, __IGNORELABL15
-                        	 sw $f0, 0($sp)
-                        	 addi $sp, $sp, -8
+                        	 l.a $t0, __IGNORELABL15
+                        	 sw $t0, 0($sp)
+                        	 addi $sp, $sp, -4
                     
                     	 lw $t0, 8($sp)
                     	 lw $t1, 12($sp)
@@ -134,9 +134,9 @@ j main
                         .data
                         __IGNORELABL17: .double 5039.128903
                         .text
-                        	 l.s $f0, __IGNORELABL17
-                        	 sw $f0, 0($sp)
-                        	 addi $sp, $sp, -8
+                        	 l.a $t0, __IGNORELABL17
+                        	 sw $t0, 0($sp)
+                        	 addi $sp, $sp, -4
                     
                     	 lw $t0, 8($sp)
                     	 lw $t1, 12($sp)
@@ -155,9 +155,9 @@ j main
                         .data
                         __IGNORELABL19: .double 7585.800593
                         .text
-                        	 l.s $f0, __IGNORELABL19
-                        	 sw $f0, 0($sp)
-                        	 addi $sp, $sp, -8
+                        	 l.a $t0, __IGNORELABL19
+                        	 sw $t0, 0($sp)
+                        	 addi $sp, $sp, -4
                     
                     	 lw $t0, 8($sp)
                     	 lw $t1, 12($sp)
@@ -176,9 +176,9 @@ j main
                         .data
                         __IGNORELABL21: .double 11748.63533
                         .text
-                        	 l.s $f0, __IGNORELABL21
-                        	 sw $f0, 0($sp)
-                        	 addi $sp, $sp, -8
+                        	 l.a $t0, __IGNORELABL21
+                        	 sw $t0, 0($sp)
+                        	 addi $sp, $sp, -4
                     
                     	 lw $t0, 8($sp)
                     	 lw $t1, 12($sp)
@@ -197,9 +197,9 @@ j main
                         .data
                         __IGNORELABL23: .double 13446.89678
                         .text
-                        	 l.s $f0, __IGNORELABL23
-                        	 sw $f0, 0($sp)
-                        	 addi $sp, $sp, -8
+                        	 l.a $t0, __IGNORELABL23
+                        	 sw $t0, 0($sp)
+                        	 addi $sp, $sp, -4
                     
                     	 lw $t0, 8($sp)
                     	 lw $t1, 12($sp)

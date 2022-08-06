@@ -41,9 +41,8 @@ grammer = r"""
     condition_expr: condition_expr_less | condition_expr_less_equal | condition_expr_greater | condition_expr_greater_equal | condition_expr_equal | condition_expr_not_equal
 
     bool_math_expr: bool_math_expr_or | bool_math_expr_and
-    bool_math_expr_or: bool_math_expr_and "||" bool_math_expr_and 
-    bool_math_expr_and: expr_ "&&" expr_
-    expr_: expr | bool_math_expr
+    bool_math_expr_or: expr "||" expr 
+    bool_math_expr_and: expr "&&" expr
 
     assignment_expr_empty: lvalue "=" expr
     assignment_expr_with_plus: lvalue "+=" expr
