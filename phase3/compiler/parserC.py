@@ -27,52 +27,63 @@ grammer = r"""
     breakstmt: "break" ";"
     continuestmt: "continue" ";"
     printstmt: "Print" "(" expr ("," expr)* ")" ";"
-    expr: assignment_expr | constant | lvalue_exp | this_expr | call | "(" expr ")" | math_expr_minus | math_expr_sum | math_expr_mul | math_expr_div | math_expr_mod  | sign_expr | condition_expr | bool_math_expr
-          | new_expr | new_array_expr  | len_expr | not_expr
+    expr: expr_level_10
     
-    len_expr: "@len" "(" expr ")"
+    expr_level_1: "(" expr ")"
+    
+    expr_level_2:  constant | lvalue_exp | this_expr | normal_function_call | class_function_call  | len_expr | expr_level_1
+    constant: doubleconstant | constant_token | boolconstant 
     lvalue_exp: lvalue
     this_expr: "this"
+    class_function_call: expr_level_2 "." ident "(" actuals ")" 
+    normal_function_call: ident "(" actuals ")"    
+    actuals: expr ("," expr)* | null
+    len_expr: "@len" "(" expr ")"    
+    lvalue: ident |  class_val | array_val
+    class_val: expr_level_2 "." ident
+    array_val: expr_level_2 "[" expr "]" 
+    
+    expr_level_3: new_expr | new_array_expr | expr_level_2
     new_expr: "new" ident
     new_array_expr: "NewArray" "(" expr "," type ")"
+    
+    expr_level_4: sign_expr | not_expr | expr_level_3
+    not_expr:  "!" expr_level_3
+    sign_expr: "-" expr_level_3
+    
+    expr_level_5: math_expr_mul | math_expr_div | math_expr_mod | expr_level_4
+    math_expr_mul: expr_level_4 "*" expr_level_5
+    math_expr_div: expr_level_4 "/" expr_level_5
+    math_expr_mod: expr_level_4 "%" expr_level_5
+    
+    expr_level_6: math_expr_minus | math_expr_sum | expr_level_5
+    math_expr_minus: expr_level_5 "-" expr_level_6
+    math_expr_sum: expr_level_5 "+" expr_level_6
+    
+    expr_level_7: condition_expr_less | condition_expr_less_equal | condition_expr_greater | condition_expr_greater_equal | condition_expr_equal | condition_expr_not_equal | expr_level_6
+    condition_expr_less: expr_level_6 "<" expr_level_6
+    condition_expr_less_equal: expr_level_6 "<=" expr_level_6
+    condition_expr_greater: expr_level_6 ">" expr_level_6
+    condition_expr_greater_equal: expr_level_6 ">=" expr_level_6
+    condition_expr_equal: expr_level_6 "==" expr_level_6
+    condition_expr_not_equal: expr_level_6 "!=" expr_level_6
+    
+    expr_level_8: bool_math_expr_and | expr_level_7
+    bool_math_expr_and: expr_level_7 "&&" expr_level_8
+     
+     
+    expr_level_9: bool_math_expr_or | expr_level_8
+    bool_math_expr_or: expr_level_8 "||" expr_level_9 
+   
+    expr_level_10: assignment_expr | expr_level_9
     assignment_expr: assignment_expr_empty | assignment_expr_with_plus | assignment_expr_with_mul | assignment_expr_with_div | assignment_expr_with_min
-    not_expr:  "!" expr
-    sign_expr: "-" expr
-    condition_expr: condition_expr_less | condition_expr_less_equal | condition_expr_greater | condition_expr_greater_equal | condition_expr_equal | condition_expr_not_equal
-
-    bool_math_expr: bool_math_expr_or | bool_math_expr_and
-    bool_math_expr_or: expr "||" expr 
-    bool_math_expr_and: expr "&&" expr
-
-    assignment_expr_empty: lvalue "=" expr
-    assignment_expr_with_plus: lvalue "+=" expr
-    assignment_expr_with_mul: lvalue "*=" expr
-    assignment_expr_with_div: lvalue "/=" expr
-    assignment_expr_with_min: lvalue "-=" expr
-
-    math_expr_minus: expr "-" expr
-    math_expr_sum: expr "+" expr
-    math_expr_mul: expr "*" expr
-    math_expr_div: expr "/" expr
-    math_expr_mod: expr "%" expr
-
-    condition_expr_less: expr "<" expr
-    condition_expr_less_equal: expr "<=" expr
-    condition_expr_greater: expr ">" expr
-    condition_expr_greater_equal: expr ">=" expr
-    condition_expr_equal: expr "==" expr
-    condition_expr_not_equal: expr "!=" expr
-
-    lvalue: ident |  class_val | array_val
-    class_val: expr "." ident
-    array_val: expr "[" expr "]" 
-    
-    call:  normal_function_call | class_function_call
-    class_function_call: expr "." ident "(" actuals ")" 
-    normal_function_call: ident "(" actuals ")"
-    
-    actuals: expr ("," expr)* | null
-    constant: doubleconstant | constant_token | boolconstant  
+    assignment_expr_empty: lvalue "=" expr_level_9
+    assignment_expr_with_plus: lvalue "+=" expr_level_9
+    assignment_expr_with_mul: lvalue "*=" expr_level_9
+    assignment_expr_with_div: lvalue "/=" expr_level_9
+    assignment_expr_with_min: lvalue "-=" expr_level_9
+     
+     
     constant_token: INT | STRING | base16 | "null"
     null:
     ident: /@[a-zA-Z][a-zA-Z0-9_]*/ | /@__func__[a-zA-Z0-9_]*/ | /@__line__[a-zA-Z0-9_]*/ 
