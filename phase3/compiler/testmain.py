@@ -6,43 +6,32 @@ from preloadfunctions import code_predified_functions
 
 def run() -> str:
     input_content = ''' 
+
+
 int main(){
     int i;
-    int j;
-    int k;
-    int[][][] a;
+    int[] a;
+    int len;
 
-    a = NewArray(3, int[][]);
-    for(i = 0; i < 3; i = i+1){
-        a[i] = NewArray(i+1, int[]);
+    len = 5;
+    a = NewArray(len, int);
+    a[0] = 1;
+    a[1] = 2;
+    a[2] = a[1];
+    a[1] = 10;
+    a[3] = 4;
+    a[4] = 5;
+    for(i = 0; i < len; i = i+1){
+        Print(a[i]);
     }
-    for(i = 0; i < 3; i = i+1){
-        for(j = 0; j <= i; j = j+1){
-            a[i][j] = NewArray(3, int);
-            for(k = 0; k < 3; k = k+1){
-                a[i][j][k] = k;
-            }
-        }
-    }
-
-    for(i = 0; i < 3; i = i+1){
-        Print("i ", i);
-        for(j = 0; j <= i; j = j+1){
-            Print("j ", j);
-            for(k = 0; k < 3; k = k+1){
-                Print(a[i][j][k]);
-            }
-        }
-    }
-
-
+    Print(a.length());
 }
 
     '''
 
     try:
         print(input_content)
-        parse_tree, code = parser(code_predified_functions + input_content)
+        parse_tree, code = parser( input_content)
         print(parse_tree.pretty())
         try:
             symbol_table = SymbolTable()
