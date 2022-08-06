@@ -196,7 +196,7 @@ class SymbolTable():
                         break
                 if good:
                     return method
-        raise ValueError
+        raise ValueError(f"couldn't find {name}")
 
     def get_address_diff(self, name):
         offset = 0

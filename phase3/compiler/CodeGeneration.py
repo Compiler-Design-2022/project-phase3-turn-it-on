@@ -219,8 +219,7 @@ def after_enter(parse_tree, symbol_table, children):
         variable_code = children[0].code
         expr_code = children[1].code
         symbol_table.last_scope().pop_variable()
-        symbol_table.last_scope().pop_variable()
-        if children[1].type.name == "double": # DOUBLE
+        if children[1].type.name == "double":
             code = f'''{variable_code} {expr_code}
                         \t lw $t0, {children[1].type.size}($sp)
                         \t lw $t1, {children[1].type.size + children[0].type.size}($sp) # t1 is address now 
@@ -231,12 +230,13 @@ def after_enter(parse_tree, symbol_table, children):
                     '''
         else:
             code = f'''{variable_code} {expr_code}
-                        \t lw $t0, {children[1].type.size}($sp)
-                        \t lw $t1, {children[1].type.size + children[0].type.size}($sp)
-                        \t sw $t0, 0($t1)
-                        \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
-                    '''
-        print("khaaaaaaaaale", children[0].type.inside_type.name, children[1].type.name)
+                    \t lw $t0, {children[1].type.size}($sp)
+                    \t lw $t1, {children[1].type.size + children[0].type.size}($sp)
+                    \t sw $t0, 0($t1)
+                    \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
+                    \t sw $t0, 0($sp)
+                    \t addi $sp, $sp, -4
+                '''
         try:
             assert children[0].type.inside_type == children[1].type
         except:
@@ -253,8 +253,7 @@ def after_enter(parse_tree, symbol_table, children):
         variable_code = children[0].code
         expr_code = children[1].code
         symbol_table.last_scope().pop_variable()
-        symbol_table.last_scope().pop_variable()
-        if children[1].type.name == "double": # DOUBLE
+        if children[1].type.name == "double":
             code = f'''{variable_code} {expr_code}
                         \t lw $t0, {children[1].type.size}($sp)
                         \t lw $t1, {children[1].type.size + children[0].type.size}($sp) # t1 is address now 
@@ -273,6 +272,8 @@ def after_enter(parse_tree, symbol_table, children):
                         \t add $t0, $t0, $t2
                         \t sw $t0, 0($t1)
                         \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
+                        \t sw $t0, 0($sp)
+                        \t addi $sp, $sp, -4
                     '''
         return Node_Return(code=code, type=children[0].type.inside_type.merge_type(children[1].type, ["int", "double"]))
 
@@ -281,8 +282,7 @@ def after_enter(parse_tree, symbol_table, children):
         variable_code = children[0].code
         expr_code = children[1].code
         symbol_table.last_scope().pop_variable()
-        symbol_table.last_scope().pop_variable()
-        if children[1].type.name == "double": # DOUBLE
+        if children[1].type.name == "double":
             code = f'''{variable_code} {expr_code}
                         \t lw $t0, {children[1].type.size}($sp)
                         \t lw $t1, {children[1].type.size + children[0].type.size}($sp) # t1 is address now 
@@ -301,6 +301,8 @@ def after_enter(parse_tree, symbol_table, children):
                         \t sub $t0, $t2, $t0
                         \t sw $t0, 0($t1)
                         \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
+                        \t sw $t0, 0($sp)
+                        \t addi $sp, $sp, -4
                     '''
         return Node_Return(code=code, type=children[0].type.inside_type.merge_type(children[1].type, ["int", "double"]))
 
@@ -309,8 +311,7 @@ def after_enter(parse_tree, symbol_table, children):
         variable_code = children[0].code
         expr_code = children[1].code
         symbol_table.last_scope().pop_variable()
-        symbol_table.last_scope().pop_variable()
-        if children[1].type.name == "double": # DOUBLE
+        if children[1].type.name == "double":
             code = f'''{variable_code} {expr_code}
                         \t lw $t0, {children[1].type.size}($sp)
                         \t lw $t1, {children[1].type.size + children[0].type.size}($sp) # t1 is address now 
@@ -329,6 +330,8 @@ def after_enter(parse_tree, symbol_table, children):
                         \t mul $t0, $t2, $t0
                         \t sw $t0, 0($t1)
                         \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
+                        \t sw $t0, 0($sp)
+                        \t addi $sp, $sp, -4
                     '''
         return Node_Return(code=code, type=children[0].type.inside_type.merge_type(children[1].type, ["int", "double"]))
 
@@ -337,8 +340,7 @@ def after_enter(parse_tree, symbol_table, children):
         variable_code = children[0].code
         expr_code = children[1].code
         symbol_table.last_scope().pop_variable()
-        symbol_table.last_scope().pop_variable()
-        if children[1].type.name == "double": # DOUBLE
+        if children[1].type.name == "double":
             code = f'''{variable_code} {expr_code}
                         \t lw $t0, {children[1].type.size}($sp)
                         \t lw $t1, {children[1].type.size + children[0].type.size}($sp) # t1 is address now 
@@ -357,6 +359,8 @@ def after_enter(parse_tree, symbol_table, children):
                         \t div $t0, $t2, $t0
                         \t sw $t0, 0($t1)
                         \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
+                        \t sw $t0, 0($sp)
+                        \t addi $sp, $sp, -4
                     '''
         return Node_Return(code=code, type=children[0].type.inside_type.merge_type(children[1].type, ["int", "double"]))
 
@@ -946,12 +950,13 @@ def after_enter(parse_tree, symbol_table, children):
 
         code = "".join(child_codes_list)
         org_sum = sum
-        for child in reversed(children):
+        for child in children:
             if len(symbol_table.last_scope().variables) > 0:
                 symbol_table.last_scope().pop_variable()
             if child.type.name == "string" or child.type == Type("array", Type("char")):
                 label = "PRINT_" + get_label()
                 code += f'''
+                            #print string start
                             \t lw $t0, {sum}($sp)
                             \t lw $t2, 0($t0)
                             \t addi $t0, $t0, 4
@@ -968,6 +973,7 @@ def after_enter(parse_tree, symbol_table, children):
                             \t li $a0, 32
                             \t li $v0, 11  
                             \t syscall
+                            #print string end
                         '''
             elif child.type.name == "bool":
                 str_label = get_label()
@@ -1009,6 +1015,7 @@ def after_enter(parse_tree, symbol_table, children):
 
             if child.type.name == "char" or child.type.name == "int":
                 code += f'''
+                            #print int/char start
                             \t lw $t0, {sum}($sp)
                             \t li $v0, {type_print}
                             \t move $a0, $t0
@@ -1016,6 +1023,7 @@ def after_enter(parse_tree, symbol_table, children):
                             \t li $a0, 32
                             \t li $v0, 11  
                             \t syscall
+                            #print int/char end
                         '''
 
             sum -= child.type.size
@@ -1025,10 +1033,12 @@ def after_enter(parse_tree, symbol_table, children):
         if len(children) == 1 and (t=="assignment_expr_empty" or t=="assignment_expr_with_plus" or t=="assignment_expr_with_mul" or t=="assignment_expr_with_div" or t=="assignment_expr_with_min"):
             org_sum = 0
         code += f'''
+                    #print free stack
                     \taddi $sp, $sp, {org_sum}
                     \tli $a0, 10
                     \tli $v0, 11  
                     \tsyscall
+                    #print end
                 '''
         return Node_Return(code=code, type=None)
 
