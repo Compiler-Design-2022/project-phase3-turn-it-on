@@ -76,7 +76,7 @@ class Type():
             self.size = 4
             self.inside_type = inside_type
         elif name == "double":
-            self.size = 8
+            self.size = 4
         elif name == "string":
             self.size = 4  # its a pointer
             self.inside_type = Type("char")

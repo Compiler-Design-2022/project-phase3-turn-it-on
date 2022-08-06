@@ -6,43 +6,47 @@ from preloadfunctions import code_predified_functions
 
 def run() -> str:
     input_content = ''' 
-int main(){
-    int i;
-    int j;
-    int k;
-    int[][][] a;
+int main() {
+    double d1;
+    double d2;
+    double d3;
+    double d4;
+    double d5;
+    double d6;
+    double d7;
+    double d8;
 
-    a = NewArray(3, int[][]);
-    for(i = 0; i < 3; i = i+1){
-        a[i] = NewArray(i+1, int[]);
-    }
-    for(i = 0; i < 3; i = i+1){
-        for(j = 0; j <= i; j = j+1){
-            a[i][j] = NewArray(3, int);
-            for(k = 0; k < 3; k = k+1){
-                a[i][j][k] = k;
-            }
-        }
-    }
+    bool r;
 
-    for(i = 0; i < 3; i = i+1){
-        Print("i ", i);
-        for(j = 0; j <= i; j = j+1){
-            Print("j ", j);
-            for(k = 0; k < 3; k = k+1){
-                Print(a[i][j][k]);
-            }
-        }
-    }
+    d1 = 69.82413714;
+    d2 = 960.7071281;
+    d3 = 0.5281794697;
+    d4 = 0.5281794697;
+    d5 = -5039.128903;
+    d6 = 7585.800593;
+    d7 = -11748.63533;
+    d8 = -13446.89678;
 
+    r = d1 < d2;
+    Print(r);
+
+    r = d3 < d4;
+    Print(r);
+
+    r = d5 < d6;
+    Print(r);
+
+    r = d7 < d8;
+    Print(r);
 
 }
+
 
     '''
 
     try:
         print(input_content)
-        parse_tree, code = parser(code_predified_functions + input_content)
+        parse_tree, code = parser(input_content)
         print(parse_tree.pretty())
         try:
             symbol_table = SymbolTable()
