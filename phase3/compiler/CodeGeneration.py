@@ -294,15 +294,28 @@ def after_enter(parse_tree, symbol_table, children):
     elif parse_tree.data == "constant":  # TODO only int
         if children[0].type.name == "string":
             return Node_Return(code=children[0].code, type=children[0].type)
-        symbol_table.last_scope().push_variable(Variable("__IGNORE", children[0].type))
-        code = f''' \t sub $t0, $t0, $t0
-                    \t addi $t0, $t0, {children[0].text}
-                    \t sw $t0, 0($sp)
-                    \t addi $sp, $sp, -{children[0].type.size}
-                '''
-        return Node_Return(code=code, type=children[0].type)
+        elif children[0].type.name == "double":
+            double_name = "__IGNORE" + get_label()
+            symbol_table.last_scope().push_variable(Variable("__IGNORE", Type("double")))
+            code = f''' 
+                        .data
+                        {double_name}: .double {children[0].text}
+                        .text
+                        \t l.s $f0, {double_name}
+                        \t sw $f0, 0($sp)
+                        \t addi $sp, $sp, -{children[0].type.size}
+                    '''
+            return Node_Return(code=code, type=children[0].type)
+        else:
+            symbol_table.last_scope().push_variable(Variable("__IGNORE", children[0].type))
+            code = f''' \t sub $t0, $t0, $t0
+                        \t addi $t0, $t0, {children[0].text}
+                        \t sw $t0, 0($sp)
+                        \t addi $sp, $sp, -{children[0].type.size}
+                    '''
+            return Node_Return(code=code, type=children[0].type)
 
-    # boolconstant: boolconstant_true | boolconstant_false
+    # doubleconstant
     elif parse_tree.data == "doubleconstant":
         return Node_Return(code="", type=Type("double"), text=children[0].text + "." + children[1].text)
 

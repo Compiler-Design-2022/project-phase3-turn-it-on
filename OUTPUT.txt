@@ -7,19 +7,35 @@ j main
                 
                     sub $t1, $t1, $t1
                     sw $t1, 0($sp)
-                    addi $sp, $sp, -4
+                    addi $sp, $sp, -8
                 
                     sub $t1, $t1, $t1
                     sw $t1, 0($sp)
-                    addi $sp, $sp, -4
+                    addi $sp, $sp, -8
                 
                     sub $t1, $t1, $t1
                     sw $t1, 0($sp)
-                    addi $sp, $sp, -4
+                    addi $sp, $sp, -8
                 
                     sub $t1, $t1, $t1
                     sw $t1, 0($sp)
-                    addi $sp, $sp, -4
+                    addi $sp, $sp, -8
+                
+                    sub $t1, $t1, $t1
+                    sw $t1, 0($sp)
+                    addi $sp, $sp, -8
+                
+                    sub $t1, $t1, $t1
+                    sw $t1, 0($sp)
+                    addi $sp, $sp, -8
+                
+                    sub $t1, $t1, $t1
+                    sw $t1, 0($sp)
+                    addi $sp, $sp, -8
+                
+                    sub $t1, $t1, $t1
+                    sw $t1, 0($sp)
+                    addi $sp, $sp, -8
                 
                     sub $t1, $t1, $t1
                     sw $t1, 0($sp)
@@ -27,314 +43,179 @@ j main
                 
                     	LABL8_start:
                 
-                    	 addi $t0, $sp, 20
+                    	 addi $t0, $sp, 68
                     	 sw $t0, 0($sp)
                     	 addi $sp, $sp, -4
-                  	 sub $t0, $t0, $t0
-                    	 addi $t0, $t0, 1
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                
-                    	 lw $t0, 4($sp)
-                    	 lw $t1, 8($sp)
+                  
+                        .data
+                        __IGNORELABL9: .double 69.82413714
+                        .text
+                        	 l.s $f0, __IGNORELABL9
+                        	 sw $f0, 0($sp)
+                        	 addi $sp, $sp, -8
+                    
+                    	 lw $t0, 8($sp)
+                    	 lw $t1, 12($sp)
                     	 sw $t0, 0($t1)
-                    	 addi $sp, $sp, 8
+                    	 addi $sp, $sp, 12
                 
                     	 addi $sp, $sp, 0
                     	 LABL8_end:
                 
-                    	LABL9_start:
-                
-                    	 addi $t0, $sp, 16
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                  	 sub $t0, $t0, $t0
-                    	 addi $t0, $t0, 0
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                
-                    	 lw $t0, 4($sp)
-                    	 lw $t1, 8($sp)
-                    	 sw $t0, 0($t1)
-                    	 addi $sp, $sp, 8
-                
-                    	 addi $sp, $sp, 0
-                    	 LABL9_end:
-                
                     	LABL10_start:
                 
-                    	 addi $t0, $sp, 12
+                    	 addi $t0, $sp, 60
                     	 sw $t0, 0($sp)
                     	 addi $sp, $sp, -4
-                  	 sub $t0, $t0, $t0
-                    	 addi $t0, $t0, 1
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                
-                    	 lw $t0, 4($sp)
-                    	 lw $t1, 8($sp)
+                  
+                        .data
+                        __IGNORELABL11: .double 960.7071281
+                        .text
+                        	 l.s $f0, __IGNORELABL11
+                        	 sw $f0, 0($sp)
+                        	 addi $sp, $sp, -8
+                    
+                    	 lw $t0, 8($sp)
+                    	 lw $t1, 12($sp)
                     	 sw $t0, 0($t1)
-                    	 addi $sp, $sp, 8
+                    	 addi $sp, $sp, 12
                 
                     	 addi $sp, $sp, 0
                     	 LABL10_end:
                 
-                    	LABL11_start:
-                
-                    	 addi $t0, $sp, 8
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                  	 sub $t0, $t0, $t0
-                    	 addi $t0, $t0, 0
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                
-                    	 lw $t0, 4($sp)
-                    	 lw $t1, 8($sp)
-                    	 sw $t0, 0($t1)
-                    	 addi $sp, $sp, 8
-                
-                    	 addi $sp, $sp, 0
-                    	 LABL11_end:
-                
                     	LABL12_start:
                 
-                    	 addi $t0, $sp, 4
+                    	 addi $t0, $sp, 52
                     	 sw $t0, 0($sp)
                     	 addi $sp, $sp, -4
-                 
-                    	 addi $t0, $sp, 24
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                
-                    	lw $t0, 4($sp)
-                    	lw $t1, 0($t0)
-                    	sw $t1, 4($sp)
-                 
-                    	 addi $t0, $sp, 24
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                
-                    	lw $t0, 4($sp)
-                    	lw $t1, 0($t0)
-                    	sw $t1, 4($sp)
-                 
-                    	 addi $t0, $sp, 24
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                
-                    	lw $t0, 4($sp)
-                    	lw $t1, 0($t0)
-                    	sw $t1, 4($sp)
-                
-                    	 lw $t0, 4($sp)
-                    	 lw $t1, 8($sp)
-                    	 or $t0, $t1, $t0
-                    	 addi $sp, $sp, 8
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                 
-                    	 addi $t0, $sp, 20
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                
-                    	lw $t0, 4($sp)
-                    	lw $t1, 0($t0)
-                    	sw $t1, 4($sp)
-                
-                    	 lw $t0, 4($sp)
-                    	 xori $t0, $t0, 1
-                    	 sw $t0, 4($sp)
-                
-                    	 lw $t0, 4($sp)
-                    	 lw $t1, 8($sp)
-                    	 and $t0, $t1, $t0
-                    	 addi $sp, $sp, 8
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                
-                    	 lw $t0, 4($sp)
-                    	 lw $t1, 8($sp)
-                    	 and $t0, $t1, $t0
-                    	 addi $sp, $sp, 8
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                
-                    	 lw $t0, 4($sp)
-                    	 lw $t1, 8($sp)
+                  
+                        .data
+                        __IGNORELABL13: .double 0.5281794697
+                        .text
+                        	 l.s $f0, __IGNORELABL13
+                        	 sw $f0, 0($sp)
+                        	 addi $sp, $sp, -8
+                    
+                    	 lw $t0, 8($sp)
+                    	 lw $t1, 12($sp)
                     	 sw $t0, 0($t1)
-                    	 addi $sp, $sp, 8
+                    	 addi $sp, $sp, 12
                 
                     	 addi $sp, $sp, 0
                     	 LABL12_end:
                 
-                    	LABL15_start:
+                    	LABL14_start:
                 
-                    	 addi $t0, $sp, 4
+                    	 addi $t0, $sp, 44
                     	 sw $t0, 0($sp)
                     	 addi $sp, $sp, -4
-                
-                    	lw $t0, 4($sp)
-                    	lw $t1, 0($t0)
-                    	sw $t1, 4($sp)
-                
-                            	 sub $t0, $t0, $t0
-                            	 lw $t1, 4($sp)
-                            	 bne $t0, $t1, LABL17
-                            .data
-                            	 IGNORE__LABL18: .asciiz "false"
-                            .text
-                            	 li $v0, 4
-                            	 la $a0, IGNORE__LABL18
-                            	 syscall
-                            	 j LABL18
-                            	 LABL17:
-                            .data
-                            	 IGNORE__LABL17: .asciiz "true"
-                            .text
-                            	 li $v0, 4
-                            	 la $a0, IGNORE__LABL17
-                            	 syscall
-                            	 LABL18:
-                        
-                    	addi $sp, $sp, 4
-                    	li $a0, 10
-                    	li $v0, 11  
-                    	syscall
-                
-                    	 addi $sp, $sp, 0
-                    	 LABL15_end:
-                
-                    	LABL19_start:
-                
-                    	 addi $t0, $sp, 4
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                 
-                    	 addi $t0, $sp, 20
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                
-                    	lw $t0, 4($sp)
-                    	lw $t1, 0($t0)
-                    	sw $t1, 4($sp)
-                 
-                    	 addi $t0, $sp, 16
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                
-                    	lw $t0, 4($sp)
-                    	lw $t1, 0($t0)
-                    	sw $t1, 4($sp)
-                 
-                    	 addi $t0, $sp, 24
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                
-                    	lw $t0, 4($sp)
-                    	lw $t1, 0($t0)
-                    	sw $t1, 4($sp)
-                
-                    	 lw $t0, 4($sp)
-                    	 lw $t1, 8($sp)
-                    	 or $t0, $t1, $t0
-                    	 addi $sp, $sp, 8
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                
-                    	 lw $t0, 4($sp)
-                    	 lw $t1, 8($sp)
-                    	 and $t0, $t1, $t0
-                    	 addi $sp, $sp, 8
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                 
-                    	 addi $t0, $sp, 16
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                
-                    	lw $t0, 4($sp)
-                    	lw $t1, 0($t0)
-                    	sw $t1, 4($sp)
-                 
-                    	 addi $t0, $sp, 20
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                
-                    	lw $t0, 4($sp)
-                    	lw $t1, 0($t0)
-                    	sw $t1, 4($sp)
-                
-                    	 lw $t0, 4($sp)
-                    	 lw $t1, 8($sp)
-                    	 or $t0, $t1, $t0
-                    	 addi $sp, $sp, 8
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                
-                    	 lw $t0, 4($sp)
-                    	 xori $t0, $t0, 1
-                    	 sw $t0, 4($sp)
-                
-                    	 lw $t0, 4($sp)
-                    	 lw $t1, 8($sp)
-                    	 and $t0, $t1, $t0
-                    	 addi $sp, $sp, 8
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                
-                    	 lw $t0, 4($sp)
-                    	 lw $t1, 8($sp)
+                  
+                        .data
+                        __IGNORELABL15: .double 0.5281794697
+                        .text
+                        	 l.s $f0, __IGNORELABL15
+                        	 sw $f0, 0($sp)
+                        	 addi $sp, $sp, -8
+                    
+                    	 lw $t0, 8($sp)
+                    	 lw $t1, 12($sp)
                     	 sw $t0, 0($t1)
-                    	 addi $sp, $sp, 8
+                    	 addi $sp, $sp, 12
                 
                     	 addi $sp, $sp, 0
-                    	 LABL19_end:
+                    	 LABL14_end:
+                
+                    	LABL16_start:
+                
+                    	 addi $t0, $sp, 36
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                  
+                        .data
+                        __IGNORELABL17: .double 5039.128903
+                        .text
+                        	 l.s $f0, __IGNORELABL17
+                        	 sw $f0, 0($sp)
+                        	 addi $sp, $sp, -8
+                    
+                    	 lw $t0, 8($sp)
+                    	 lw $t1, 12($sp)
+                    	 sw $t0, 0($t1)
+                    	 addi $sp, $sp, 12
+                
+                    	 addi $sp, $sp, 0
+                    	 LABL16_end:
+                
+                    	LABL18_start:
+                
+                    	 addi $t0, $sp, 28
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                  
+                        .data
+                        __IGNORELABL19: .double 7585.800593
+                        .text
+                        	 l.s $f0, __IGNORELABL19
+                        	 sw $f0, 0($sp)
+                        	 addi $sp, $sp, -8
+                    
+                    	 lw $t0, 8($sp)
+                    	 lw $t1, 12($sp)
+                    	 sw $t0, 0($t1)
+                    	 addi $sp, $sp, 12
+                
+                    	 addi $sp, $sp, 0
+                    	 LABL18_end:
+                
+                    	LABL20_start:
+                
+                    	 addi $t0, $sp, 20
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                  
+                        .data
+                        __IGNORELABL21: .double 11748.63533
+                        .text
+                        	 l.s $f0, __IGNORELABL21
+                        	 sw $f0, 0($sp)
+                        	 addi $sp, $sp, -8
+                    
+                    	 lw $t0, 8($sp)
+                    	 lw $t1, 12($sp)
+                    	 sw $t0, 0($t1)
+                    	 addi $sp, $sp, 12
+                
+                    	 addi $sp, $sp, 0
+                    	 LABL20_end:
                 
                     	LABL22_start:
                 
-                    	 addi $t0, $sp, 4
+                    	 addi $t0, $sp, 12
                     	 sw $t0, 0($sp)
                     	 addi $sp, $sp, -4
-                
-                    	lw $t0, 4($sp)
-                    	lw $t1, 0($t0)
-                    	sw $t1, 4($sp)
-                
-                            	 sub $t0, $t0, $t0
-                            	 lw $t1, 4($sp)
-                            	 bne $t0, $t1, LABL24
-                            .data
-                            	 IGNORE__LABL25: .asciiz "false"
-                            .text
-                            	 li $v0, 4
-                            	 la $a0, IGNORE__LABL25
-                            	 syscall
-                            	 j LABL25
-                            	 LABL24:
-                            .data
-                            	 IGNORE__LABL24: .asciiz "true"
-                            .text
-                            	 li $v0, 4
-                            	 la $a0, IGNORE__LABL24
-                            	 syscall
-                            	 LABL25:
-                        
-                    	addi $sp, $sp, 4
-                    	li $a0, 10
-                    	li $v0, 11  
-                    	syscall
+                  
+                        .data
+                        __IGNORELABL23: .double 13446.89678
+                        .text
+                        	 l.s $f0, __IGNORELABL23
+                        	 sw $f0, 0($sp)
+                        	 addi $sp, $sp, -8
+                    
+                    	 lw $t0, 8($sp)
+                    	 lw $t1, 12($sp)
+                    	 sw $t0, 0($t1)
+                    	 addi $sp, $sp, 12
                 
                     	 addi $sp, $sp, 0
                     	 LABL22_end:
                 
-                    	LABL26_start:
+                    	LABL24_start:
                 
                     	 addi $t0, $sp, 4
                     	 sw $t0, 0($sp)
                     	 addi $sp, $sp, -4
                  
-                    	 addi $t0, $sp, 12
+                    	 addi $t0, $sp, 72
                     	 sw $t0, 0($sp)
                     	 addi $sp, $sp, -4
                 
@@ -342,7 +223,7 @@ j main
                     	lw $t1, 0($t0)
                     	sw $t1, 4($sp)
                  
-                    	 addi $t0, $sp, 20
+                    	 addi $t0, $sp, 72
                     	 sw $t0, 0($sp)
                     	 addi $sp, $sp, -4
                 
@@ -350,78 +231,10 @@ j main
                     	lw $t1, 0($t0)
                     	sw $t1, 4($sp)
                  
-                    	 addi $t0, $sp, 24
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                
-                    	lw $t0, 4($sp)
-                    	lw $t1, 0($t0)
-                    	sw $t1, 4($sp)
-                 
-                    	 addi $t0, $sp, 32
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                
-                    	lw $t0, 4($sp)
-                    	lw $t1, 0($t0)
-                    	sw $t1, 4($sp)
-                 
-                    	 lw $t0, 4($sp)
-                    	 lw $t1, 8($sp)
-                    	 seq $t0, $t0, $t1
-                    	 addi $sp, $sp, 8
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                
-                    	 lw $t0, 4($sp)
-                    	 lw $t1, 8($sp)
-                    	 or $t0, $t1, $t0
-                    	 addi $sp, $sp, 8
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                 
-                    	 lw $t0, 4($sp)
-                    	 lw $t1, 8($sp)
-                    	 seq $t0, $t0, $t1
-                    	 addi $sp, $sp, 8
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                 
-                    	 addi $t0, $sp, 24
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                
-                    	lw $t0, 4($sp)
-                    	lw $t1, 0($t0)
-                    	sw $t1, 4($sp)
-                 
-                    	 addi $t0, $sp, 32
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                
-                    	lw $t0, 4($sp)
-                    	lw $t1, 0($t0)
-                    	sw $t1, 4($sp)
-                
-                    	 lw $t0, 4($sp)
-                    	 xori $t0, $t0, 1
-                    	 sw $t0, 4($sp)
-                 
-                    	 lw $t0, 4($sp)
-                    	 lw $t1, 8($sp)
-                    	 seq $t0, $t0, $t1
-                    	 addi $sp, $sp, 8
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                
-                    	 lw $t0, 4($sp)
-                    	 xori $t0, $t0, 1
-                    	 sw $t0, 4($sp)
-                
-                    	 lw $t0, 4($sp)
-                    	 lw $t1, 8($sp)
-                    	 and $t0, $t1, $t0
-                    	 addi $sp, $sp, 8
+                    	 lw $t0, 8($sp)
+                    	 lw $t1, 16($sp)
+                    	 slt $t0, $t1, $t0
+                    	 addi $sp, $sp, 16
                     	 sw $t0, 0($sp)
                     	 addi $sp, $sp, -4
                 
@@ -431,9 +244,9 @@ j main
                     	 addi $sp, $sp, 8
                 
                     	 addi $sp, $sp, 0
-                    	 LABL26_end:
+                    	 LABL24_end:
                 
-                    	LABL31_start:
+                    	LABL25_start:
                 
                     	 addi $t0, $sp, 4
                     	 sw $t0, 0($sp)
@@ -445,22 +258,22 @@ j main
                 
                             	 sub $t0, $t0, $t0
                             	 lw $t1, 4($sp)
-                            	 bne $t0, $t1, LABL33
+                            	 bne $t0, $t1, LABL27
                             .data
-                            	 IGNORE__LABL34: .asciiz "false"
+                            	 IGNORE__LABL28: .asciiz "false"
                             .text
                             	 li $v0, 4
-                            	 la $a0, IGNORE__LABL34
+                            	 la $a0, IGNORE__LABL28
                             	 syscall
-                            	 j LABL34
-                            	 LABL33:
+                            	 j LABL28
+                            	 LABL27:
                             .data
-                            	 IGNORE__LABL33: .asciiz "true"
+                            	 IGNORE__LABL27: .asciiz "true"
                             .text
                             	 li $v0, 4
-                            	 la $a0, IGNORE__LABL33
+                            	 la $a0, IGNORE__LABL27
                             	 syscall
-                            	 LABL34:
+                            	 LABL28:
                         
                     	addi $sp, $sp, 4
                     	li $a0, 10
@@ -468,9 +281,231 @@ j main
                     	syscall
                 
                     	 addi $sp, $sp, 0
-                    	 LABL31_end:
+                    	 LABL25_end:
                 
-                    	 addi $sp, $sp, 20
+                    	LABL29_start:
+                
+                    	 addi $t0, $sp, 4
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                 
+                    	 addi $t0, $sp, 56
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                
+                    	lw $t0, 4($sp)
+                    	lw $t1, 0($t0)
+                    	sw $t1, 4($sp)
+                 
+                    	 addi $t0, $sp, 56
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                
+                    	lw $t0, 4($sp)
+                    	lw $t1, 0($t0)
+                    	sw $t1, 4($sp)
+                 
+                    	 lw $t0, 8($sp)
+                    	 lw $t1, 16($sp)
+                    	 slt $t0, $t1, $t0
+                    	 addi $sp, $sp, 16
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                
+                    	 lw $t0, 4($sp)
+                    	 lw $t1, 8($sp)
+                    	 sw $t0, 0($t1)
+                    	 addi $sp, $sp, 8
+                
+                    	 addi $sp, $sp, 0
+                    	 LABL29_end:
+                
+                    	LABL30_start:
+                
+                    	 addi $t0, $sp, 4
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                
+                    	lw $t0, 4($sp)
+                    	lw $t1, 0($t0)
+                    	sw $t1, 4($sp)
+                
+                            	 sub $t0, $t0, $t0
+                            	 lw $t1, 4($sp)
+                            	 bne $t0, $t1, LABL32
+                            .data
+                            	 IGNORE__LABL33: .asciiz "false"
+                            .text
+                            	 li $v0, 4
+                            	 la $a0, IGNORE__LABL33
+                            	 syscall
+                            	 j LABL33
+                            	 LABL32:
+                            .data
+                            	 IGNORE__LABL32: .asciiz "true"
+                            .text
+                            	 li $v0, 4
+                            	 la $a0, IGNORE__LABL32
+                            	 syscall
+                            	 LABL33:
+                        
+                    	addi $sp, $sp, 4
+                    	li $a0, 10
+                    	li $v0, 11  
+                    	syscall
+                
+                    	 addi $sp, $sp, 0
+                    	 LABL30_end:
+                
+                    	LABL34_start:
+                
+                    	 addi $t0, $sp, 4
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                 
+                    	 addi $t0, $sp, 40
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                
+                    	lw $t0, 4($sp)
+                    	lw $t1, 0($t0)
+                    	sw $t1, 4($sp)
+                 
+                    	 addi $t0, $sp, 40
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                
+                    	lw $t0, 4($sp)
+                    	lw $t1, 0($t0)
+                    	sw $t1, 4($sp)
+                 
+                    	 lw $t0, 8($sp)
+                    	 lw $t1, 16($sp)
+                    	 slt $t0, $t1, $t0
+                    	 addi $sp, $sp, 16
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                
+                    	 lw $t0, 4($sp)
+                    	 lw $t1, 8($sp)
+                    	 sw $t0, 0($t1)
+                    	 addi $sp, $sp, 8
+                
+                    	 addi $sp, $sp, 0
+                    	 LABL34_end:
+                
+                    	LABL35_start:
+                
+                    	 addi $t0, $sp, 4
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                
+                    	lw $t0, 4($sp)
+                    	lw $t1, 0($t0)
+                    	sw $t1, 4($sp)
+                
+                            	 sub $t0, $t0, $t0
+                            	 lw $t1, 4($sp)
+                            	 bne $t0, $t1, LABL37
+                            .data
+                            	 IGNORE__LABL38: .asciiz "false"
+                            .text
+                            	 li $v0, 4
+                            	 la $a0, IGNORE__LABL38
+                            	 syscall
+                            	 j LABL38
+                            	 LABL37:
+                            .data
+                            	 IGNORE__LABL37: .asciiz "true"
+                            .text
+                            	 li $v0, 4
+                            	 la $a0, IGNORE__LABL37
+                            	 syscall
+                            	 LABL38:
+                        
+                    	addi $sp, $sp, 4
+                    	li $a0, 10
+                    	li $v0, 11  
+                    	syscall
+                
+                    	 addi $sp, $sp, 0
+                    	 LABL35_end:
+                
+                    	LABL39_start:
+                
+                    	 addi $t0, $sp, 4
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                 
+                    	 addi $t0, $sp, 24
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                
+                    	lw $t0, 4($sp)
+                    	lw $t1, 0($t0)
+                    	sw $t1, 4($sp)
+                 
+                    	 addi $t0, $sp, 24
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                
+                    	lw $t0, 4($sp)
+                    	lw $t1, 0($t0)
+                    	sw $t1, 4($sp)
+                 
+                    	 lw $t0, 8($sp)
+                    	 lw $t1, 16($sp)
+                    	 slt $t0, $t1, $t0
+                    	 addi $sp, $sp, 16
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                
+                    	 lw $t0, 4($sp)
+                    	 lw $t1, 8($sp)
+                    	 sw $t0, 0($t1)
+                    	 addi $sp, $sp, 8
+                
+                    	 addi $sp, $sp, 0
+                    	 LABL39_end:
+                
+                    	LABL40_start:
+                
+                    	 addi $t0, $sp, 4
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                
+                    	lw $t0, 4($sp)
+                    	lw $t1, 0($t0)
+                    	sw $t1, 4($sp)
+                
+                            	 sub $t0, $t0, $t0
+                            	 lw $t1, 4($sp)
+                            	 bne $t0, $t1, LABL42
+                            .data
+                            	 IGNORE__LABL43: .asciiz "false"
+                            .text
+                            	 li $v0, 4
+                            	 la $a0, IGNORE__LABL43
+                            	 syscall
+                            	 j LABL43
+                            	 LABL42:
+                            .data
+                            	 IGNORE__LABL42: .asciiz "true"
+                            .text
+                            	 li $v0, 4
+                            	 la $a0, IGNORE__LABL42
+                            	 syscall
+                            	 LABL43:
+                        
+                    	addi $sp, $sp, 4
+                    	li $a0, 10
+                    	li $v0, 11  
+                    	syscall
+                
+                    	 addi $sp, $sp, 0
+                    	 LABL40_end:
+                
+                    	 addi $sp, $sp, 68
                     	 LABL7_end:
                 
                 

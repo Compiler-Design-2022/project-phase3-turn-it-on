@@ -9,28 +9,41 @@ def run(input_file_address: str) -> bool:
     # input_file = open(input_file_address)
     # input_content = input_file.read()
     input_content = ''' 
-    int main() {
-    bool b1;
-    bool b2;
-    bool b3;
-    bool b4;
+int main() {
+    double d1;
+    double d2;
+    double d3;
+    double d4;
+    double d5;
+    double d6;
+    double d7;
+    double d8;
 
-    bool br;
+    bool r;
 
-    b1 = true;
-    b2 = false;
-    b3 = true;
-    b4 = false;
+    d1 = 69.82413714;
+    d2 = 960.7071281;
+    d3 = 0.5281794697;
+    d4 = 0.5281794697;
+    d5 = -5039.128903;
+    d6 = 7585.800593;
+    d7 = -11748.63533;
+    d8 = -13446.89678;
 
-    br = b1 && ((b2 || b3) && !b4);
-    Print(br);
+    r = d1 < d2;
+    Print(r);
 
-    br = (b2 && b4 || b3) && (!b4 || b4);
-    Print(br);
+    r = d3 < d4;
+    Print(r);
 
-    br = (b4 == b3 || b3 == b2) && !(b2 == !b1);
-    Print(br);
+    r = d5 < d6;
+    Print(r);
+
+    r = d7 < d8;
+    Print(r);
+
 }
+
 
     '''
 
