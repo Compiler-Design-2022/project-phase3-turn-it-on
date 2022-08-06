@@ -2,87 +2,7 @@ from os import listdir
 from parserC import parser
 from CodeGeneration import cgen, function_declaration
 from SymbolTable import SymbolTable, Scope, Method, Type
-
-type_change_function_inside4to4 = '''
-    ~mips
-    lw $t0, 8($sp) 
-    lw $t1, 4($sp)
-    sw $t1, 0($sp) 
-    addi $sp, $sp, -4
-    jr $t0
-    ~
-'''
-code_predified_functions = '''
-char itoc(int a){
-    ''' + type_change_function_inside4to4 + '''
-}
-bool itob(int a){
-    ''' + type_change_function_inside4to4 + '''
-}
-int btoi(bool a){
-    ''' + type_change_function_inside4to4 + '''
-}
-int ctoi(char a){
-    ''' + type_change_function_inside4to4 + '''
-}
-int dtoi(double a){
-    ''' + type_change_function_inside4to4 + '''
-}
-double itod(int a){
-    ''' + type_change_function_inside4to4 + '''
-}''' + '''
-int ReadChar(){
-    ~mips
-    li $v0, 12           #read_char 
-    syscall             #ReadChar 
-    lw $t0, 4($sp) 
-    sw $v0, 0($sp) 
-    addi $sp, $sp, -4
-    jr $t0
-    ~
-}
-
-
-char[] ReadLine(){
-        char[] res; 
-        int inp; 
-        int size;
-        
-        size=0;
-        res=NewArray(100, char);                                                                                                   
-        while(true){ 
-            inp = ReadChar(); 
-            if (inp == 10){ 
-                break; 
-            }
-            res[size] = itoc(inp); 
-            size+=1;
-        } 
-        res[-1]=itoc(size);
-        return res; 
-}
-int ReadInteger(){
-        int res; 
-        int inp; 
-        int sign; 
-        sign = 1; 
-        res = 0; 
-        while(true){ 
-            inp = ReadChar(); 
-            if (inp == 10){ 
-                break; 
-            }
-            if (inp != 43){ 
-                if (inp == 45){ 
-                    sign = -1; 
-                }else{  
-                    res = (res * 10) + (inp - 48); 
-                } 
-            } 
-        } 
-        return res * sign; 
-}
-'''
+from phase3.compiler.preloadfunctions import code_predified_functions
 
 
 def run(input_file_address: str) -> bool:
@@ -123,7 +43,6 @@ int main() {
             symbol_table = SymbolTable()
             symbol_table.push_scope(Scope())
             function_declaration(parse_tree, symbol_table)
-            symbol_table.push_method(Method("ReadChar", Type("char"), []))
             mips_code = cgen(parse_tree, symbol_table).code
             with open("OUTPUT.txt", mode="w") as f:
                 f.write(mips_code)
