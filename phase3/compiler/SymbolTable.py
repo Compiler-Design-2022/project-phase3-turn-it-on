@@ -88,7 +88,7 @@ class Type():
         elif name == "void":
             self.size = 0
         else:
-            print(name)
+            # print(name)
             raise ValueError  # type not found
 
     def __eq__(self, other):
@@ -136,7 +136,7 @@ class Scope():
 
 
     def push_variable(self, variable: Variable):
-        print("push variable : ", variable.name, variable.type.size)
+        # print("push variable : ", variable.name, variable.type.size)
         self.variables.append(variable)
 
     def last_variable(self):
@@ -152,7 +152,7 @@ class Scope():
 
     def pop_variable(self):
         variable = self.variables.pop()
-        print("pop variable : ", variable.name, variable.type.size)
+        # print("pop variable : ", variable.name, variable.type.size)
 
     def get_variable(self, name):
         for i in range(len(self.variables) - 1, -1, -1):
@@ -174,20 +174,20 @@ class SymbolTable():
         self.scope_function_declared: [Scope] = []
 
     def push_method(self, method: Method):
-        print("push method", method)
+        # print("push method", method)
         self.vtable.append(method)
 
     def push_scope(self, scope: Scope):
-        print("push scope ")
+        # print("push scope ")
         self.scope_stack.append(scope)
         if scope.method_scope:
             self.scope_function_declared.append(scope)
 
     def get_method(self, name, input_types=None):
         name = name.replace("@", "")
-        print(name, input_types)
+        # print(name, input_types)
         for method in self.vtable:
-            print(method)
+            # print(method)
             if method.name == name and len(input_types) == len(method.input_variables):
                 good = True
                 for var1, type2 in zip(method.input_variables, input_types):
@@ -216,6 +216,6 @@ class SymbolTable():
         return self.scope_stack[len(self.scope_stack) - 1]
 
     def pop_scope(self):
-        print("pop scope ")
+        # print("pop scope ")
         self.scope_stack.pop()
 

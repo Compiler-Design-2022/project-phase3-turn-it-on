@@ -59,7 +59,7 @@ def cgen(parse_tree, symbol_table: SymbolTable):
     if parse_tree.__class__ is lark.Token:
         return cgen_token(parse_tree, symbol_table)
 
-    print("^" * 60, parse_tree.data, parse_tree._meta)
+    # print("^" * 60, parse_tree.data, parse_tree._meta)
     before_enter(parse_tree, symbol_table)
     children_return = []
     for child in parse_tree.children:
@@ -67,7 +67,7 @@ def cgen(parse_tree, symbol_table: SymbolTable):
         children_return.append(child_return)
 
     scope = symbol_table.last_scope()
-    print(len(symbol_table.scope_stack))
+    # print(len(symbol_table.scope_stack))
     gen: Node_Return = after_enter(parse_tree, symbol_table, children_return)
     gen.scope = scope
     return gen
@@ -228,10 +228,10 @@ def after_enter(parse_tree, symbol_table, children):
         try:
             assert children[0].type.inside_type == children[1].type
         except:
-            print("*" * 40)
-            print("left side type of assignment: ", children[0].type.inside_type)
-            print("right side type of assignment: ", children[1].type)
-            print("#" * 40)
+            # print("*" * 40)
+            # print("left side type of assignment: ", children[0].type.inside_type)
+            # print("right side type of assignment: ", children[1].type)
+            # print("#" * 40)
             raise ValueError
 
         return Node_Return(code=code, type=children[1].type, text="assignment_expr_empty")
@@ -499,6 +499,18 @@ def after_enter(parse_tree, symbol_table, children):
                         \taddi $sp, $sp, -4
                     '''
         return Node_Return(code=code, type=children[0].type.merge_type(children[1].type, ["int", "double"]))
+
+    elif parse_tree.data == "sign_expr":
+        inside_expr_code = children[0].code
+        code = f'''{inside_expr_code}
+                    \tlw $t0, {children[0].type.size}($sp)
+                    \tli $t1, -1
+                    \tmul $t0, $t1, $t0
+                    \tsw $t0, {children[0].type.size}($sp)
+                '''
+        assert children[0].type == Type("int") or children[0].type == Type("double")
+        return Node_Return(code=code, type=children[0].type)
+
 
     # math_expr_div: expr "/" expr
     elif parse_tree.data == "math_expr_div":
@@ -936,10 +948,10 @@ def after_enter(parse_tree, symbol_table, children):
                     \t sw $t0, 0($sp)
                     \t addi $sp, $sp, -{method.output_type.size}
                 '''
-        print("&" * 40)
-        for var in symbol_table.last_scope().variables:
-            print(var)
-        print("*" * 40)
+        # print("&" * 40)
+        # for var in symbol_table.last_scope().variables:
+        #     print(var)
+        # print("*" * 40)
         for var in method.input_variables:
             symbol_table.last_scope().pop_variable()
         symbol_table.last_scope().pop_variable()
