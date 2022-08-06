@@ -52,13 +52,13 @@ grammer = r"""
     sign_expr: "-" expr_level_3
     
     expr_level_5: math_expr_mul | math_expr_div | math_expr_mod | expr_level_4
-    math_expr_mul: expr_level_4 "*" expr_level_5
-    math_expr_div: expr_level_4 "/" expr_level_5
-    math_expr_mod: expr_level_4 "%" expr_level_5
+    math_expr_mul: expr_level_5 "*" expr_level_4
+    math_expr_div: expr_level_5 "/" expr_level_4
+    math_expr_mod: expr_level_5 "%" expr_level_4
     
     expr_level_6: math_expr_minus | math_expr_sum | expr_level_5
-    math_expr_minus: expr_level_5 "-" expr_level_6
-    math_expr_sum: expr_level_5 "+" expr_level_6
+    math_expr_minus: expr_level_6 "-" expr_level_5
+    math_expr_sum: expr_level_6 "+" expr_level_5
     
     expr_level_7: condition_expr_less | condition_expr_less_equal | condition_expr_greater | condition_expr_greater_equal | condition_expr_equal | condition_expr_not_equal | expr_level_6
     condition_expr_less: expr_level_6 "<" expr_level_6
@@ -69,11 +69,11 @@ grammer = r"""
     condition_expr_not_equal: expr_level_6 "!=" expr_level_6
     
     expr_level_8: bool_math_expr_and | expr_level_7
-    bool_math_expr_and: expr_level_7 "&&" expr_level_8
+    bool_math_expr_and: expr_level_8 "&&" expr_level_7
      
      
     expr_level_9: bool_math_expr_or | expr_level_8
-    bool_math_expr_or: expr_level_8 "||" expr_level_9 
+    bool_math_expr_or: expr_level_9 "||" expr_level_8 
    
     expr_level_10: assignment_expr | expr_level_9
     assignment_expr: assignment_expr_empty | assignment_expr_with_plus | assignment_expr_with_mul | assignment_expr_with_div | assignment_expr_with_min
