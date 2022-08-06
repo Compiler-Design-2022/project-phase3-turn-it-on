@@ -150,9 +150,6 @@ def linker_add_imports(string):
 
 
 def parser(string):
-    if string.find("print") != -1:
-        print("RIDI")
-        raise ValueError
     string = replace_defines(string + ' ')
     string = remove_comment(string)
     string = string.replace(");", ") ;")

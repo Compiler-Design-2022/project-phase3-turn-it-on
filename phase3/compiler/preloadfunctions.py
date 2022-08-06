@@ -88,7 +88,9 @@ int ReadInteger(){
                 if (inp == 45){ 
                     sign = -1; 
                 }else{  
-                    res = (res * 10) + (inp - 48); 
+                    if (inp <58 && 48<=inp){
+                        res = (res * 10) + (inp - 48);
+                    } 
                 } 
             } 
         } 
@@ -105,13 +107,9 @@ string math_expr_sum_4(string a, string b){
     ans=NewArray(al+bl, char);
     for(i=0;i<al;i+=1){
         ans[i]=a[i];
-        Print(i);
-        Print(ans[i]);
     }
     for(i=0;i<bl;i+=1){
         ans[al+i]=b[i];
-        Print(i+al);
-        Print(ans[al+i]);
     }
     return catos(ans);
 }
@@ -130,7 +128,6 @@ bool string_equality_check(string a, string b){
         x=ctoi(a[i]);
         y=ctoi(b[i]);
         if(x!=y){
-            Print("diff in:", i, "X", x, "Y", y);
             return false;
         }
     }

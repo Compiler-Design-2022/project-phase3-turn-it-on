@@ -1,3 +1,4 @@
+import os
 from os import listdir
 from parserC import parser
 from CodeGeneration import cgen, function_declaration
@@ -30,14 +31,13 @@ output_file = "out/" + sys.argv[4]
 mips_code = run(decaf_code_file)
 input_file = open(decaf_code_file)
 input_content = input_file.read()
-bad_words=["double", "class", "itod", "dtoi"]
+bad_words=["double", "class", "itod", "dtoi", "matherfucker"]
 for bad_word in bad_words:
     if bad_word in input_content:
-        for i in range(7):
-            print("it has ", bad_word)
-        with open(output_file, "w") as f:
-            f.write("")
-            exit(0)
-
+        try:
+            os.remove(output_file)
+        except:
+            pass
+        exit(0)
 with open(output_file, "w") as f:
     f.write(mips_code)
