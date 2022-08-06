@@ -39,8 +39,13 @@ grammer = r"""
     not_expr:  "!" expr
     sign_expr: "-" expr
     condition_expr: condition_expr_less | condition_expr_less_equal | condition_expr_greater | condition_expr_greater_equal | condition_expr_equal | condition_expr_not_equal
-    bool_math_expr: bool_math_expr_and | bool_math_expr_or
-    
+
+    bool_math_expr: bool_math_expr_or | bool_math_expr_and
+    bool_math_expr_or: bool_math_expr_and "||" bool_math_expr_and 
+    bool_math_expr_and: expr_ "&&" expr_
+    expr_: expr | bool_math_expr
+
+
     assignment_expr_empty: lvalue "=" expr
     assignment_expr_with_plus: lvalue "+=" expr
     assignment_expr_with_mul: lvalue "*=" expr
@@ -59,10 +64,6 @@ grammer = r"""
     condition_expr_greater_equal: expr ">=" expr
     condition_expr_equal: expr "==" expr
     condition_expr_not_equal: expr "!=" expr
-
-    bool_math_expr_and: expr "&&" expr
-    bool_math_expr_or: expr "||" expr
-
 
     lvalue: ident |  class_val | array_val
     class_val: expr "." ident
@@ -187,3 +188,10 @@ def replace_defines(input):
     return answer
 
 # print(parser(open(f"../tests/in-out/t205-define.in").read()).pretty())
+
+
+
+#bool_math_expr: bool_math_expr_and bool_math_expr_or_prim
+#bool_math_expr_or_prim: null | "||" bool_math_expr_and bool_math_expr_or_prim
+#bool_math_expr_and: null | expr bool_math_expr_and_prim 
+#bool_math_expr_and_prim: "&&" expr bool_math_expr_and_prim
