@@ -18,7 +18,7 @@ int main() {
 
     try:
         print(input_content)
-        parse_tree, code = parser(input_content)
+        parse_tree, code = parser( input_content)
         print(parse_tree.pretty())
         try:
             symbol_table = SymbolTable()
