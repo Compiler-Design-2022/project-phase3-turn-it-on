@@ -668,20 +668,46 @@ def after_enter(parse_tree, symbol_table, children):
                         \t li $v0, 11  
                         \t syscall
                     '''
+            elif child.type.name == "bool":
+                str_label = get_label()
+                true_label = get_label()
+                false_label = get_label()
+                code += f'''
+                        \t sub $t0, $t0, $t0
+                        \t lw $t1, 4($sp)
+                        \t bne $t0, $t1, {true_label}
+                        .data
+                        \t IGNORE__{false_label}: .asciiz "false"
+                        .text
+                        \t li $v0, 4
+                        \t la $a0, IGNORE__{false_label}
+                        \t syscall
+                        \t j {false_label}
+                        \t {true_label}:
+                        .data
+                        \t IGNORE__{true_label}: .asciiz "true"
+                        .text
+                        \t li $v0, 4
+                        \t la $a0, IGNORE__{true_label}
+                        \t syscall
+                        \t {false_label}:
+                    '''
+                
             elif child.type.name == "char":
                 type_print = 11
             elif child.type.name == "int":
                 type_print = 1
+
             if child.type.name == "char" or child.type.name == "int":
                 code += f'''
-                \tlw $t0, {sum}($sp)
-                \tli $v0, {type_print}
-                \tmove $a0, $t0
-                \tsyscall
-                \tli $a0, 32
-                \tli $v0, 11  
-                \tsyscall
-                '''
+                            \t lw $t0, {sum}($sp)
+                            \t li $v0, {type_print}
+                            \t move $a0, $t0
+                            \t syscall
+                            \t li $a0, 32
+                            \t li $v0, 11  
+                            \t syscall
+                        '''
 
             sum -= child.type.size
 
