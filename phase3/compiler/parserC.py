@@ -38,7 +38,7 @@ grammer = r"""
     class_function_call: expr_level_2 "." ident "(" actuals ")" 
     normal_function_call: ident "(" actuals ")"    
     actuals: expr ("," expr)* | null
-    len_expr: "@len" "(" expr ")"    
+    len_expr: expr_level_2 ".length()"
     lvalue: ident |  class_val | array_val
     class_val: expr_level_2 "." ident
     array_val: expr_level_2 "[" expr "]" 
