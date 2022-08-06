@@ -204,7 +204,7 @@ class SymbolTable():
             if self.scope_stack[i].get_address_diff(name) is not None:
                 return offset + self.scope_stack[i].get_address_diff(name)
             offset += self.scope_stack[i].size()
-        raise ValueError  # value doesn't declared
+        raise ValueError(f"couln't find variable {name}")  # value doesn't declared
 
     def get_variable(self, name):
         for i in range(len(self.scope_stack) - 1, -1, -1):

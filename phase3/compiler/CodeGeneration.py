@@ -412,8 +412,7 @@ def after_enter(parse_tree, symbol_table, children):
         else:
             symbol_table.last_scope().push_variable(Variable("__IGNORE", children[0].type))
             code = f''' 
-                        \t sub $t0, $t0, $t0
-                        \t addi $t0, $t0, {children[0].text}
+                        \t li $t0, {children[0].text}
                         \t sw $t0, 0($sp)
                         \t addi $sp, $sp, -{children[0].type.size}
                     '''
@@ -793,6 +792,23 @@ def after_enter(parse_tree, symbol_table, children):
                         \t sw $t0, 0($sp)
                         \t addi $sp, $sp, -4
                     '''
+        elif children[0].type == Type("string") or children[0].type == Type("array", inside_type="char"):
+            code = f'''{left_expr_code} {right_expr_code}
+                                    #begin string equality check
+                                    \t lw $t0, 4($sp)
+                                    \t lw $t1, 8($sp)
+                                    \t addi $sp, $sp, -12
+                                    \t sw $t0, 4($sp)
+                                    \t sw $t1, 8($sp)
+                                    \t jal string_equality_check
+                                    \t lw $t0, 4($sp)
+                                    \t addi $sp, $sp, 16
+                                    \t sw $t0, 0($sp)
+                                    \t addi $sp, $sp, -4
+                                    #end string equality check
+                                '''
+            assert children[0].type == children[1].type
+            return Node_Return(code=code, type=Type("bool"))
         else:
             # seq $t0, $t0, $t1 ------>>>>> $t0 will be 1 if $t0 and $t1 are equal, and zero otherwise
             code = f'''{left_expr_code} {right_expr_code} 
@@ -969,16 +985,36 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.last_scope().pop_variable()  # t0 right t1 left
         symbol_table.last_scope().pop_variable()  # t0 right t1 left
         symbol_table.last_scope().push_variable(Variable("__IGNORE_BOOL", Type("bool")))
-        code = f'''{left_expr_code} {right_expr_code} 
-                    \t lw $t0, {children[1].type.size}($sp)
-                    \t lw $t1, {children[1].type.size + children[0].type.size}($sp)
-                    \t subu $t2, $t0, $t1
-                    \t sltu $t2, $zero, $t2
-                    \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
-                    \t sw $t2, 0($sp)
-                    \t addi $sp, $sp, -4
-                '''
-        return Node_Return(code=code, type=Type("bool"))
+        if children[0].type == Type("string") or children[0].type == Type("array", inside_type="char"):
+            code = f'''{left_expr_code} {right_expr_code}
+                                    #begin string equality check
+                                    \t lw $t0, 4($sp)
+                                    \t lw $t1, 8($sp)
+                                    \t addi $sp, $sp, -12
+                                    \t sw $t0, 4($sp)
+                                    \t sw $t1, 8($sp)
+                                    \t jal string_equality_check
+                                    \t lw $t0, 4($sp)
+                                    \t li $t1, 1
+                                    \t sub $t0, $t1, $t0
+                                    \t addi $sp, $sp, 16
+                                    \t sw $t0, 0($sp)
+                                    \t addi $sp, $sp, -4
+                                    #end string equality check
+                                '''
+            assert children[0].type == children[1].type
+            return Node_Return(code=code, type=Type("bool"))
+        else:
+            code = f'''{left_expr_code} {right_expr_code} 
+                        \t lw $t0, {children[1].type.size}($sp)
+                        \t lw $t1, {children[1].type.size + children[0].type.size}($sp)
+                        \t subu $t2, $t0, $t1
+                        \t sltu $t2, $zero, $t2
+                        \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
+                        \t sw $t2, 0($sp)
+                        \t addi $sp, $sp, -4
+                    '''
+            return Node_Return(code=code, type=Type("bool"))
 
     # not_expr:  "!" expr
     elif parse_tree.data == "not_expr":
@@ -1003,8 +1039,7 @@ def after_enter(parse_tree, symbol_table, children):
         code = "".join(child_codes_list)
         org_sum = sum
         for child in children:
-            if len(symbol_table.last_scope().variables) > 0:
-                symbol_table.last_scope().pop_variable()
+            symbol_table.last_scope().pop_variable()
             if child.type.name == "string" or child.type == Type("array", Type("char")):
                 label = "PRINT_" + get_label()
                 code += f'''
@@ -1081,12 +1116,12 @@ def after_enter(parse_tree, symbol_table, children):
             sum -= child.type.size
 
         code += f'''
-                    #print free stack
+                    #print endl
                     \taddi $sp, $sp, {org_sum}
                     \tli $a0, 10
                     \tli $v0, 11  
                     \tsyscall
-                    #print end
+                    #print endl END
                 '''
         return Node_Return(code=code, type=None)
 

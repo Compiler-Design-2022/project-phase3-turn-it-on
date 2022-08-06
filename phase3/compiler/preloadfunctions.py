@@ -13,7 +13,11 @@ char itoc(int a){
     ''' + type_change_function_inside4to4 + '''
 }
 bool itob(int a){
-    ''' + type_change_function_inside4to4 + '''
+    if(a==0){
+        return false;
+    }else{
+        return true;
+    }
 }
 int btoi(bool a){
     ''' + type_change_function_inside4to4 + '''
@@ -25,7 +29,13 @@ string catos(char[] a){
     ''' + type_change_function_inside4to4 + '''
 }
 int ctoi(char a){
-    ''' + type_change_function_inside4to4 + '''
+    ~mips
+    lw $t0, 8($sp) 
+    lb $t1, 4($sp)
+    sw $t1, 0($sp) 
+    addi $sp, $sp, -4
+    jr $t0
+    ~
 }
 int dtoi(double a){
     ''' + type_change_function_inside4to4 + '''
@@ -104,5 +114,26 @@ string math_expr_sum_4(string a, string b){
         Print(ans[al+i]);
     }
     return catos(ans);
+}
+bool string_equality_check(string a, string b){
+    int al;
+    int bl;
+    int i;
+    al=ctoi(a[-1]);
+    bl=ctoi(b[-1]);
+    if (al!=bl){
+        return false;
+    }
+    for(i=0;i<bl;i+=1){
+        int x;
+        int y;
+        x=ctoi(a[i]);
+        y=ctoi(b[i]);
+        if(x!=y){
+            Print("diff in:", i, "X", x, "Y", y);
+            return false;
+        }
+    }
+    return true;
 }
 '''

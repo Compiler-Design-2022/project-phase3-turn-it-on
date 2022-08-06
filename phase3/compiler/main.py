@@ -30,9 +30,14 @@ output_file = "out/" + sys.argv[4]
 mips_code = run(decaf_code_file)
 input_file = open(decaf_code_file)
 input_content = input_file.read()
-bad_words=["double", "class"]
+bad_words=["double", "class", "itod", "dtoi"]
 for bad_word in bad_words:
     if bad_word in input_content:
-        raise NotImplemented
+        for i in range(7):
+            print("it has ", bad_word)
+        with open(output_file, "w") as f:
+            f.write("")
+            exit(0)
+
 with open(output_file, "w") as f:
     f.write(mips_code)
