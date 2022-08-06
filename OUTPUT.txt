@@ -1,0 +1,191 @@
+j main
+        
+                    main:
+                    
+                    
+                    	LABL8_start:
+                
+                    	LABL9_start:
+                 	 sub $t0, $t0, $t0
+                    	 addi $t0, $t0, 0
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                  	 sub $t0, $t0, $t0
+                    	 addi $t0, $t0, 0
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                 
+                    	 lw $t0, 4($sp)
+                    	 lw $t1, 8($sp)
+                    	 seq $t0, $t0, $t1
+                    	 addi $sp, $sp, 8
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                
+                        	 sub $t0, $t0, $t0
+                        	 lw $t1, 4($sp)
+                        	 bne $t0, $t1, LABL11
+                        .data
+                        	 IGNORE__LABL12: .asciiz "false"
+                        .text
+                        	 li $v0, 4
+                        	 la $a0, IGNORE__LABL12
+                        	 syscall
+                        	 j LABL12
+                        	 LABL11:
+                        .data
+                        	 IGNORE__LABL11: .asciiz "true"
+                        .text
+                        	 li $v0, 4
+                        	 la $a0, IGNORE__LABL11
+                        	 syscall
+                        	 LABL12:
+                    
+                    	addi $sp, $sp, 4
+                    	li $a0, 10
+                    	li $v0, 11  
+                    	syscall
+                
+                    	 addi $sp, $sp, 0
+                    	 LABL9_end:
+                
+                    	LABL13_start:
+                 	 sub $t0, $t0, $t0
+                    	 addi $t0, $t0, 0
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                  	 sub $t0, $t0, $t0
+                    	 addi $t0, $t0, 1
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                 
+                    	 lw $t0, 4($sp)
+                    	 lw $t1, 8($sp)
+                    	 seq $t0, $t0, $t1
+                    	 addi $sp, $sp, 8
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                
+                        	 sub $t0, $t0, $t0
+                        	 lw $t1, 4($sp)
+                        	 bne $t0, $t1, LABL15
+                        .data
+                        	 IGNORE__LABL16: .asciiz "false"
+                        .text
+                        	 li $v0, 4
+                        	 la $a0, IGNORE__LABL16
+                        	 syscall
+                        	 j LABL16
+                        	 LABL15:
+                        .data
+                        	 IGNORE__LABL15: .asciiz "true"
+                        .text
+                        	 li $v0, 4
+                        	 la $a0, IGNORE__LABL15
+                        	 syscall
+                        	 LABL16:
+                    
+                    	addi $sp, $sp, 4
+                    	li $a0, 10
+                    	li $v0, 11  
+                    	syscall
+                
+                    	 addi $sp, $sp, 0
+                    	 LABL13_end:
+                
+                    	LABL17_start:
+                 	 sub $t0, $t0, $t0
+                    	 addi $t0, $t0, 1
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                  	 sub $t0, $t0, $t0
+                    	 addi $t0, $t0, 0
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                 
+                    	 lw $t0, 4($sp)
+                    	 lw $t1, 8($sp)
+                    	 seq $t0, $t0, $t1
+                    	 addi $sp, $sp, 8
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                
+                        	 sub $t0, $t0, $t0
+                        	 lw $t1, 4($sp)
+                        	 bne $t0, $t1, LABL19
+                        .data
+                        	 IGNORE__LABL20: .asciiz "false"
+                        .text
+                        	 li $v0, 4
+                        	 la $a0, IGNORE__LABL20
+                        	 syscall
+                        	 j LABL20
+                        	 LABL19:
+                        .data
+                        	 IGNORE__LABL19: .asciiz "true"
+                        .text
+                        	 li $v0, 4
+                        	 la $a0, IGNORE__LABL19
+                        	 syscall
+                        	 LABL20:
+                    
+                    	addi $sp, $sp, 4
+                    	li $a0, 10
+                    	li $v0, 11  
+                    	syscall
+                
+                    	 addi $sp, $sp, 0
+                    	 LABL17_end:
+                
+                    	LABL21_start:
+                 	 sub $t0, $t0, $t0
+                    	 addi $t0, $t0, 1
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                  	 sub $t0, $t0, $t0
+                    	 addi $t0, $t0, 1
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                 
+                    	 lw $t0, 4($sp)
+                    	 lw $t1, 8($sp)
+                    	 seq $t0, $t0, $t1
+                    	 addi $sp, $sp, 8
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                
+                        	 sub $t0, $t0, $t0
+                        	 lw $t1, 4($sp)
+                        	 bne $t0, $t1, LABL23
+                        .data
+                        	 IGNORE__LABL24: .asciiz "false"
+                        .text
+                        	 li $v0, 4
+                        	 la $a0, IGNORE__LABL24
+                        	 syscall
+                        	 j LABL24
+                        	 LABL23:
+                        .data
+                        	 IGNORE__LABL23: .asciiz "true"
+                        .text
+                        	 li $v0, 4
+                        	 la $a0, IGNORE__LABL23
+                        	 syscall
+                        	 LABL24:
+                    
+                    	addi $sp, $sp, 4
+                    	li $a0, 10
+                    	li $v0, 11  
+                    	syscall
+                
+                    	 addi $sp, $sp, 0
+                    	 LABL21_end:
+                
+                    	 addi $sp, $sp, 0
+                    	 LABL8_end:
+                
+                
+                        	 j ENDPROGRAM
+                      
+        	 ENDPROGRAM:
+        

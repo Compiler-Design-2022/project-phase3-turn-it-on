@@ -90,13 +90,16 @@ def run(input_file_address: str) -> bool:
     # input_content = input_file.read()
     input_content = ''' 
         int main() {
-            Print(ReadLine());
-        }
+    Print(false == false);
+    Print(false == true);
+    Print(true == false);
+    Print(true == true);
+}
     '''
 
     try:
         print(input_content)
-        parse_tree, code = parser(code_predified_functions + input_content)
+        parse_tree, code = parser(input_content)
         print(parse_tree.pretty())
         # print(parse_tree)
         try:
