@@ -701,8 +701,6 @@ def after_enter(parse_tree, symbol_table, children):
         first_part_code_type_size, id = 0, 0
         first_part_code, increment_code = "", ""
         if parse_tree.children[id].data == "first_forstmt_part":
-            #if len(symbol_table.last_scope().variables) > 0:
-            #    symbol_table.last_scope().pop_variable()
             first_part_code_type_size = children[id].type.size
             first_part_code += children[id].code
             symbol_table.last_scope().pop_variable()
@@ -714,9 +712,6 @@ def after_enter(parse_tree, symbol_table, children):
         id += 1
 
         if parse_tree.children[id].data == "third_forstmt_part":
-            #if len(symbol_table.last_scope().variables) > 0:
-            #    symbol_table.last_scope().pop_variable()
-            third_part_code_type_size += children[id].type.size
             increment_code += children[id].code
             id += 1
 
@@ -818,19 +813,19 @@ def after_enter(parse_tree, symbol_table, children):
                     '''
         elif children[0].type == Type("string") or children[0].type == Type("array", inside_type="char"):
             code = f'''{left_expr_code} {right_expr_code}
-                                    #begin string equality check
-                                    \t lw $t0, 4($sp)
-                                    \t lw $t1, 8($sp)
-                                    \t addi $sp, $sp, -12
-                                    \t sw $t0, 4($sp)
-                                    \t sw $t1, 8($sp)
-                                    \t jal string_equality_check
-                                    \t lw $t0, 4($sp)
-                                    \t addi $sp, $sp, 16
-                                    \t sw $t0, 0($sp)
-                                    \t addi $sp, $sp, -4
-                                    #end string equality check
-                                '''
+                        #begin string equality check
+                        \t lw $t0, 4($sp)
+                        \t lw $t1, 8($sp)
+                        \t addi $sp, $sp, -12
+                        \t sw $t0, 4($sp)
+                        \t sw $t1, 8($sp)
+                        \t jal string_equality_check
+                        \t lw $t0, 4($sp)
+                        \t addi $sp, $sp, 16
+                        \t sw $t0, 0($sp)
+                        \t addi $sp, $sp, -4
+                        #end string equality check
+                    '''
             assert children[0].type == children[1].type
             return Node_Return(code=code, type=Type("bool"))
         else:
@@ -1006,7 +1001,9 @@ def after_enter(parse_tree, symbol_table, children):
     elif parse_tree.data == "condition_expr_not_equal":
         left_expr_code = children[0].code
         right_expr_code = children[1].code
-        symbol_table.last_scope().pop_variable()  # t0 right t1 left
+        symbol_table.last_scope().pop_variable() 
+        symbol_table.last_scope().pop_variable()
+        symbol_table.last_scope().push_variable(Variable("__IGNORE_BOOL", Type("bool")))
         if children[0].type.name == "double": # DOUBLE
             true_label = "__IGONRE" + get_label()
             false_label = "__IGONRE" + get_label()
@@ -1027,28 +1024,24 @@ def after_enter(parse_tree, symbol_table, children):
                         \t sw $t0, 0($sp)
                         \t addi $sp, $sp, -4
                     '''
-        else:
-
-        if children[0].type.name == "double": # DOUBLE
-            true_label = "__IGONRE" + get_label()
-            false_label = "__IGONRE" + get_label()
-            code = f'''{left_expr_code} {right_expr_code} 
-                        \t lw $t0, {children[1].type.size}($sp)
-                        \t lw $t1, {children[1].type.size + children[0].type.size}($sp)
-                        \t lwc1 $f0, 0($t0) # value
-                        \t lwc1 $f2, 0($t1) # value
-                        \t li $t0, 0
-                        \t c.eq.s $f2, $f0
-                        \t bc1t {false_label}
-                        \t li $t0, 1
-                        \t j {true_label}
-                        \t {false_label}:
-                        \t li $t0, 0
-                        \t {true_label}:
-                        \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
+        elif children[0].type == Type("string") or children[0].type == Type("array", inside_type="char"):
+            code = f'''{left_expr_code} {right_expr_code}
+                        #begin string equality check
+                        \t lw $t0, 4($sp)
+                        \t lw $t1, 8($sp)
+                        \t addi $sp, $sp, -12
+                        \t sw $t0, 4($sp)
+                        \t sw $t1, 8($sp)
+                        \t jal string_equality_check
+                        \t lw $t0, 4($sp)
+                        \t li $t1, 1
+                        \t sub $t0, $t1, $t0
+                        \t addi $sp, $sp, 16
                         \t sw $t0, 0($sp)
                         \t addi $sp, $sp, -4
+                        #end string equality check
                     '''
+            assert children[0].type == children[1].type
         else:
             code = f'''{left_expr_code} {right_expr_code} 
                         \t lw $t0, {children[1].type.size}($sp)
@@ -1084,7 +1077,8 @@ def after_enter(parse_tree, symbol_table, children):
         code = "".join(child_codes_list)
         org_sum = sum
         for child in children:
-            symbol_table.last_scope().pop_variable()
+            if len(symbol_table.last_scope().variables) > 0:	
+                symbol_table.last_scope().pop_variable()
             if child.type.name == "string" or child.type == Type("array", Type("char")):
                 label = "PRINT_" + get_label()
                 code += f'''
