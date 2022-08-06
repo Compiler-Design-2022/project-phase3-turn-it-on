@@ -28,7 +28,7 @@ grammer = r"""
     continuestmt: "continue" ";"
     printstmt: "Print" "(" expr ("," expr)* ")" ";"
     expr: assignment_expr | constant | lvalue_exp | this_expr | call | "(" expr ")" | math_expr_minus | math_expr_sum | math_expr_mul | math_expr_div | math_expr_mod  | sign_expr | condition_expr | bool_math_expr
-          | new_expr | new_array_expr  | len_expr
+          | new_expr | new_array_expr  | len_expr | not_expr
     
     len_expr: "@len" "(" expr ")"
     lvalue_exp: lvalue
@@ -41,10 +41,8 @@ grammer = r"""
     condition_expr: condition_expr_less | condition_expr_less_equal | condition_expr_greater | condition_expr_greater_equal | condition_expr_equal | condition_expr_not_equal
 
     bool_math_expr: bool_math_expr_or | bool_math_expr_and
-    bool_math_expr_or: bool_math_expr_and "||" bool_math_expr_and 
-    bool_math_expr_and: expr_ "&&" expr_
-    expr_: expr | bool_math_expr
-
+    bool_math_expr_or: expr "||" expr 
+    bool_math_expr_and: expr "&&" expr
 
     assignment_expr_empty: lvalue "=" expr
     assignment_expr_with_plus: lvalue "+=" expr
@@ -195,3 +193,8 @@ def replace_defines(input):
 #bool_math_expr_or_prim: null | "||" bool_math_expr_and bool_math_expr_or_prim
 #bool_math_expr_and: null | expr bool_math_expr_and_prim 
 #bool_math_expr_and_prim: "&&" expr bool_math_expr_and_prim
+
+#bool_math_expr: bool_math_expr_or | bool_math_expr_and
+#bool_math_expr_or: bool_math_expr_and "||" bool_math_expr_and 
+#bool_math_expr_and: expr_ "&&" expr_
+#expr_: expr | bool_math_expr

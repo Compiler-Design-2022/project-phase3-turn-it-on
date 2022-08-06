@@ -634,6 +634,17 @@ def after_enter(parse_tree, symbol_table, children):
                 '''
         return Node_Return(code=code, type=Type("bool"))
 
+    # not_expr:  "!" expr
+    elif parse_tree.data == "not_expr":
+        code = children[0].code
+        true_label = get_label()
+        false_label = get_label()
+        code += f'''
+                    \t lw $t0, 4($sp)
+                    \t xori $t0, $t0, 1
+                    \t sw $t0, 4($sp)
+                '''
+        return Node_Return(code=code, type=Type("bool"))
 
     # printstmt: "Print" "(" expr ("," expr)* ")" ";"
     elif parse_tree.data == "printstmt":
@@ -651,47 +662,47 @@ def after_enter(parse_tree, symbol_table, children):
             if child.type.name == "string" or child.type == Type("array", Type("char")):
                 label = "PRINT_" + get_label()
                 code += f'''
-                        \t lw $t0, {sum}($sp)
-                        \t lw $t2, 0($t0)
-                        \t addi $t0, $t0, 4
-                        \t li $t3, -1
-                        \t addi $t2,$t2, -1
-                        {label}:
-                        \t lb $t1, 0($t0)
-                        \t li $v0, 11
-                        \t move $a0, $t1
-                        \t syscall
-                        \t addi $t2,$t2, -1
-                        \t addi $t0, $t0, 4
-                        \t bne $t2, $t3, {label}
-                        \t li $a0, 32
-                        \t li $v0, 11  
-                        \t syscall
-                    '''
+                            \t lw $t0, {sum}($sp)
+                            \t lw $t2, 0($t0)
+                            \t addi $t0, $t0, 4
+                            \t li $t3, -1
+                            \t addi $t2,$t2, -1
+                            {label}:
+                            \t lb $t1, 0($t0)
+                            \t li $v0, 11
+                            \t move $a0, $t1
+                            \t syscall
+                            \t addi $t2,$t2, -1
+                            \t addi $t0, $t0, 4
+                            \t bne $t2, $t3, {label}
+                            \t li $a0, 32
+                            \t li $v0, 11  
+                            \t syscall
+                        '''
             elif child.type.name == "bool":
                 str_label = get_label()
                 true_label = get_label()
                 false_label = get_label()
                 code += f'''
-                        \t sub $t0, $t0, $t0
-                        \t lw $t1, 4($sp)
-                        \t bne $t0, $t1, {true_label}
-                        .data
-                        \t IGNORE__{false_label}: .asciiz "false"
-                        .text
-                        \t li $v0, 4
-                        \t la $a0, IGNORE__{false_label}
-                        \t syscall
-                        \t j {false_label}
-                        \t {true_label}:
-                        .data
-                        \t IGNORE__{true_label}: .asciiz "true"
-                        .text
-                        \t li $v0, 4
-                        \t la $a0, IGNORE__{true_label}
-                        \t syscall
-                        \t {false_label}:
-                    '''
+                            \t sub $t0, $t0, $t0
+                            \t lw $t1, 4($sp)
+                            \t bne $t0, $t1, {true_label}
+                            .data
+                            \t IGNORE__{false_label}: .asciiz "false"
+                            .text
+                            \t li $v0, 4
+                            \t la $a0, IGNORE__{false_label}
+                            \t syscall
+                            \t j {false_label}
+                            \t {true_label}:
+                            .data
+                            \t IGNORE__{true_label}: .asciiz "true"
+                            .text
+                            \t li $v0, 4
+                            \t la $a0, IGNORE__{true_label}
+                            \t syscall
+                            \t {false_label}:
+                        '''
                 
             elif child.type.name == "char":
                 type_print = 11
@@ -755,8 +766,8 @@ def after_enter(parse_tree, symbol_table, children):
     # normal_function_call: ident "(" actuals ")"
     elif parse_tree.data == "normal_function_call":
         code = f'''
-        \taddi $sp, $sp, -{Type("int").size}
-        '''
+                    \taddi $sp, $sp, -{Type("int").size}
+                '''
         for child in children:
             code += child.code
 
