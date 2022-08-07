@@ -77,11 +77,11 @@ grammer = r"""
    
     expr_level_10: assignment_expr | expr_level_9
     assignment_expr: assignment_expr_empty | assignment_expr_with_plus | assignment_expr_with_mul | assignment_expr_with_div | assignment_expr_with_min
-    assignment_expr_empty: lvalue "=" expr_level_9
-    assignment_expr_with_plus: lvalue "+=" expr_level_9
-    assignment_expr_with_mul: lvalue "*=" expr_level_9
-    assignment_expr_with_div: lvalue "/=" expr_level_9
-    assignment_expr_with_min: lvalue "-=" expr_level_9
+    assignment_expr_empty: lvalue "=" expr_level_10
+    assignment_expr_with_plus: lvalue "+=" expr_level_10
+    assignment_expr_with_mul: lvalue "*=" expr_level_10
+    assignment_expr_with_div: lvalue "/=" expr_level_10
+    assignment_expr_with_min: lvalue "-=" expr_level_10
      
      
     constant_token: INT | STRING | base16 | "null"
