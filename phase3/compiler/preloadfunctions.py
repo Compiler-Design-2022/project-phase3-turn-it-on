@@ -84,13 +84,18 @@ char[] ReadLine(){
         char[] res; 
         int inp; 
         int size;
-
+        int bufsize;
         size=0;
+        bufsize=100;
         res=NewArray(100, char);                                                                                                   
         while(true){ 
             inp = ReadChar(); 
             if (inp == 10){ 
                 break; 
+            }
+            if(size==bufsize){
+                res=res+NewArray(100, char);
+                bufsize+=100;
             }
             res[size] = itoc(inp); 
             size+=1;
