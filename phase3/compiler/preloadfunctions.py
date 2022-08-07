@@ -41,10 +41,41 @@ int ctoi(char a){
     ~
 }
 int dtoi(double a){
+    zero_num = "__IGNORE"+get_label()
+    half_num = "__IGNORE"+get_label()
+    one_num = "__IGNORE"+get_label()
+    neg_one = "__IGNORE"+get_label()
+    positive_label = "positive_number" + get_label()
+    end_label = "end_number" + get_label()
     ~mips
     lw $t0, 12($sp) 
     lw $t1, 4($sp)
-    mtc1 $t1, $f0
+    mtc1 $t1, $f2
+
+    .data
+    {zero_num}: .float 0.0
+    {half_num}: .float 0.5
+    {one_num}: .float 1
+    {negone_num}: .float -1
+    .text
+    \t la $t2, {zero_num}
+    \t la $t10, {half_num}
+    \t lw $t3, 0($t2)
+    \t mtc1 $t3, $f0
+    \t c.le.s $f0, $f2
+    \t bc1t {positive_label}
+    \t cvt.w.s $f4, $f2
+    \t lw $t3, 0($t10)
+    \t mtc1 $t3, $f6
+    \t add.s $f4, $f4, 
+ 
+
+    \t j {end_label}
+    \t {positive_label}:
+    
+
+    \t {end_label}:
+
     cvt.w.s $f2, $f0
     mfc1 $t1, $f2
     sw $t1, 0($sp) 
