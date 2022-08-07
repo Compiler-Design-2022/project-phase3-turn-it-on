@@ -51,9 +51,9 @@ class Method:
         self.input_variables = copy.deepcopy(input_variables)
 
     def __str__(self):
-        ans= f"name:{self.name}  label:{self.label} output_type:{self.output_type} input_types:"
+        ans = f"name:{self.name}  label:{self.label} output_type:{self.output_type} input_types:"
         for var in self.input_variables:
-            ans+=str(var)
+            ans += str(var)
         return ans
 
     def get_method_inputs_size(self):
@@ -116,9 +116,14 @@ class Variable():
     def __init__(self, name, type: Type):
         self.name = name
         self.type = type
+        self.is_global = False
+
+    def set_global(self):
+        self.is_global = True
 
     def __str__(self):
         return f" vn:{self.name} {self.type}"
+
 
 class Scope():
     def __init__(self, for_scope=False, method_scope=False, method=None):
@@ -133,7 +138,7 @@ class Scope():
         self.method = method
         if method_scope:
             self.push_variable(Variable("$RA", Type("int")))
-
+            self.push_variable(Variable("$GSA", Type("int")))
 
     def push_variable(self, variable: Variable):
         # print("push variable : ", variable.name, variable.type.size)
@@ -218,4 +223,3 @@ class SymbolTable():
     def pop_scope(self):
         # print("pop scope ")
         self.scope_stack.pop()
-

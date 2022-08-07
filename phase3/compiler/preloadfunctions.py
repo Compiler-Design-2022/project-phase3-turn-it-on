@@ -1,7 +1,7 @@
 
 type_change_function_inside4to4 = '''
     ~mips
-    lw $t0, 8($sp) 
+    lw $t0, 12($sp) 
     lw $t1, 4($sp)
     sw $t1, 0($sp) 
     addi $sp, $sp, -4
@@ -30,7 +30,7 @@ string catos(char[] a){
 }
 int ctoi(char a){
     ~mips
-    lw $t0, 8($sp) 
+    lw $t0, 12($sp) 
     lb $t1, 4($sp)
     sw $t1, 0($sp) 
     addi $sp, $sp, -4
@@ -39,7 +39,7 @@ int ctoi(char a){
 }
 int dtoi(double a){
     ~mips
-    lw $t0, 8($sp) 
+    lw $t0, 12($sp) 
     lw $t1, 4($sp)
      mtc1 $t1, $f12
     cvt.s.w $f12, $f12
@@ -50,8 +50,17 @@ int dtoi(double a){
 }
 int getsp(){
     ~mips
-    lw $t0, 4($sp) 
+    lw $t0, 8($sp) 
     sw $sp, 0($sp) 
+    addi $sp, $sp, -4
+    jr $t0
+    ~
+}
+int getGSA(){
+    ~mips
+    lw $t0, 8($sp) 
+    lw $t1, 4($sp)
+    sw $t1, 0($sp) 
     addi $sp, $sp, -4
     jr $t0
     ~
@@ -63,7 +72,7 @@ int ReadChar(){
     ~mips
     li $v0, 12           #read_char 
     syscall             #ReadChar 
-    lw $t0, 4($sp) 
+    lw $t0, 8($sp) 
     sw $v0, 0($sp) 
     addi $sp, $sp, -4
     jr $t0
