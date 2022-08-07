@@ -201,7 +201,7 @@ class SymbolTable():
                         break
                 if good:
                     return method
-        raise ValueError(f"couldn't find {name}")
+        raise ValueError(f"couldn't find {name} input-types:{' '.join(map(str, input_types))}")
 
     def get_address_diff(self, name):
         offset = 0
