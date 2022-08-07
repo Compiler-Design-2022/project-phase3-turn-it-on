@@ -10,64 +10,84 @@
                     sw $ra 8($sp)
                     
                     	LABL7_start:
-                
-                            sub $t1, $t1, $t1
-                            sw $t1, 0($sp)
-                            addi $sp, $sp, -4
-                        
-                            sub $t1, $t1, $t1
-                            sw $t1, 0($sp)
-                            addi $sp, $sp, -4
-                         
+                 
                             .data
                             __IGNORELABL8: .float 0.0
                             .text
                             	 la $t0, __IGNORELABL8
-                            	 sw $t0, 0($sp)
+                            	 lw $t1, 0($t0)
+                            	 sw $t1, 0($sp)
+                            	 addi $sp, $sp, -4
+                         
+                            .data
+                            __IGNORELABL9: .float 0.0
+                            .text
+                            	 la $t0, __IGNORELABL9
+                            	 lw $t1, 0($t0)
+                            	 sw $t1, 0($sp)
+                            	 addi $sp, $sp, -4
+                         
+                            .data
+                            __IGNORELABL10: .float 0.0
+                            .text
+                            	 la $t0, __IGNORELABL10
+                            	 lw $t1, 0($t0)
+                            	 sw $t1, 0($sp)
+                            	 addi $sp, $sp, -4
+                         
+                            .data
+                            __IGNORELABL11: .float 0.0
+                            .text
+                            	 la $t0, __IGNORELABL11
+                            	 lw $t1, 0($t0)
+                            	 sw $t1, 0($sp)
+                            	 addi $sp, $sp, -4
+                         
+                            .data
+                            __IGNORELABL12: .float 0.0
+                            .text
+                            	 la $t0, __IGNORELABL12
+                            	 lw $t1, 0($t0)
+                            	 sw $t1, 0($sp)
+                            	 addi $sp, $sp, -4
+                         
+                            .data
+                            __IGNORELABL13: .float 0.0
+                            .text
+                            	 la $t0, __IGNORELABL13
+                            	 lw $t1, 0($t0)
+                            	 sw $t1, 0($sp)
+                            	 addi $sp, $sp, -4
+                         
+                            .data
+                            __IGNORELABL14: .float 0.0
+                            .text
+                            	 la $t0, __IGNORELABL14
+                            	 lw $t1, 0($t0)
+                            	 sw $t1, 0($sp)
+                            	 addi $sp, $sp, -4
+                         
+                            .data
+                            __IGNORELABL15: .float 0.0
+                            .text
+                            	 la $t0, __IGNORELABL15
+                            	 lw $t1, 0($t0)
+                            	 sw $t1, 0($sp)
                             	 addi $sp, $sp, -4
                         
-                    	LABL9_start:
+                    	LABL16_start:
                 
-                        	 addi $t0, $sp, 12
+                        	 addi $t0, $sp, 32
                         	 sw $t0, 0($sp)
                         	 addi $sp, $sp, -4
-                     #new_array_expr cal size
-         
-                        	 li $t0, 1
-                        	 sw $t0, 0($sp)
+                      
+                        .data
+                        __IGNORELABL17: .float 69.82413714
+                        .text
+                        	 la $t0, __IGNORELABL17
+                        	 lw $t1, 0($t0)
+                        	 sw $t1, 0($sp)
                         	 addi $sp, $sp, -4
-                    
-            #new_arra expr cal size END
-            #new array expr get memory
-                    	 lw $t0, 4($sp)
-                    	 move $t8, $t0
-                    	 sub $t1, $t1, $t1 
-                    	 addi $t1, $t1, 4
-                    	 mul $t0, $t0, $t1
-                    	 addi $t0, $t0, 4
-                    	 move $t4, $t0
-                    	 move $a0, $t0
-                    	 li $v0, 9 
-                    	 syscall
-                    	 move $t6, $v0
-                    	 lw $t0, 4($sp)
-                    	 sw $t0 ,0($v0)
-                    	 sw $v0, 4($sp)
-            #new array expr get memory END
-                
-                        	 move $a0, $t4
-                        	 li $v0, 9 
-                        	 syscall
-                        	 li $t1, 4
-                        	 move $t5, $v0
-                        	 __IGNORELABL10:
-                        	 addi $t5, $t5, 4
-                        	 addi $t6, $t6, 4
-                        	 beq $t1, $t4, __IGNORELABL11
-                        	 sw $t5, 0($t6)
-                        	 addi $t1, $t1, 4
-                        	 j __IGNORELABL10
-                        	 __IGNORELABL11:
                     
                     	 lw $t0, 4($sp)
                     	 lw $t1, 8($sp)
@@ -77,50 +97,21 @@
                     	 addi $sp, $sp, -4
                 
                     	 addi $sp, $sp, 4
-                    	 LABL9_end:
+                    	 LABL16_end:
                 
-                    	LABL12_start:
+                    	LABL18_start:
                 
-                        	 addi $t0, $sp, 8
+                        	 addi $t0, $sp, 28
                         	 sw $t0, 0($sp)
                         	 addi $sp, $sp, -4
-                     #new_array_expr cal size
-         
-                        	 li $t0, 1
-                        	 sw $t0, 0($sp)
+                      
+                        .data
+                        __IGNORELABL19: .float 960.7071281
+                        .text
+                        	 la $t0, __IGNORELABL19
+                        	 lw $t1, 0($t0)
+                        	 sw $t1, 0($sp)
                         	 addi $sp, $sp, -4
-                    
-            #new_arra expr cal size END
-            #new array expr get memory
-                    	 lw $t0, 4($sp)
-                    	 move $t8, $t0
-                    	 sub $t1, $t1, $t1 
-                    	 addi $t1, $t1, 4
-                    	 mul $t0, $t0, $t1
-                    	 addi $t0, $t0, 4
-                    	 move $t4, $t0
-                    	 move $a0, $t0
-                    	 li $v0, 9 
-                    	 syscall
-                    	 move $t6, $v0
-                    	 lw $t0, 4($sp)
-                    	 sw $t0 ,0($v0)
-                    	 sw $v0, 4($sp)
-            #new array expr get memory END
-                
-                        	 move $a0, $t4
-                        	 li $v0, 9 
-                        	 syscall
-                        	 li $t1, 4
-                        	 move $t5, $v0
-                        	 __IGNORELABL13:
-                        	 addi $t5, $t5, 4
-                        	 addi $t6, $t6, 4
-                        	 beq $t1, $t4, __IGNORELABL14
-                        	 sw $t5, 0($t6)
-                        	 addi $t1, $t1, 4
-                        	 j __IGNORELABL13
-                        	 __IGNORELABL14:
                     
                     	 lw $t0, 4($sp)
                     	 lw $t1, 8($sp)
@@ -130,116 +121,173 @@
                     	 addi $sp, $sp, -4
                 
                     	 addi $sp, $sp, 4
-                    	 LABL12_end:
+                    	 LABL18_end:
                 
-                    	LABL15_start:
-                #array val load array
+                    	LABL20_start:
+                
+                        	 addi $t0, $sp, 24
+                        	 sw $t0, 0($sp)
+                        	 addi $sp, $sp, -4
+                      
+                        .data
+                        __IGNORELABL21: .float 0.5281794697
+                        .text
+                        	 la $t0, __IGNORELABL21
+                        	 lw $t1, 0($t0)
+                        	 sw $t1, 0($sp)
+                        	 addi $sp, $sp, -4
                     
+                    	 lw $t0, 4($sp)
+                    	 lw $t1, 8($sp)
+                    	 sw $t0, 0($t1)
+                    	 addi $sp, $sp, 8
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                
+                    	 addi $sp, $sp, 4
+                    	 LABL20_end:
+                
+                    	LABL22_start:
+                
+                        	 addi $t0, $sp, 20
+                        	 sw $t0, 0($sp)
+                        	 addi $sp, $sp, -4
+                      
+                        .data
+                        __IGNORELABL23: .float 0.5281794697
+                        .text
+                        	 la $t0, __IGNORELABL23
+                        	 lw $t1, 0($t0)
+                        	 sw $t1, 0($sp)
+                        	 addi $sp, $sp, -4
+                    
+                    	 lw $t0, 4($sp)
+                    	 lw $t1, 8($sp)
+                    	 sw $t0, 0($t1)
+                    	 addi $sp, $sp, 8
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                
+                    	 addi $sp, $sp, 4
+                    	 LABL22_end:
+                
+                    	LABL24_start:
+                
+                        	 addi $t0, $sp, 16
+                        	 sw $t0, 0($sp)
+                        	 addi $sp, $sp, -4
+                      
+                        .data
+                        __IGNORELABL25: .float 5039.128903
+                        .text
+                        	 la $t0, __IGNORELABL25
+                        	 lw $t1, 0($t0)
+                        	 sw $t1, 0($sp)
+                        	 addi $sp, $sp, -4
+                    
+                        	 lw $t0, 4($sp)
+                        	 mtc1 $t0, $f0
+                        	 neg.s $f2, $f0
+                        	 mfc1 $t0, $f2
+                        	 sw $t0, 4($sp)
+                    
+                    	 lw $t0, 4($sp)
+                    	 lw $t1, 8($sp)
+                    	 sw $t0, 0($t1)
+                    	 addi $sp, $sp, 8
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                
+                    	 addi $sp, $sp, 4
+                    	 LABL24_end:
+                
+                    	LABL26_start:
+                
                         	 addi $t0, $sp, 12
                         	 sw $t0, 0($sp)
                         	 addi $sp, $sp, -4
-                    
-                    	lw $t0, 4($sp)
-                    	lw $t1, 0($t0)
-                    	sw $t1, 4($sp)
-                 
-                    #array val load array END
-                    #array val index load 
-                     
-                        	 li $t0, 0
-                        	 sw $t0, 0($sp)
+                      
+                        .data
+                        __IGNORELABL27: .float 7585.800593
+                        .text
+                        	 la $t0, __IGNORELABL27
+                        	 lw $t1, 0($t0)
+                        	 sw $t1, 0($sp)
                         	 addi $sp, $sp, -4
                     
-                    #array val index load END
-                    #array val start
                     	 lw $t0, 4($sp)
                     	 lw $t1, 8($sp)
-                    	 li $t2, 4 # it is 4 
-                    	 mul $t0, $t0, $t2
-                    	 add $t0, $t0, $t1
+                    	 sw $t0, 0($t1)
                     	 addi $sp, $sp, 8
-                    	 addi $t0, $t0, 4
                     	 sw $t0, 0($sp)
                     	 addi $sp, $sp, -4
-                    #array val end
-                  
-                        .data
-                        __IGNORELABL16: .float 4.2
-                        .text
-                        	 la $t0, __IGNORELABL16
-                        	 sw $t0, 0($sp)
-                        	 addi $sp, $sp, -4
-                    
-                        	 lw $t0, 4($sp)
-                        	 lw $t1, 8($sp) # t1 is address now 
-                        	 lwc1 $f0, 0($t0) # value
-                        	 lw $t2, 0($t1)
-                        	 swc1 $f0, 0($t2)
-                        	 addi $sp, $sp, 8
-                        	 sw $t2, 0($sp)
-                        	 addi $sp, $sp, -4
-                    
-                    	 addi $sp, $sp, 4
-                    	 LABL15_end:
                 
-                    	LABL17_start:
-                #array val load array
-                    
+                    	 addi $sp, $sp, 4
+                    	 LABL26_end:
+                
+                    	LABL28_start:
+                
                         	 addi $t0, $sp, 8
                         	 sw $t0, 0($sp)
                         	 addi $sp, $sp, -4
-                    
-                    	lw $t0, 4($sp)
-                    	lw $t1, 0($t0)
-                    	sw $t1, 4($sp)
-                 
-                    #array val load array END
-                    #array val index load 
-                     
-                        	 li $t0, 0
-                        	 sw $t0, 0($sp)
-                        	 addi $sp, $sp, -4
-                    
-                    #array val index load END
-                    #array val start
-                    	 lw $t0, 4($sp)
-                    	 lw $t1, 8($sp)
-                    	 li $t2, 4 # it is 4 
-                    	 mul $t0, $t0, $t2
-                    	 add $t0, $t0, $t1
-                    	 addi $sp, $sp, 8
-                    	 addi $t0, $t0, 4
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                    #array val end
-                  
+                      
                         .data
-                        __IGNORELABL18: .float 5.9
+                        __IGNORELABL29: .float 11748.63533
                         .text
-                        	 la $t0, __IGNORELABL18
-                        	 sw $t0, 0($sp)
+                        	 la $t0, __IGNORELABL29
+                        	 lw $t1, 0($t0)
+                        	 sw $t1, 0($sp)
                         	 addi $sp, $sp, -4
                     
                         	 lw $t0, 4($sp)
-                        	 lw $t1, 8($sp) # t1 is address now 
-                        	 lwc1 $f0, 0($t0) # value
-                        	 lw $t2, 0($t1)
-                        	 swc1 $f0, 0($t2)
-                        	 addi $sp, $sp, 8
-                        	 sw $t2, 0($sp)
-                        	 addi $sp, $sp, -4
+                        	 mtc1 $t0, $f0
+                        	 neg.s $f2, $f0
+                        	 mfc1 $t0, $f2
+                        	 sw $t0, 4($sp)
                     
-                    	 addi $sp, $sp, 4
-                    	 LABL17_end:
+                    	 lw $t0, 4($sp)
+                    	 lw $t1, 8($sp)
+                    	 sw $t0, 0($t1)
+                    	 addi $sp, $sp, 8
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
                 
-                    	LABL19_start:
+                    	 addi $sp, $sp, 4
+                    	 LABL28_end:
+                
+                    	LABL30_start:
                 
                         	 addi $t0, $sp, 4
                         	 sw $t0, 0($sp)
                         	 addi $sp, $sp, -4
-                     #array val load array
+                      
+                        .data
+                        __IGNORELABL31: .float 13446.89678
+                        .text
+                        	 la $t0, __IGNORELABL31
+                        	 lw $t1, 0($t0)
+                        	 sw $t1, 0($sp)
+                        	 addi $sp, $sp, -4
                     
-                        	 addi $t0, $sp, 16
+                        	 lw $t0, 4($sp)
+                        	 mtc1 $t0, $f0
+                        	 neg.s $f2, $f0
+                        	 mfc1 $t0, $f2
+                        	 sw $t0, 4($sp)
+                    
+                    	 lw $t0, 4($sp)
+                    	 lw $t1, 8($sp)
+                    	 sw $t0, 0($t1)
+                    	 addi $sp, $sp, 8
+                    	 sw $t0, 0($sp)
+                    	 addi $sp, $sp, -4
+                
+                    	 addi $sp, $sp, 4
+                    	 LABL30_end:
+                
+                    	LABL32_start:
+                
+                        	 addi $t0, $sp, 32
                         	 sw $t0, 0($sp)
                         	 addi $sp, $sp, -4
                     
@@ -247,104 +295,26 @@
                     	lw $t1, 0($t0)
                     	sw $t1, 4($sp)
                  
-                    #array val load array END
-                    #array val index load 
-                     
-                        	 li $t0, 0
-                        	 sw $t0, 0($sp)
-                        	 addi $sp, $sp, -4
-                    
-                    #array val index load END
-                    #array val start
-                    	 lw $t0, 4($sp)
-                    	 lw $t1, 8($sp)
-                    	 li $t2, 4 # it is 4 
-                    	 mul $t0, $t0, $t2
-                    	 add $t0, $t0, $t1
-                    	 addi $sp, $sp, 8
-                    	 addi $t0, $t0, 4
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                    #array val end
-                
-                    	lw $t0, 4($sp)
-                    	lw $t1, 0($t0)
-                    	sw $t1, 4($sp)
-                 #array val load array
-                    
-                        	 addi $t0, $sp, 16
+                        	 addi $t0, $sp, 32
                         	 sw $t0, 0($sp)
                         	 addi $sp, $sp, -4
                     
                     	lw $t0, 4($sp)
                     	lw $t1, 0($t0)
                     	sw $t1, 4($sp)
-                 
-                    #array val load array END
-                    #array val index load 
-                     
-                        	 li $t0, 0
-                        	 sw $t0, 0($sp)
-                        	 addi $sp, $sp, -4
-                    
-                    #array val index load END
-                    #array val start
-                    	 lw $t0, 4($sp)
-                    	 lw $t1, 8($sp)
-                    	 li $t2, 4 # it is 4 
-                    	 mul $t0, $t0, $t2
-                    	 add $t0, $t0, $t1
-                    	 addi $sp, $sp, 8
-                    	 addi $t0, $t0, 4
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
-                    #array val end
-                
-                    	lw $t0, 4($sp)
-                    	lw $t1, 0($t0)
-                    	sw $t1, 4($sp)
-                
-                    	 lw $t0, 4($sp)
-                    	 lw $t1, 8($sp)
-                
-                    	 lwc1 $f0, 0($t0)
-                
-                    	 lwc1 $f2, 0($t1)
-                
-                    	 add.s $f0, $f2, $f0
-                    	 addi $sp, $sp, 8
-                    .data
-                    __IGNORELABL20: .float 0.0
-                    .text
-                    	 la $t0, __IGNORELABL20
-                    	 swc1 $f0, 0($t0)
-                    	 sw $t0, 0($sp)
-                    	 addi $sp, $sp, -4
                 
                         	 lw $t0, 4($sp)
-                        	 lw $t1, 8($sp) # t1 is address now 
-                        	 lwc1 $f0, 0($t0) # value
-                        	 lw $t2, 0($t1)
-                        	 swc1 $f0, 0($t2)
+                        	 lw $t1, 8($sp)
+                        	 mtc1 $t0, $f0
+                        	 mtc1 $t1, $f2
+                        	 div.s $f0, $f2, $f0
+                        	 mfc1 $t0, $f0
                         	 addi $sp, $sp, 8
-                        	 sw $t2, 0($sp)
-                        	 addi $sp, $sp, -4
-                    
-                    	 addi $sp, $sp, 4
-                    	 LABL19_end:
-                
-                    	LABL21_start:
-                
-                        	 addi $t0, $sp, 4
                         	 sw $t0, 0($sp)
                         	 addi $sp, $sp, -4
                     
-                    	lw $t0, 4($sp)
-                    	lw $t1, 0($t0)
-                    	sw $t1, 4($sp)
-                
                             	 lw $t0, 4($sp)
-                            	 lwc1 $f0, 0($t0)
+                            	 mtc1 $t0, $f0
                             	 li $v0, 2
                             	 sub.s $f2, $f2, $f2
                             	 add.s $f12, $f0, $f2
@@ -358,9 +328,144 @@
                     #print endl END
                 
                     	 addi $sp, $sp, 0
-                    	 LABL21_end:
+                    	 LABL32_end:
                 
-                    	 addi $sp, $sp, 12
+                    	LABL33_start:
+                
+                        	 addi $t0, $sp, 20
+                        	 sw $t0, 0($sp)
+                        	 addi $sp, $sp, -4
+                    
+                    	lw $t0, 4($sp)
+                    	lw $t1, 0($t0)
+                    	sw $t1, 4($sp)
+                 
+                        	 addi $t0, $sp, 24
+                        	 sw $t0, 0($sp)
+                        	 addi $sp, $sp, -4
+                    
+                    	lw $t0, 4($sp)
+                    	lw $t1, 0($t0)
+                    	sw $t1, 4($sp)
+                
+                        	 lw $t0, 4($sp)
+                        	 lw $t1, 8($sp)
+                        	 mtc1 $t0, $f0
+                        	 mtc1 $t1, $f2
+                        	 div.s $f0, $f2, $f0
+                        	 mfc1 $t0, $f0
+                        	 addi $sp, $sp, 8
+                        	 sw $t0, 0($sp)
+                        	 addi $sp, $sp, -4
+                    
+                            	 lw $t0, 4($sp)
+                            	 mtc1 $t0, $f0
+                            	 li $v0, 2
+                            	 sub.s $f2, $f2, $f2
+                            	 add.s $f12, $f0, $f2
+                            	 syscall
+                        
+                    #print endl
+                    	addi $sp, $sp, 4
+                    	li $a0, 10
+                    	li $v0, 11  
+                    	syscall
+                    #print endl END
+                
+                    	 addi $sp, $sp, 0
+                    	 LABL33_end:
+                
+                    	LABL34_start:
+                
+                        	 addi $t0, $sp, 16
+                        	 sw $t0, 0($sp)
+                        	 addi $sp, $sp, -4
+                    
+                    	lw $t0, 4($sp)
+                    	lw $t1, 0($t0)
+                    	sw $t1, 4($sp)
+                 
+                        	 addi $t0, $sp, 16
+                        	 sw $t0, 0($sp)
+                        	 addi $sp, $sp, -4
+                    
+                    	lw $t0, 4($sp)
+                    	lw $t1, 0($t0)
+                    	sw $t1, 4($sp)
+                
+                        	 lw $t0, 4($sp)
+                        	 lw $t1, 8($sp)
+                        	 mtc1 $t0, $f0
+                        	 mtc1 $t1, $f2
+                        	 div.s $f0, $f2, $f0
+                        	 mfc1 $t0, $f0
+                        	 addi $sp, $sp, 8
+                        	 sw $t0, 0($sp)
+                        	 addi $sp, $sp, -4
+                    
+                            	 lw $t0, 4($sp)
+                            	 mtc1 $t0, $f0
+                            	 li $v0, 2
+                            	 sub.s $f2, $f2, $f2
+                            	 add.s $f12, $f0, $f2
+                            	 syscall
+                        
+                    #print endl
+                    	addi $sp, $sp, 4
+                    	li $a0, 10
+                    	li $v0, 11  
+                    	syscall
+                    #print endl END
+                
+                    	 addi $sp, $sp, 0
+                    	 LABL34_end:
+                
+                    	LABL35_start:
+                
+                        	 addi $t0, $sp, 8
+                        	 sw $t0, 0($sp)
+                        	 addi $sp, $sp, -4
+                    
+                    	lw $t0, 4($sp)
+                    	lw $t1, 0($t0)
+                    	sw $t1, 4($sp)
+                 
+                        	 addi $t0, $sp, 8
+                        	 sw $t0, 0($sp)
+                        	 addi $sp, $sp, -4
+                    
+                    	lw $t0, 4($sp)
+                    	lw $t1, 0($t0)
+                    	sw $t1, 4($sp)
+                
+                        	 lw $t0, 4($sp)
+                        	 lw $t1, 8($sp)
+                        	 mtc1 $t0, $f0
+                        	 mtc1 $t1, $f2
+                        	 div.s $f0, $f2, $f0
+                        	 mfc1 $t0, $f0
+                        	 addi $sp, $sp, 8
+                        	 sw $t0, 0($sp)
+                        	 addi $sp, $sp, -4
+                    
+                            	 lw $t0, 4($sp)
+                            	 mtc1 $t0, $f0
+                            	 li $v0, 2
+                            	 sub.s $f2, $f2, $f2
+                            	 add.s $f12, $f0, $f2
+                            	 syscall
+                        
+                    #print endl
+                    	addi $sp, $sp, 4
+                    	li $a0, 10
+                    	li $v0, 11  
+                    	syscall
+                    #print endl END
+                
+                    	 addi $sp, $sp, 0
+                    	 LABL35_end:
+                
+                    	 addi $sp, $sp, 32
                     	 LABL7_end:
                 
                 
