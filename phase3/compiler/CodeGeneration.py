@@ -290,16 +290,9 @@ def after_enter(parse_tree, symbol_table, children):
                     \t sw $t0, 0($sp)
                     \t addi $sp, $sp, -4
                 '''
-        try:
-            assert children[0].type.inside_type == children[1].type
-        except:
-            # print("*" * 40)
-            # print("left side type of assignment: ", children[0].type.inside_type)
-            # print("right side type of assignment: ", children[1].type)
-            # print("#" * 40)
-            raise ValueError
+        assert children[0].type.inside_type == children[1].type
 
-        return Node_Return(code=code, type=Type("int"), text="assignment")
+        return Node_Return(code=code, type=children[1].type, text="assignment")
 
     # assignment_expr_with_plus: lvalue "+=" expr
     elif parse_tree.data == "assignment_expr_with_plus":
@@ -334,7 +327,8 @@ def after_enter(parse_tree, symbol_table, children):
                         \t sw $t0, 0($sp)
                         \t addi $sp, $sp, -4
                     '''
-            return Node_Return(code=code, type=Type("int"), text="assignment")
+            assert children[0].type.inside_type == children[1].type
+            return Node_Return(code=code, type=children[1].type, text="assignment")
 
     # assignment_expr_with_min: lvalue "-=" expr
     elif parse_tree.data == "assignment_expr_with_min":
@@ -369,7 +363,8 @@ def after_enter(parse_tree, symbol_table, children):
                         \t sw $t0, 0($sp)
                         \t addi $sp, $sp, -4
                     '''
-            return Node_Return(code=code, type=Type("int"), text="assignment")
+            assert children[0].type.inside_type == children[1].type
+            return Node_Return(code=code, type=children[1].type, text="assignment")
 
     # assignment_expr_with_mul: lvalue "*=" expr
     elif parse_tree.data == "assignment_expr_with_mul":
@@ -404,7 +399,8 @@ def after_enter(parse_tree, symbol_table, children):
                         \t sw $t0, 0($sp)
                         \t addi $sp, $sp, -4
                     '''
-            return Node_Return(code=code, type=Type("int"), text="assignment")
+            assert children[0].type.inside_type == children[1].type
+            return Node_Return(code=code, type=children[1].type, text="assignment")
 
     # assignment_expr_with_div: lvalue "/=" expr
     elif parse_tree.data == "assignment_expr_with_div":
@@ -439,7 +435,8 @@ def after_enter(parse_tree, symbol_table, children):
                         \t sw $t0, 0($sp)
                         \t addi $sp, $sp, -4
                     '''
-            return Node_Return(code=code, type=Type("int"), text="assignment")
+            assert children[0].type.inside_type == children[1].type
+            return Node_Return(code=code, type=children[1].type, text="assignment")
 
     # constant: doubleconstant | constant_token | boolconstant
     elif parse_tree.data == "constant":  # TODO only int
@@ -513,6 +510,8 @@ def after_enter(parse_tree, symbol_table, children):
                         \t addi $sp, $sp, 12
                         #added inputs
                         \t addi $sp, $sp, 8
+                        #expr inputs
+                        \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
                         \t sw $t0, 0($sp)
                         \t addi $sp, $sp, -4
                     '''
@@ -864,6 +863,8 @@ def after_enter(parse_tree, symbol_table, children):
                         #added inputs
                         \t addi $sp, $sp, 8
                         \t addi $sp, $sp, 12
+                        #expr inputs
+                        \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
                         \t sw $t0, 0($sp)
                         \t addi $sp, $sp, -4
                         #end string equality check
@@ -1083,6 +1084,8 @@ def after_enter(parse_tree, symbol_table, children):
                         #added inputs
                         \t addi $sp, $sp, 8
                         \t addi $sp, $sp, 12
+                        #expr inputs
+                        \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
                         \t sw $t0, 0($sp)
                         \t addi $sp, $sp, -4
                         #end string equality check
@@ -1276,32 +1279,27 @@ def after_enter(parse_tree, symbol_table, children):
     elif parse_tree.data == "function_decl":
         function_name = children[1].text.replace("@", "")
         stmtblock_code = children[3].code
-        save_ra = "" if function_name == "main" else f'''sw $ra {symbol_table.get_address_diff("$RA")}($sp)'''
+        save_ra = f'''sw $ra {symbol_table.get_address_diff("$RA")}($sp)'''
 
         code = f'''
                     {function_name}:
                     {save_ra}
                     {stmtblock_code}
                 '''
-        if function_name != "main":
-            code += f'''
-                        \t lw $t1, {symbol_table.get_address_diff("$RA")}($sp)
-                    '''
-            pop_size = 0
-            for scope in reversed(symbol_table.scope_stack):
-                scope: Scope
-                if scope.method_scope:
-                    break
-                else:
-                    pop_size += scope.size()
-            code += f'''
-                        \t addi $sp, $sp, {pop_size}
-                        \t jr $t1
-                    '''
-        else:
-            code += f'''
-                        \t j ENDPROGRAM
-                      '''
+        code += f'''
+                    \t lw $t1, {symbol_table.get_address_diff("$RA")}($sp)
+                '''
+        pop_size = 0
+        for scope in reversed(symbol_table.scope_stack):
+            scope: Scope
+            if scope.method_scope:
+                break
+            else:
+                pop_size += scope.size()
+        code += f'''
+                    \t addi $sp, $sp, {pop_size}
+                    \t jr $t1
+                '''
 
         symbol_table.pop_scope()
         return Node_Return(code=code, type=None)
@@ -1311,7 +1309,7 @@ def after_enter(parse_tree, symbol_table, children):
         type_list = []
         variable_count = 0 if parse_tree.children[0].data == "null" else len(children)
         for i in range(variable_count):
-            type_list.append(symbol_table.last_scope().variables[-(i + 1)])
+            type_list.append(symbol_table.last_scope().variables[i])
 
         return Node_Return(code=None, type=type_list)
 
@@ -1389,18 +1387,20 @@ def after_enter(parse_tree, symbol_table, children):
         return Node_Return(code=code, type=[children[i].type for i in range(len(children))])
     elif parse_tree.data == "program":
         code = f'''{parse_tree.code}
+        \t addi $t0, $sp, 0
         \t addi $sp, $sp, -4
-        \t sw $sp, 0($sp)
+        \t sw $t0, 0($sp)
         \t addi $sp, $sp, -4
-        j main
+        jal main
+        j ENDPROGRAM
         '''
         for child in children:
             if child.code is not None:
                 code += child.code
             else:
                 code += child.text
-        code += '''
-        \t ENDPROGRAM:
+        code+='''
+        ENDPROGRAM:
         '''
         return Node_Return(code=code, type=children[0].type, text=children[0].text)
     elif parse_tree.data == "call":
