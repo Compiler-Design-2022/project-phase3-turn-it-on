@@ -87,7 +87,7 @@ grammer = r"""
     constant_token: INT | STRING | base16 | "null"
     null:
     ident: /@[a-zA-Z][a-zA-Z0-9_]*/ | /@__func__[a-zA-Z0-9_]*/ | /@__line__[a-zA-Z0-9_]*/ 
-    doubleconstant: /[0-9]+/"."/[0-9]+/ | /[0-9]+/"." | /[0-9]+/"."/[0-9]*[Ee][+-]?[0-9]+/
+    doubleconstant: /[0-9]+/"."/[0-9]+/ | /[0-9]+/"." | /[0-9]+/"."/[0-9]*[@]?[Ee][+-]?[0-9]+/ 
     boolconstant: boolconstant_true | boolconstant_false
     boolconstant_true: "true"
     boolconstant_false: "false"
