@@ -250,7 +250,7 @@ def after_enter(parse_tree, symbol_table, children):
                     #array val start
                     \t lw $t0, {children[1].type.size}($sp)
                     \t lw $t1, {children[1].type.size + children[0].type.size}($sp)
-                    \t li $t2, {children[0].type.size}
+                    \t li $t2, {children[0].type.size} # it is 4 
                     \t mul $t0, $t0, $t2
                     \t add $t0, $t0, $t1
                     \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
@@ -308,20 +308,12 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.last_scope().pop_variable()
         symbol_table.last_scope().pop_variable()
         symbol_table.last_scope().push_variable(Variable("__IGNORE_assignment_expr_with_plus", children[1].type))
-
+        
         if children[1].type.name == "double":
-            code = f'''{variable_code} {expr_code}
-                        \t lw $t0, {children[1].type.size}($sp)
-                        \t lw $t1, {children[1].type.size + children[0].type.size}($sp) # t1 is address now 
-                        \t lwc1 $f0, 0($t0) # value
-                        \t lw $t2, 0($t1)
-                        \t lwc1 $f2, 0($t0)
-                        \t add.s $f0, $f2, $f0
-                        \t swc1 $f0, 0($t2)
-                        \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
-                        \t sw $t2, 0($sp)
-                        \t addi $sp, $sp, -4
-                    '''
+            code = get_code_assignment_expr_double(children, "expr_is_not_ref", variable_code, expr_code, "add.s")
+            return Node_Return(code=code, type=Type("double"), text="assignment")
+        elif children[1].type.name == "ref" and children[1].type.inside_type == "double":
+            code = get_code_assignment_expr_double(children, "expr_is_ref", variable_code, expr_code, "add.s")
             return Node_Return(code=code, type=Type("double"), text="assignment")
         else:
             code = f'''{variable_code} {expr_code}
@@ -345,18 +337,10 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.last_scope().push_variable(Variable("__IGNORE_assignment_expr_with_min", children[1].type))
 
         if children[1].type.name == "double":
-            code = f'''{variable_code} {expr_code}
-                        \t lw $t0, {children[1].type.size}($sp)
-                        \t lw $t1, {children[1].type.size + children[0].type.size}($sp) # t1 is address now 
-                        \t lwc1 $f0, 0($t0) # value
-                        \t lw $t2, 0($t1)
-                        \t lwc1 $f2, 0($t0)
-                        \t sub.s $f0, $f2, $f0
-                        \t swc1 $f0, 0($t2)
-                        \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
-                        \t sw $t2, 0($sp)
-                        \t addi $sp, $sp, -4
-                    '''
+            code = get_code_assignment_expr_double(children, "expr_is_not_ref", variable_code, expr_code, "sub.s")
+            return Node_Return(code=code, type=Type("double"), text="assignment")
+        elif children[1].type.name == "ref" and children[1].type.inside_type == "double":
+            code = get_code_assignment_expr_double(children, "expr_is_ref", variable_code, expr_code, "sub.s")
             return Node_Return(code=code, type=Type("double"), text="assignment")
         else:
             code = f'''{variable_code} {expr_code}
@@ -380,18 +364,10 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.last_scope().push_variable(Variable("__IGNORE_assignment_expr_with_mul", children[1].type))
 
         if children[1].type.name == "double":
-            code = f'''{variable_code} {expr_code}
-                        \t lw $t0, {children[1].type.size}($sp)
-                        \t lw $t1, {children[1].type.size + children[0].type.size}($sp) # t1 is address now 
-                        \t lwc1 $f0, 0($t0) # value
-                        \t lw $t2, 0($t1)
-                        \t lwc1 $f2, 0($t0)
-                        \t mul.s $f0, $f2, $f0
-                        \t swc1 $f0, 0($t2)
-                        \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
-                        \t sw $t2, 0($sp)
-                        \t addi $sp, $sp, -4
-                    '''
+            code = get_code_assignment_expr_double(children, "expr_is_not_ref", variable_code, expr_code, "mul.s")
+            return Node_Return(code=code, type=Type("double"), text="assignment")
+        elif children[1].type.name == "ref" and children[1].type.inside_type == "double":
+            code = get_code_assignment_expr_double(children, "expr_is_ref", variable_code, expr_code, "mul.s")
             return Node_Return(code=code, type=Type("double"), text="assignment")
         else:
             code = f'''{variable_code} {expr_code}
@@ -415,18 +391,10 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.last_scope().push_variable(Variable("__IGNORE_assignment_expr_with_div", children[1].type))
 
         if children[1].type.name == "double":
-            code = f'''{variable_code} {expr_code}
-                        \t lw $t0, {children[1].type.size}($sp)
-                        \t lw $t1, {children[1].type.size + children[0].type.size}($sp) # t1 is address now 
-                        \t lwc1 $f0, 0($t0) # value
-                        \t lw $t2, 0($t1)
-                        \t lwc1 $f2, 0($t0)
-                        \t div.s $f0, $f2, $f0
-                        \t swc1 $f0, 0($t2)
-                        \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
-                        \t sw $t2, 0($sp)
-                        \t addi $sp, $sp, -4
-                    '''
+            code = get_code_assignment_expr_double(children, "expr_is_not_ref", variable_code, expr_code, "div.s")
+            return Node_Return(code=code, type=Type("double"), text="assignment")
+        elif children[1].type.name == "ref" and children[1].type.inside_type == "double":
+            code = get_code_assignment_expr_double(children, "expr_is_ref", variable_code, expr_code, "div.s")
             return Node_Return(code=code, type=Type("double"), text="assignment")
         else:
             code = f'''{variable_code} {expr_code}
@@ -480,24 +448,13 @@ def after_enter(parse_tree, symbol_table, children):
         left_expr_code = children[0].code
         right_expr_code = children[1].code
         symbol_table.last_scope().pop_variable()
-        if children[1].type.name == "double":  # DOUBLE
-            double_name = "__IGNORE" + get_label()
-            # create variable, push result in this variable, reference is at the top of the stack
-            code = f'''{left_expr_code} {right_expr_code}
-                        \t lw $t0, {children[1].type.size}($sp)
-                        \t lw $t1, {children[1].type.size + children[0].type.size}($sp)
-                        \t lwc1 $f0, 0($t0) # value
-                        \t lwc1 $f2, 0($t1) # value
-                        \t add.s $f0, $f2, $f0
-                        \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
-                        .data
-                        {double_name}: .float 0.0
-                        .text
-                        \t la $t0, {double_name}
-                        \t swc1 $f0, 0($t0)
-                        \t sw $t0, 0($sp)
-                        \t addi $sp, $sp, -4
-                    '''
+        type1 = "expr_is_ref" if children[0].type.name == "ref" and children[0].type.inside_type == "double" else "expr_is_not_ref"
+        type2 = "expr_is_ref" if children[0].type.name == "ref" and children[0].type.inside_type == "double" else "expr_is_not_ref"
+        if children[0].type.name == "double":
+            code = get_code_math_expr_double(children, type1, type2, left_expr_code, right_expr_code, "add.s")
+            return Node_Return(code=code, type=Type("double"), text="math_double")
+        elif children[0].type.name == "ref" and children[0].type.inside_type == "double":  
+            code = get_code_math_expr_double(children, type1, type2, left_expr_code, right_expr_code, "add.s")
             return Node_Return(code=code, type=Type("double"), text="math_double")
         elif children[0].type.name == "string" or children[0].type.name == "array":
             code = f'''{left_expr_code} {right_expr_code}
@@ -534,24 +491,13 @@ def after_enter(parse_tree, symbol_table, children):
         left_expr_code = children[0].code
         right_expr_code = children[1].code
         symbol_table.last_scope().pop_variable()
-        if children[1].type.name == "double":  # DOUBLE
-            double_name = "__IGNORE" + get_label()
-            # create variable, push result in this variable, reference is at the top of the stack
-            code = f'''{left_expr_code} {right_expr_code}
-                        \t lw $t0, {children[1].type.size}($sp)
-                        \t lw $t1, {children[1].type.size + children[0].type.size}($sp)
-                        \t lwc1 $f0, 0($t0) # value
-                        \t lwc1 $f2, 0($t1) # value
-                        \t sub.s $f0, $f2, $f0
-                        \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
-                        .data
-                        {double_name}: .float 0.0
-                        .text
-                        \t la $t0, {double_name}
-                        \t swc1 $f0, 0($t0)
-                        \t sw $t0, 0($sp)
-                        \t addi $sp, $sp, -4
-                    '''
+        type1 = "expr_is_ref" if children[0].type.name == "ref" and children[0].type.inside_type == "double" else "expr_is_not_ref"
+        type2 = "expr_is_ref" if children[0].type.name == "ref" and children[0].type.inside_type == "double" else "expr_is_not_ref"
+        if children[0].type.name == "double":
+            code = get_code_math_expr_double(children, type1, type2, left_expr_code, right_expr_code, "sub.s")
+            return Node_Return(code=code, type=Type("double"), text="math_double")
+        elif children[0].type.name == "ref" and children[0].type.inside_type == "double":  
+            code = get_code_math_expr_double(children, type1, type2, left_expr_code, right_expr_code, "sub.s")
             return Node_Return(code=code, type=Type("double"), text="math_double")
         else:
             code = f'''{left_expr_code} {right_expr_code}
@@ -569,24 +515,13 @@ def after_enter(parse_tree, symbol_table, children):
         left_expr_code = children[0].code
         right_expr_code = children[1].code
         symbol_table.last_scope().pop_variable()
-        if children[1].type.name == "double":  # DOUBLE
-            double_name = "__IGNORE" + get_label()
-            # create variable, push result in this variable, reference is at the top of the stack
-            code = f'''{left_expr_code} {right_expr_code}
-                        \t lw $t0, {children[1].type.size}($sp)
-                        \t lw $t1, {children[1].type.size + children[0].type.size}($sp)
-                        \t lwc1 $f0, 0($t0) # value
-                        \t lwc1 $f2, 0($t1) # value
-                        \t mul.s $f0, $f2, $f0
-                        \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
-                        .data
-                        {double_name}: .float 0.0
-                        .text
-                        \t la $t0, {double_name}
-                        \t swc1 $f0, 0($t0)
-                        \t sw $t0, 0($sp)
-                        \t addi $sp, $sp, -4
-                    '''
+        type1 = "expr_is_ref" if children[0].type.name == "ref" and children[0].type.inside_type == "double" else "expr_is_not_ref"
+        type2 = "expr_is_ref" if children[0].type.name == "ref" and children[0].type.inside_type == "double" else "expr_is_not_ref"
+        if children[0].type.name == "double":
+            code = get_code_math_expr_double(children, type1, type2, left_expr_code, right_expr_code, "mul.s")
+            return Node_Return(code=code, type=Type("double"), text="math_double")
+        elif children[0].type.name == "ref" and children[0].type.inside_type == "double":  
+            code = get_code_math_expr_double(children, type1, type2, left_expr_code, right_expr_code, "mul.s")
             return Node_Return(code=code, type=Type("double"), text="math_double")
         else:
             code = f'''{left_expr_code} {right_expr_code}
@@ -625,24 +560,13 @@ def after_enter(parse_tree, symbol_table, children):
         left_expr_code = children[0].code
         right_expr_code = children[1].code
         symbol_table.last_scope().pop_variable()
-        if children[1].type.name == "double":
-            double_name = "__IGNORE" + get_label()
-            # create variable, push result in this variable, reference is at the top of the stack
-            code = f'''{left_expr_code} {right_expr_code}
-                        \t lw $t0, {children[1].type.size}($sp)
-                        \t lw $t1, {children[1].type.size + children[0].type.size}($sp)
-                        \t lwc1 $f0, 0($t0) # value
-                        \t lwc1 $f2, 0($t1) # value
-                        \t div.s $f0, $f2, $f0
-                        \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
-                        .data
-                        {double_name}: .float 0.0
-                        .text
-                        \t la $t0, {double_name}
-                        \t swc1 $f0, 0($t0)
-                        \t sw $t0, 0($sp)
-                        \t addi $sp, $sp, -4
-                    '''
+        type1 = "expr_is_ref" if children[0].type.name == "ref" and children[0].type.inside_type == "double" else "expr_is_not_ref"
+        type2 = "expr_is_ref" if children[0].type.name == "ref" and children[0].type.inside_type == "double" else "expr_is_not_ref"
+        if children[0].type.name == "double":
+            code = get_code_math_expr_double(children, type1, type2, left_expr_code, right_expr_code, "div.s")
+            return Node_Return(code=code, type=Type("double"), text="math_double")
+        elif children[0].type.name == "ref" and children[0].type.inside_type == "double":  
+            code = get_code_math_expr_double(children, type1, type2, left_expr_code, right_expr_code, "div.s")
             return Node_Return(code=code, type=Type("double"), text="math_double")
         else:
             code = f'''{left_expr_code} {right_expr_code}
@@ -829,26 +753,15 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.last_scope().pop_variable()  # t0 right t1 left
         symbol_table.last_scope().pop_variable()  # t0 right t1 left
         symbol_table.last_scope().push_variable(Variable("__IGNORE_condition_expr_equal_BOOL", Type("bool")))
-        if children[0].type.name == "double":  # DOUBLE
-            true_label = "__IGONRE" + get_label()
-            false_label = "__IGONRE" + get_label()
-            code = f'''{left_expr_code} {right_expr_code} 
-                        \t lw $t0, {children[1].type.size}($sp)
-                        \t lw $t1, {children[1].type.size + children[0].type.size}($sp)
-                        \t lwc1 $f0, 0($t0) # value
-                        \t lwc1 $f2, 0($t1) # value
-                        \t li $t0, 0
-                        \t c.eq.s $f2, $f0
-                        \t bc1t {true_label}
-                        \t li $t0, 0
-                        \t j {false_label}
-                        \t {true_label}:
-                        \t li $t0, 1
-                        \t {false_label}:
-                        \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
-                        \t sw $t0, 0($sp)
-                        \t addi $sp, $sp, -4
-                    '''
+
+        type1 = "expr_is_ref" if children[0].type.name == "ref" and children[0].type.inside_type == "double" else "expr_is_not_ref"
+        type2 = "expr_is_ref" if children[0].type.name == "ref" and children[0].type.inside_type == "double" else "expr_is_not_ref"
+        if children[0].type.name == "double":
+            code = get_code_condition_expr_double(children, type1, type2, left_expr_code, right_expr_code, "c.eq.s", "$f2", "$f0")
+            return Node_Return(code=code, type=Type("double"), text="math_double")
+        elif children[0].type.name == "ref" and children[0].type.inside_type == "double":  
+            code = get_code_condition_expr_double(children, type1, type2, left_expr_code, right_expr_code, "c.eq.s", "$f2", "$f0")
+            return Node_Return(code=code, type=Type("double"), text="math_double")
         elif children[0].type == Type("string") or children[0].type == Type("array", inside_type="char"):
             code = f'''{left_expr_code} {right_expr_code}
                         #begin string equality check
@@ -890,26 +803,13 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.last_scope().pop_variable()  # t0 right t1 left
         symbol_table.last_scope().push_variable(Variable("__IGNORE_condition_expr_less_equal_BOOL", Type("bool")))
 
-        if children[0].type.name == "double":  # DOUBLE
-            true_label = "__IGONRE" + get_label()
-            false_label = "__IGONRE" + get_label()
-            code = f'''{left_expr_code} {right_expr_code} 
-                        \t lw $t0, {children[1].type.size}($sp)
-                        \t lw $t1, {children[1].type.size + children[0].type.size}($sp)
-                        \t lwc1 $f0, 0($t0) # value
-                        \t lwc1 $f2, 0($t1) # value
-                        \t li $t0, 0
-                        \t c.le.s $f2, $f0
-                        \t bc1t {true_label}
-                        \t li $t0, 0
-                        \t j {false_label}
-                        \t {true_label}:
-                        \t li $t0, 1
-                        \t {false_label}:
-                        \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
-                        \t sw $t0, 0($sp)
-                        \t addi $sp, $sp, -4
-                    '''
+        type1 = "expr_is_ref" if children[0].type.name == "ref" and children[0].type.inside_type == "double" else "expr_is_not_ref"
+        type2 = "expr_is_ref" if children[0].type.name == "ref" and children[0].type.inside_type == "double" else "expr_is_not_ref"
+        if children[0].type.name == "double":
+            code = get_code_condition_expr_double(children, type1, type2, left_expr_code, right_expr_code, "c.le.s", "$f2", "$f0")
+            return Node_Return(code=code, type=Type("double"), text="math_double")
+        elif children[0].type.name == "ref" and children[0].type.inside_type == "double":  
+            code = get_code_condition_expr_double(children, type1, type2, left_expr_code, right_expr_code, "c.le.s", "$f2", "$f0")
         else:
             # sle $t0, $t0, $t1 ------>>>>> $t0 will be 1 if $t0 <= $t1 , and zero otherwise
             code = f'''{left_expr_code} {right_expr_code} 
@@ -930,26 +830,13 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.last_scope().pop_variable()  # t0 right t1 left
         symbol_table.last_scope().push_variable(Variable("__IGNORE_condition_expr_less_BOOL", Type("bool")))
 
-        if children[0].type.name == "double":  # DOUBLE
-            true_label = "__IGONRE" + get_label()
-            false_label = "__IGONRE" + get_label()
-            code = f'''{left_expr_code} {right_expr_code} 
-                        \t lw $t0, {children[1].type.size}($sp)
-                        \t lw $t1, {children[1].type.size + children[0].type.size}($sp)
-                        \t lwc1 $f0, 0($t0) # value
-                        \t lwc1 $f2, 0($t1) # value
-                        \t li $t0, 0
-                        \t c.lt.s $f2, $f0
-                        \t bc1t {true_label}
-                        \t li $t0, 0
-                        \t j {false_label}
-                        \t {true_label}:
-                        \t li $t0, 1
-                        \t {false_label}:
-                        \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
-                        \t sw $t0, 0($sp)
-                        \t addi $sp, $sp, -4
-                    '''
+        type1 = "expr_is_ref" if children[0].type.name == "ref" and children[0].type.inside_type == "double" else "expr_is_not_ref"
+        type2 = "expr_is_ref" if children[0].type.name == "ref" and children[0].type.inside_type == "double" else "expr_is_not_ref"
+        if children[0].type.name == "double":
+            code = get_code_condition_expr_double(children, type1, type2, left_expr_code, right_expr_code, "c.lt.s", "$f2", "$f0")
+            return Node_Return(code=code, type=Type("double"), text="math_double")
+        elif children[0].type.name == "ref" and children[0].type.inside_type == "double":  
+            code = get_code_condition_expr_double(children, type1, type2, left_expr_code, right_expr_code, "c.lt.s", "$f2", "$f0")
         else:
             code = f'''{left_expr_code} {right_expr_code} 
                         \t lw $t0, {children[1].type.size}($sp)
@@ -969,26 +856,13 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.last_scope().pop_variable()  # t0 right t1 left
         symbol_table.last_scope().push_variable(Variable("__IGNORE_condition_expr_greater_BOOL", Type("bool")))
 
-        if children[0].type.name == "double":  # DOUBLE
-            true_label = "__IGONRE" + get_label()
-            false_label = "__IGONRE" + get_label()
-            code = f'''{left_expr_code} {right_expr_code} 
-                        \t lw $t0, {children[1].type.size}($sp)
-                        \t lw $t1, {children[1].type.size + children[0].type.size}($sp)
-                        \t lwc1 $f0, 0($t0) # value
-                        \t lwc1 $f2, 0($t1) # value
-                        \t li $t0, 0
-                        \t c.lt.s $f0, $f2
-                        \t bc1t {true_label}
-                        \t li $t0, 0
-                        \t j {false_label}
-                        \t {true_label}:
-                        \t li $t0, 1
-                        \t {false_label}:
-                        \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
-                        \t sw $t0, 0($sp)
-                        \t addi $sp, $sp, -4
-                    '''
+        type1 = "expr_is_ref" if children[0].type.name == "ref" and children[0].type.inside_type == "double" else "expr_is_not_ref"
+        type2 = "expr_is_ref" if children[0].type.name == "ref" and children[0].type.inside_type == "double" else "expr_is_not_ref"
+        if children[0].type.name == "double":
+            code = get_code_condition_expr_double(children, type1, type2, left_expr_code, right_expr_code, "c.lt.s", "$f0", "$f2")
+            return Node_Return(code=code, type=Type("double"), text="math_double")
+        elif children[0].type.name == "ref" and children[0].type.inside_type == "double":  
+            code = get_code_condition_expr_double(children, type1, type2, left_expr_code, right_expr_code, "c.lt.s", "$f0", "$f2")
         else:
             code = f'''{left_expr_code} {right_expr_code} 
                         \t lw $t0, {children[1].type.size}($sp)
@@ -1008,26 +882,13 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.last_scope().pop_variable()  # t0 right t1 left
         symbol_table.last_scope().push_variable(Variable("__IGNORE_condition_expr_greater_equal_BOOL", Type("bool")))
 
-        if children[0].type.name == "double":  # DOUBLE
-            true_label = "__IGONRE" + get_label()
-            false_label = "__IGONRE" + get_label()
-            code = f'''{left_expr_code} {right_expr_code} 
-                        \t lw $t0, {children[1].type.size}($sp)
-                        \t lw $t1, {children[1].type.size + children[0].type.size}($sp)
-                        \t lwc1 $f0, 0($t0) # value
-                        \t lwc1 $f2, 0($t1) # value
-                        \t li $t0, 0
-                        \t c.le.s $f2, $f0
-                        \t bc1t {true_label}
-                        \t li $t0, 0
-                        \t j {false_label}
-                        \t {true_label}:
-                        \t li $t0, 1
-                        \t {false_label}:
-                        \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
-                        \t sw $t0, 0($sp)
-                        \t addi $sp, $sp, -4
-                    '''
+        type1 = "expr_is_ref" if children[0].type.name == "ref" and children[0].type.inside_type == "double" else "expr_is_not_ref"
+        type2 = "expr_is_ref" if children[0].type.name == "ref" and children[0].type.inside_type == "double" else "expr_is_not_ref"
+        if children[0].type.name == "double":
+            code = get_code_condition_expr_double(children, type1, type2, left_expr_code, right_expr_code, "c.le.s", "$f0", "$f2")
+            return Node_Return(code=code, type=Type("double"), text="math_double")
+        elif children[0].type.name == "ref" and children[0].type.inside_type == "double":  
+            code = get_code_condition_expr_double(children, type1, type2, left_expr_code, right_expr_code, "c.le.s", "$f0", "$f2")
         else:
             code = f'''{left_expr_code} {right_expr_code} 
                         \t lw $t0, {children[1].type.size}($sp)
@@ -1414,6 +1275,121 @@ def after_enter(parse_tree, symbol_table, children):
                 code += child.text
         return Node_Return(code=code, type=children[0].type if len(children) > 0 else Type(),
                            text=children[0].text if len(children) > 0 else None)  # TODO: not good!
+
+
+
+
+
+def get_code_assignment_expr_double(children, type, variable_code, expr_code, command):
+
+        code = f'''{variable_code} {expr_code}
+                    \t lw $t0, {children[1].type.size}($sp)
+                    \t lw $t1, {children[1].type.size + children[0].type.size}($sp)
+                '''
+        if type == "expr_is_ref":
+            code += f'''
+                    \t lw $t3, 0($t0)
+                    \t lwc1 $f0, 0($t3)
+                '''
+        else:
+            code += f'''
+                    \t lwc1 $f0, 0($t0)
+                '''
+        code += f'''
+                    \t lw $t2, 0($t1)
+                    \t lwc1 $f2, 0($t0)
+                    \t {command} $f0, $f2, $f0
+                    \t swc1 $f0, 0($t2)
+                    \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
+                    \t sw $t2, 0($sp)
+                    \t addi $sp, $sp, -4
+                '''
+        return code
+
+
+def get_code_math_expr_double(children, type1, type2, left_expr_code, right_expr_code, command):
+
+        double_name = "__IGNORE" + get_label()
+        # create variable, push result in this variable, reference is at the top of the stack
+                
+        code = f'''{left_expr_code} {right_expr_code}
+                    \t lw $t0, {children[1].type.size}($sp)
+                    \t lw $t1, {children[1].type.size + children[0].type.size}($sp)
+                '''
+        if type1 == "expr_is_ref":
+            code += f'''
+                    \t lw $t3, 0($t0)
+                    \t lwc1 $f0, 0($t3)
+                '''
+        else:
+            code += f'''
+                    \t lwc1 $f0, 0($t0)
+                '''
+        if type2 == "expr_is_ref":
+            code += f'''
+                    \t lw $t4, 0($t1)
+                    \t lwc1 $f2, 0($t4)
+                '''
+        else:
+            code += f'''
+                    \t lwc1 $f2, 0($t1)
+                '''
+        code += f'''
+                    \t {command} $f0, $f2, $f0
+                    \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
+                    .data
+                    {double_name}: .float 0.0
+                    .text
+                    \t la $t0, {double_name}
+                    \t swc1 $f0, 0($t0)
+                    \t sw $t0, 0($sp)
+                    \t addi $sp, $sp, -4
+                '''
+        return code
+
+
+def get_code_condition_expr_double(children, type1, type2, left_expr_code, right_expr_code, command, reg1, reg2):
+        true_label = "__IGONRE" + get_label()
+        false_label = "__IGONRE" + get_label()
+
+        code = f'''{left_expr_code} {right_expr_code}
+                    \t lw $t0, {children[1].type.size}($sp)
+                    \t lw $t1, {children[1].type.size + children[0].type.size}($sp)
+                '''
+        if type1 == "expr_is_ref":
+            code += f'''
+                    \t lw $t3, 0($t0)
+                    \t lwc1 $f0, 0($t3)
+                '''
+        else:
+            code += f'''
+                    \t lwc1 $f0, 0($t0)
+                '''
+        if type2 == "expr_is_ref":
+            code += f'''
+                    \t lw $t4, 0($t1)
+                    \t lwc1 $f2, 0($t4)
+                '''
+        else:
+            code += f'''
+                    \t lwc1 $f2, 0($t1)
+                '''
+        code += f'''
+                    \t li $t0, 0
+                    \t {command} {reg1}, {reg2}
+                    \t bc1t {true_label}
+                    \t li $t0, 0
+                    \t j {false_label}
+                    \t {true_label}:
+                    \t li $t0, 1
+                    \t {false_label}:
+                    \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
+                    \t sw $t0, 0($sp)
+                    \t addi $sp, $sp, -4
+                '''
+        return code
+
+
 
 
 all_node = '''
