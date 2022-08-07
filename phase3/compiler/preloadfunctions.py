@@ -44,9 +44,10 @@ int dtoi(double a){
     ~mips
     lw $t0, 12($sp) 
     lw $t1, 4($sp)
-     mtc1 $t1, $f12
-    cvt.s.w $f12, $f12
-    sw $t0, 0($sp) 
+    mtc1 $t1, $f0
+    cvt.w.s $f2, $f0
+    mfc1 $t1, $f2
+    sw $t1, 0($sp) 
     addi $sp, $sp, -4
     jr $t0
     ~
