@@ -1142,9 +1142,6 @@ def after_enter(parse_tree, symbol_table, children):
                             \t li $v0, {type_print}
                             \t move $a0, $t0
                             \t syscall
-                            \t li $a0, 32
-                            \t li $v0, 11  
-                            \t syscall
                             #print int/char end
                         '''
 
