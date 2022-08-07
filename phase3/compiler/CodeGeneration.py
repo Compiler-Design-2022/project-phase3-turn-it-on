@@ -663,8 +663,9 @@ def after_enter(parse_tree, symbol_table, children):
         code = f'''{left_expr_code} {right_expr_code}
                     \t lw $t0, {children[1].type.size}($sp)
                     \t lw $t1, {children[1].type.size + children[0].type.size}($sp)
-                    \t divu $t1, $t0
-                    \t mfhi $t0       # temp for the mod
+                    \t div $t3, $t1, $t0
+                    \t mul $t3, $t3, $t0
+                    \t sub $t0, $t1, $t3
                     \t addi $sp, $sp, {children[1].type.size + children[0].type.size}
                     \t sw $t0, 0($sp)
                     \t addi $sp, $sp, -4
