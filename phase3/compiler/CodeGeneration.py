@@ -220,7 +220,7 @@ def after_enter(parse_tree, symbol_table, children):
     # new_array_expr: "NewArray" "(" expr "," type ")"
     elif parse_tree.data == "new_array_expr":  # TODO differrent type different code
         expr_code = children[0].code
-
+        
         code = f'''#new_array_expr cal size
         {expr_code}
             #new_arra expr cal size END
@@ -231,14 +231,36 @@ def after_enter(parse_tree, symbol_table, children):
                     \t addi $t1, $t1, {children[1].type.size}
                     \t mul $t0, $t0, $t1
                     \t addi $t0, $t0, {Type("int").size}
+                    \t move $t4, $t0
                     \t move $a0, $t0
                     \t li $v0, 9 
                     \t syscall
+                    \t move $t6, $v0
                     \t lw $t0, {children[0].type.size}($sp)
                     \t sw $t0 ,0($v0)
                     \t sw $v0, {children[0].type.size}($sp)
             #new array expr get memory END
                 '''
+        if children[1].type.name == "double":
+            # already we have number of element in $t0 and last pointer in t4, t5 is counter
+            start_label = "__IGNORE" + get_label()
+            end_label = "__IGNORE" + get_label()
+            code += f'''
+                        \t move $a0, $t4
+                        \t li $v0, 9 
+                        \t syscall
+                        \t li $t1, 4
+                        \t move $t5, $v0
+                        \t {start_label}:
+                        \t addi $t5, $t5, 4
+                        \t addi $t6, $t6, 4
+                        \t beq $t1, $t4, {end_label}
+                        \t sw $t5, 0($t6)
+                        \t addi $t1, $t1, 4
+                        \t j {start_label}
+                        \t {end_label}:
+                    '''
+
         assert children[0].type == Type("int")
         return Node_Return(code=code, type=Type("array", inside_type=children[1].type))
 

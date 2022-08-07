@@ -7,7 +7,17 @@ from preloadfunctions import code_predified_functions
 def run() -> str:
     input_content = ''' 
     
-
+int main() {
+    double[] abc;
+    double[] gfh;
+    double khar;
+    abc = NewArray(1,double);
+    gfh = NewArray(1,double);
+    abc[0] = 4.2;
+    gfh[0] = 5.9;
+    khar = abc[0] + gfh[0];
+    Print(khar);
+}
 
     '''
 

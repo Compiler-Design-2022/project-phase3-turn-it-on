@@ -1,11 +1,13 @@
 
+        	 addi $t0, $sp, 0
         	 addi $sp, $sp, -4
-        	 sw $sp, 0($sp)
+        	 sw $t0, 0($sp)
         	 addi $sp, $sp, -4
-        j main
+        jal main
+        j ENDPROGRAM
         
                     main:
-                    
+                    sw $ra 8($sp)
                     
                     	LABL7_start:
                 
@@ -43,14 +45,30 @@
                     	 addi $t1, $t1, 4
                     	 mul $t0, $t0, $t1
                     	 addi $t0, $t0, 4
+                    	 move $t4, $t0
                     	 move $a0, $t0
                     	 li $v0, 9 
                     	 syscall
+                    	 move $t6, $v0
                     	 lw $t0, 4($sp)
                     	 sw $t0 ,0($v0)
                     	 sw $v0, 4($sp)
             #new array expr get memory END
                 
+                        	 move $a0, $t4
+                        	 li $v0, 9 
+                        	 syscall
+                        	 li $t1, 4
+                        	 move $t5, $v0
+                        	 __IGNORELABL10:
+                        	 addi $t5, $t5, 4
+                        	 addi $t6, $t6, 4
+                        	 beq $t1, $t4, __IGNORELABL11
+                        	 sw $t5, 0($t6)
+                        	 addi $t1, $t1, 4
+                        	 j __IGNORELABL10
+                        	 __IGNORELABL11:
+                    
                     	 lw $t0, 4($sp)
                     	 lw $t1, 8($sp)
                     	 sw $t0, 0($t1)
@@ -61,7 +79,7 @@
                     	 addi $sp, $sp, 4
                     	 LABL9_end:
                 
-                    	LABL10_start:
+                    	LABL12_start:
                 
                         	 addi $t0, $sp, 8
                         	 sw $t0, 0($sp)
@@ -80,14 +98,30 @@
                     	 addi $t1, $t1, 4
                     	 mul $t0, $t0, $t1
                     	 addi $t0, $t0, 4
+                    	 move $t4, $t0
                     	 move $a0, $t0
                     	 li $v0, 9 
                     	 syscall
+                    	 move $t6, $v0
                     	 lw $t0, 4($sp)
                     	 sw $t0 ,0($v0)
                     	 sw $v0, 4($sp)
             #new array expr get memory END
                 
+                        	 move $a0, $t4
+                        	 li $v0, 9 
+                        	 syscall
+                        	 li $t1, 4
+                        	 move $t5, $v0
+                        	 __IGNORELABL13:
+                        	 addi $t5, $t5, 4
+                        	 addi $t6, $t6, 4
+                        	 beq $t1, $t4, __IGNORELABL14
+                        	 sw $t5, 0($t6)
+                        	 addi $t1, $t1, 4
+                        	 j __IGNORELABL13
+                        	 __IGNORELABL14:
+                    
                     	 lw $t0, 4($sp)
                     	 lw $t1, 8($sp)
                     	 sw $t0, 0($t1)
@@ -96,9 +130,9 @@
                     	 addi $sp, $sp, -4
                 
                     	 addi $sp, $sp, 4
-                    	 LABL10_end:
+                    	 LABL12_end:
                 
-                    	LABL11_start:
+                    	LABL15_start:
                 #array val load array
                     
                         	 addi $t0, $sp, 12
@@ -130,9 +164,9 @@
                     #array val end
                   
                         .data
-                        __IGNORELABL12: .float 4.2
+                        __IGNORELABL16: .float 4.2
                         .text
-                        	 la $t0, __IGNORELABL12
+                        	 la $t0, __IGNORELABL16
                         	 sw $t0, 0($sp)
                         	 addi $sp, $sp, -4
                     
@@ -146,9 +180,9 @@
                         	 addi $sp, $sp, -4
                     
                     	 addi $sp, $sp, 4
-                    	 LABL11_end:
+                    	 LABL15_end:
                 
-                    	LABL13_start:
+                    	LABL17_start:
                 #array val load array
                     
                         	 addi $t0, $sp, 8
@@ -180,9 +214,9 @@
                     #array val end
                   
                         .data
-                        __IGNORELABL14: .float 5.9
+                        __IGNORELABL18: .float 5.9
                         .text
-                        	 la $t0, __IGNORELABL14
+                        	 la $t0, __IGNORELABL18
                         	 sw $t0, 0($sp)
                         	 addi $sp, $sp, -4
                     
@@ -196,9 +230,9 @@
                         	 addi $sp, $sp, -4
                     
                     	 addi $sp, $sp, 4
-                    	 LABL13_end:
+                    	 LABL17_end:
                 
-                    	LABL15_start:
+                    	LABL19_start:
                 
                         	 addi $t0, $sp, 4
                         	 sw $t0, 0($sp)
@@ -280,9 +314,9 @@
                     	 add.s $f0, $f2, $f0
                     	 addi $sp, $sp, 8
                     .data
-                    __IGNORELABL16: .float 0.0
+                    __IGNORELABL20: .float 0.0
                     .text
-                    	 la $t0, __IGNORELABL16
+                    	 la $t0, __IGNORELABL20
                     	 swc1 $f0, 0($t0)
                     	 sw $t0, 0($sp)
                     	 addi $sp, $sp, -4
@@ -297,9 +331,9 @@
                         	 addi $sp, $sp, -4
                     
                     	 addi $sp, $sp, 4
-                    	 LABL15_end:
+                    	 LABL19_end:
                 
-                    	LABL17_start:
+                    	LABL21_start:
                 
                         	 addi $t0, $sp, 4
                         	 sw $t0, 0($sp)
@@ -324,13 +358,16 @@
                     #print endl END
                 
                     	 addi $sp, $sp, 0
-                    	 LABL17_end:
+                    	 LABL21_end:
                 
                     	 addi $sp, $sp, 12
                     	 LABL7_end:
                 
                 
-                        	 j ENDPROGRAM
-                      
-        	 ENDPROGRAM:
+                    	 lw $t1, 8($sp)
+                
+                    	 addi $sp, $sp, 0
+                    	 jr $t1
+                
+        ENDPROGRAM:
         
