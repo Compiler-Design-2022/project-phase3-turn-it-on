@@ -511,7 +511,17 @@ def after_enter(parse_tree, symbol_table, children):
 
     # doubleconstant
     elif parse_tree.data == "doubleconstant":
-        return Node_Return(code="", type=Type("double"), text=children[0].text + "." + children[1].text)
+        first_part = children[0].text
+        second_part = children[1].text.replace("@", "").replace("e", "E")
+        if second_part.find("E") == -1:
+            return Node_Return(code="", type=Type("double"), text=first_part + "." + second_part)
+        else:
+            exp = int(second_part[second_part.find("E") + 1:])
+            number = (second_part[:second_part.find("E")])
+            number = float(first_part + "." + number)
+            number = number * (10 ** exp)
+            return Node_Return(code="", type=Type("double"), text=str(number))
+
 
     # boolconstant: boolconstant_true | boolconstant_false
     elif parse_tree.data == "boolconstant":
