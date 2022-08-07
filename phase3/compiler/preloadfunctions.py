@@ -40,7 +40,7 @@ int ctoi(char a){
     jr $t0
     ~
 }
-int dtoi(double a){
+int dtoiFloor(double a){
     ~mips
     lw $t0, 12($sp) 
     lw $t1, 4($sp)
@@ -51,6 +51,13 @@ int dtoi(double a){
     addi $sp, $sp, -4
     jr $t0
     ~
+}
+int dtoi(double a){
+    if (a < 0.0){
+        return dtoiFloor(a-0.4999);
+    }else{
+        return dtoiFloor(a+0.5);
+    }
 }
 int getsp(){
     ~mips
