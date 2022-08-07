@@ -6,19 +6,14 @@ from preloadfunctions import code_predified_functions
 
 def run() -> str:
     input_content = ''' 
+    
 
-int main() {
-    int i;
-
-    i = 55;
-    for ( ; i > 50 ; i = i - 1 ) Print(i);
-}
 
     '''
 
     try:
         print(input_content)
-        parse_tree, code = parser( input_content)
+        parse_tree, code = parser(input_content)
         print(parse_tree.pretty())
         try:
             symbol_table = SymbolTable()
