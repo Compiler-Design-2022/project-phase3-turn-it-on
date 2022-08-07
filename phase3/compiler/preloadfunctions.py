@@ -70,7 +70,16 @@ int getGSA(){
     ~
 }
 double itod(int a){
-    ''' + type_change_function_inside4to4 + '''
+    ~mips
+    lw $t0, 12($sp) 
+    lw $t1, 4($sp)
+    mtc1 $t1, $f0
+    cvt.s.w $f2, $f0
+    mfc1 $t1, $f2
+    sw $t1, 0($sp) 
+    addi $sp, $sp, -4
+    jr $t0
+    ~
 }''' + '''
 int ReadChar(){
     ~mips
