@@ -728,32 +728,32 @@ def after_enter(parse_tree, symbol_table, children):
 
     # forstmt: "for" "(" first_forstmt_part ";" expr ";" third_forstmt_part ")" stmt
     elif parse_tree.data == "third_forstmt_part":
-        symbol_table.last_scope().pop_variable()
-        code = f'''
-            {children[0].code}
-            \t addi $sp, $sp, {children[0].type.size}
-        '''
-        return Node_Return(code=code, type=None)
+        if len(children)>0:
+            symbol_table.last_scope().pop_variable()
+            code = f'''
+                {children[0].code}
+                \t addi $sp, $sp, {children[0].type.size}
+            '''
+            return Node_Return(code=code, type=None)
+        else:
+            return Node_Return(code="", type=None)
 
     elif parse_tree.data == "forstmt":
-        first_part_code_type_size, id = 0, 0
+        first_part_code_type_size = 0
         first_part_code, increment_code = "", ""
-        if parse_tree.children[id].data == "first_forstmt_part":
-            first_part_code_type_size = children[id].type.size
-            first_part_code += children[id].code
+        if len(children[0].code):
+            first_part_code_type_size = children[0].type.size
+            first_part_code += children[0].code
             symbol_table.last_scope().pop_variable()
-            id += 1
 
-        condition_child = children[id]
-        condition_code = children[id].code
+        condition_child = children[1]
+        condition_code = children[1].code
         symbol_table.last_scope().pop_variable()
-        id += 1
 
-        if parse_tree.children[id].data == "third_forstmt_part":
-            increment_code += children[id].code
-            id += 1
+        if len(children[2].code):
+            increment_code += children[2].code
 
-        stmt_for_code = children[id].code
+        stmt_for_code = children[3].code
 
         # remove \taddi $sp, $sp, {first_part_code_type_size} from second line
         # remove \taddi $sp, $sp, 4 from line below stmt_for_code
