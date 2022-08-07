@@ -1,3 +1,6 @@
+from CodeGeneration import cgen, function_declaration
+from SymbolTable import Scope, SymbolTable
+from parserC import parser
 
 type_change_function_inside4to4 = '''
     ~mips

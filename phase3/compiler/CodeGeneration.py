@@ -6,6 +6,9 @@ import copy
 
 function_declaration_phase = True
 
+def reset_function_declaration_phase():
+    global function_declaration_phase
+    function_declaration_phase = True
 
 class Node_Return:
     def __init__(self, code=None, type=None, scope=None, text=None):
@@ -20,14 +23,19 @@ def cgen_token(token: lark.Token, symboltable: SymbolTable):
     if token.value[0] == "\"":
         token.value = token.value.replace("@", "")
         type = Type("string")
-        token.value = token.value.replace("\n", "\\n")
+
         ans = ""
+        token.value=token.value.replace("\\n", '\n')
+        token.value=token.value.replace("\\t", '\t')
         for c in token.value:
             if c != '"':
                 ans += c + "***"
             else:
                 ans += '"'
+        ans = ans.replace("\n", "\\n")
+        ans = ans.replace("\t", "\\t")
         token.value = ans
+
     if token.value.startswith("mips"):
         token.value = token.value.lstrip("mips").replace("@", "")
         return Node_Return(code=token.value, type=None)
@@ -231,6 +239,7 @@ def after_enter(parse_tree, symbol_table, children):
                     \t sw $v0, {children[0].type.size}($sp)
             #new array expr get memory END
                 '''
+        assert children[0].type == Type("int")
         return Node_Return(code=code, type=Type("array", inside_type=children[1].type))
 
     # array_val: expr "[" expr "]"
@@ -678,7 +687,7 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.last_scope().pop_variable()
         expr_code = children[0].code
         stmt_if_code = children[1].code
-        assert children[0].type == Type("bool") or children[0].type == Type("int")
+        assert children[0].type == Type("bool")
         if len(children) == 2:
             code = f'''{expr_code}
                         \t lw $t0, {children[0].type.size}($sp)
