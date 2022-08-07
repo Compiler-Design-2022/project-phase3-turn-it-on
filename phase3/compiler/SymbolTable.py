@@ -7,22 +7,26 @@ string_number_counter = 0
 function_number_counter = 0
 
 
-class Class:
-    def __init__(self, classname, superclass):
+class Field:
+    def __init__(self, access_mode, variable):
+        self.access_mode = access_mode
+        self.variable = variable
+
+
+class ClassObj:
+    def __init__(self, classname):
         self.name = classname
-        self.superclass = superclass
-        self.fields = []
-        self.constructors = []
-        self.methods = []
+        self.fields: [Field] = []
+        self.init_code = ""
 
-    def add_constructor(self, constructor):
-        self.constructors.append(constructor)
-
-    def add_method(self, method):
-        self.methods.append(method)
-
-    def add_method(self, field):
+    def add_field(self, field):
         self.fields.append(field)
+
+    def size(self):
+        ans = 0
+        for field in self.fields:
+            ans += field.variable.type.size
+        return ans
 
 
 def get_label():
@@ -64,7 +68,7 @@ class Method:
 
 
 class Type():
-    def __init__(self, name="int", inside_type=None):
+    def __init__(self, name="int", inside_type=None, class_name=None):
         self.name = name
         self.length = None
         self.inside_type = None
@@ -85,6 +89,10 @@ class Type():
             self.inside_type = inside_type
         elif name == "char":
             self.size = 4
+        elif name == "class":
+            self.size=4
+            self.class_name=class_name
+
         elif name == "void":
             self.size = 0
         else:
@@ -95,6 +103,8 @@ class Type():
         if other is None:
             return False
         if self.inside_type is None:
+            if self.name == "class":
+                return self.name == other.name and self.class_name == other.class_name
             return self.name == other.name
         return self.inside_type == other.inside_type
 
@@ -126,7 +136,7 @@ class Variable():
 
 
 class Scope():
-    def __init__(self, for_scope=False, method_scope=False, method=None):
+    def __init__(self, for_scope=False, method_scope=False, method=None, class_scope=False, class_obj=None):
         self.variables = []
         scope_name = get_label()
         self.begin_label = scope_name + "_start"
@@ -139,6 +149,8 @@ class Scope():
         if method_scope:
             self.push_variable(Variable("$RA", Type("int")))
             self.push_variable(Variable("$GSA", Type("int")))
+        self.class_scope = class_scope
+        self.class_obj = class_obj
 
     def push_variable(self, variable: Variable):
         # print("push variable : ", variable.name, variable.type.size)
@@ -175,23 +187,31 @@ class Scope():
 class SymbolTable():
     def __init__(self):
         self.scope_stack: [Scope] = []
-        self.vtable: [Method] = []
-        self.scope_function_declared: [Scope] = []
+        self.functions_list: [Method] = []
+        self.class_list: [ClassObj] = []
+        self.temp_class = None
+
+    def push_class(self, class_obj: ClassObj):
+        self.class_list.append(class_obj)
+
+    def get_class(self, name):
+        for class_obj in self.class_list:
+            if class_obj.name == name:
+                return class_obj
+        raise ValueError
 
     def push_method(self, method: Method):
         # print("push method", method)
-        self.vtable.append(method)
+        self.functions_list.append(method)
 
     def push_scope(self, scope: Scope):
         # print("push scope ")
         self.scope_stack.append(scope)
-        if scope.method_scope:
-            self.scope_function_declared.append(scope)
 
     def get_method(self, name, input_types=None):
         name = name.replace("@", "")
         # print(name, input_types)
-        for method in self.vtable:
+        for method in self.functions_list:
             # print(method)
             if method.name == name and len(input_types) == len(method.input_variables):
                 good = True
@@ -209,7 +229,7 @@ class SymbolTable():
             if self.scope_stack[i].get_address_diff(name) is not None:
                 return offset + self.scope_stack[i].get_address_diff(name)
             offset += self.scope_stack[i].size()
-        raise ValueError(f"couln't find variable {name}")  # value doesn't declared
+        raise ValueError(f"couldn't find variable {name}")  # value doesn't declared
 
     def get_variable(self, name):
         for i in range(len(self.scope_stack) - 1, -1, -1):
