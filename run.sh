@@ -42,12 +42,9 @@ for folder in ${dirlist[*]}; do
         python main.py -i "$folder/$filelist" -o "$folder/$output_asm"
       fi
       if [[ -f "out/$folder/$output_asm" ]]; then
-        echo "Running Test $filename -------------------------------------"
         if [ $? -eq 0 ]; then
-          echo "MIPS Generated Successfuly!"
           spim -a -f "$OUTPUT_DIRECTORY$folder/$output_asm" <"$TEST_DIRECTORY$folder/$program_input" >"$OUTPUT_DIRECTORY$folder/$output_filename"
           if [ $? -eq 0 ]; then
-            echo "Code Executed Successfuly!"
             if command -v python3; then
               python3 comp.py -a "$OUTPUT_DIRECTORY$folder/$output_filename" -b "$TEST_DIRECTORY$folder/$output_filename" -o "$REPORT_DIRECTORY$folder/$report_filename"
             else
@@ -58,8 +55,7 @@ for folder in ${dirlist[*]}; do
               echo "++++ test passed"
             else
               ((NUMBER_OF_FAILED++))
-              echo "---- test failed !"
-              echo
+              echo "------------------------------------------------------ test failed ! $folder/$output_asm"
             fi
           fi
         else
@@ -67,6 +63,7 @@ for folder in ${dirlist[*]}; do
           ((NUMBER_OF_FAILED++))
         fi
       else
+        echo "failed attttttttttttttttttttt $folder/$output_asm"
         ((NUMBER_OF_FAILED++))
       fi
     done

@@ -7,8 +7,8 @@ grammer = r"""
     decl: variable_decl | function_decl | class_decl | interface_decl
     variable_decl: variable ";"
     variable: type ident
-    type: /int/ | /char/ | /double/ | /bool/ | /string/ | ident | type "[]" 
-    function_decl: type ident "(" formals ")" stmtblock | /void/ ident "(" formals ")" stmtblock 
+    type: /int/ | /char/ | /double/ | /bool/ | /string/ | /void/ | ident | type "[]" 
+    function_decl: type ident "(" formals ")" stmtblock 
     formals: variable ("," variable)+ |  variable | null
     class_decl: "class" ident ("extends" ident)? ("implements" ident ("," ident)*)? "{" field* "}"
     field: access_mode variable_decl | access_mode function_decl

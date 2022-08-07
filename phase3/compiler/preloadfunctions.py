@@ -38,7 +38,23 @@ int ctoi(char a){
     ~
 }
 int dtoi(double a){
-    ''' + type_change_function_inside4to4 + '''
+    ~mips
+    lw $t0, 8($sp) 
+    lw $t1, 4($sp)
+     mtc1 $t1, $f12
+    cvt.s.w $f12, $f12
+    sw $t0, 0($sp) 
+    addi $sp, $sp, -4
+    jr $t0
+    ~
+}
+int getsp(){
+    ~mips
+    lw $t0, 4($sp) 
+    sw $sp, 0($sp) 
+    addi $sp, $sp, -4
+    jr $t0
+    ~
 }
 double itod(int a){
     ''' + type_change_function_inside4to4 + '''

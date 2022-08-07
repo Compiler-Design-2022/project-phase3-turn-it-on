@@ -153,7 +153,7 @@ def after_enter(parse_tree, symbol_table, children):
                         \t sw $t0, 0($sp)
                         \t addi $sp, $sp, -4
                     '''
-        else: # init value is 0 for int
+        else:  # init value is 0 for int
             code = f'''
                         sub $t1, $t1, $t1
                         sw $t1, 0($sp)
@@ -446,7 +446,7 @@ def after_enter(parse_tree, symbol_table, children):
         left_expr_code = children[0].code
         right_expr_code = children[1].code
         symbol_table.last_scope().pop_variable()
-        if children[1].type.name == "double": # DOUBLE
+        if children[1].type.name == "double":  # DOUBLE
             double_name = "__IGNORE" + get_label()
             # create variable, push result in this variable, reference is at the top of the stack
             code = f'''{left_expr_code} {right_expr_code}
@@ -496,7 +496,7 @@ def after_enter(parse_tree, symbol_table, children):
         left_expr_code = children[0].code
         right_expr_code = children[1].code
         symbol_table.last_scope().pop_variable()
-        if children[1].type.name == "double": # DOUBLE
+        if children[1].type.name == "double":  # DOUBLE
             double_name = "__IGNORE" + get_label()
             # create variable, push result in this variable, reference is at the top of the stack
             code = f'''{left_expr_code} {right_expr_code}
@@ -531,7 +531,7 @@ def after_enter(parse_tree, symbol_table, children):
         left_expr_code = children[0].code
         right_expr_code = children[1].code
         symbol_table.last_scope().pop_variable()
-        if children[1].type.name == "double": # DOUBLE
+        if children[1].type.name == "double":  # DOUBLE
             double_name = "__IGNORE" + get_label()
             # create variable, push result in this variable, reference is at the top of the stack
             code = f'''{left_expr_code} {right_expr_code}
@@ -563,7 +563,7 @@ def after_enter(parse_tree, symbol_table, children):
 
     elif parse_tree.data == "sign_expr":
         inside_expr_code = children[0].code
-        if children[0].type.name == "double": # DOUBLE
+        if children[0].type.name == "double":  # DOUBLE
             code = f'''{inside_expr_code}
                         \t lw $t0, {children[0].type.size}($sp)
                         \t lwc1 $f0, 0($t0) # value
@@ -739,7 +739,7 @@ def after_enter(parse_tree, symbol_table, children):
                     \t addi $sp, $sp, 4
                     \t j {symbol_table.last_scope().begin_label}  
                     \t {symbol_table.last_scope().end_label}:
-                    \t addi $sp, $sp, {first_part_code_type_size+4}
+                    \t addi $sp, $sp, {first_part_code_type_size + 4}
                 '''
         symbol_table.pop_scope()
         return Node_Return(code=code, type=None)
@@ -791,7 +791,7 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.last_scope().pop_variable()  # t0 right t1 left
         symbol_table.last_scope().pop_variable()  # t0 right t1 left
         symbol_table.last_scope().push_variable(Variable("__IGNORE_BOOL", Type("bool")))
-        if children[0].type.name == "double": # DOUBLE
+        if children[0].type.name == "double":  # DOUBLE
             true_label = "__IGONRE" + get_label()
             false_label = "__IGONRE" + get_label()
             code = f'''{left_expr_code} {right_expr_code} 
@@ -848,7 +848,7 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.last_scope().pop_variable()  # t0 right t1 left
         symbol_table.last_scope().push_variable(Variable("__IGNORE_BOOL", Type("bool")))
 
-        if children[0].type.name == "double": # DOUBLE
+        if children[0].type.name == "double":  # DOUBLE
             true_label = "__IGONRE" + get_label()
             false_label = "__IGONRE" + get_label()
             code = f'''{left_expr_code} {right_expr_code} 
@@ -888,7 +888,7 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.last_scope().pop_variable()  # t0 right t1 left
         symbol_table.last_scope().push_variable(Variable("__IGNORE_BOOL", Type("bool")))
 
-        if children[0].type.name == "double": # DOUBLE
+        if children[0].type.name == "double":  # DOUBLE
             true_label = "__IGONRE" + get_label()
             false_label = "__IGONRE" + get_label()
             code = f'''{left_expr_code} {right_expr_code} 
@@ -927,7 +927,7 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.last_scope().pop_variable()  # t0 right t1 left
         symbol_table.last_scope().push_variable(Variable("__IGNORE_BOOL", Type("bool")))
 
-        if children[0].type.name == "double": # DOUBLE
+        if children[0].type.name == "double":  # DOUBLE
             true_label = "__IGONRE" + get_label()
             false_label = "__IGONRE" + get_label()
             code = f'''{left_expr_code} {right_expr_code} 
@@ -966,7 +966,7 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.last_scope().pop_variable()  # t0 right t1 left
         symbol_table.last_scope().push_variable(Variable("__IGNORE_BOOL", Type("bool")))
 
-        if children[0].type.name == "double": # DOUBLE
+        if children[0].type.name == "double":  # DOUBLE
             true_label = "__IGONRE" + get_label()
             false_label = "__IGONRE" + get_label()
             code = f'''{left_expr_code} {right_expr_code} 
@@ -1001,10 +1001,10 @@ def after_enter(parse_tree, symbol_table, children):
     elif parse_tree.data == "condition_expr_not_equal":
         left_expr_code = children[0].code
         right_expr_code = children[1].code
-        symbol_table.last_scope().pop_variable() 
+        symbol_table.last_scope().pop_variable()
         symbol_table.last_scope().pop_variable()
         symbol_table.last_scope().push_variable(Variable("__IGNORE_BOOL", Type("bool")))
-        if children[0].type.name == "double": # DOUBLE
+        if children[0].type.name == "double":  # DOUBLE
             true_label = "__IGONRE" + get_label()
             false_label = "__IGONRE" + get_label()
             code = f'''{left_expr_code} {right_expr_code} 
@@ -1077,8 +1077,7 @@ def after_enter(parse_tree, symbol_table, children):
         code = "".join(child_codes_list)
         org_sum = sum
         for child in children:
-            if len(symbol_table.last_scope().variables) > 0:	
-                symbol_table.last_scope().pop_variable()
+            symbol_table.last_scope().pop_variable()
             if child.type.name == "string" or child.type == Type("array", Type("char")):
                 label = "PRINT_" + get_label()
                 code += f'''
@@ -1096,9 +1095,6 @@ def after_enter(parse_tree, symbol_table, children):
                             \t addi $t2,$t2, -1
                             \t addi $t0, $t0, 4
                             \t bne $t2, $t3, {label}
-                            \t li $a0, 32
-                            \t li $v0, 11  
-                            \t syscall
                             #print string end
                         '''
             elif child.type.name == "bool":
@@ -1203,14 +1199,20 @@ def after_enter(parse_tree, symbol_table, children):
 
         function_name = children[0].text.replace("@", "")
         method: Method = symbol_table.get_method(function_name, children[1].type)
-        code += f'''
-                    \t jal {function_name}
-                    \t lw $t0, {method.output_type.size}($sp)
-                    \t addi $sp, $sp, {method.output_type.size}
-                    \t addi $sp, $sp, {method.get_method_inputs_size() + Type("int").size}
-                    \t sw $t0, 0($sp)
-                    \t addi $sp, $sp, -{method.output_type.size}
-                '''
+        if method.output_type.size != 0:
+            code += f'''
+                        \t jal {function_name}
+                        \t lw $t0, {method.output_type.size}($sp)
+                        \t addi $sp, $sp, {method.output_type.size}
+                        \t addi $sp, $sp, {method.get_method_inputs_size() + Type("int").size}
+                        \t sw $t0, 0($sp)
+                        \t addi $sp, $sp, -{method.output_type.size}
+                    '''
+        else:
+            code += f'''
+                        \t jal {function_name}
+                        \t addi $sp, $sp, {method.get_method_inputs_size() + Type("int").size}
+                    '''
         # print("&" * 40)
         # for var in symbol_table.last_scope().variables:
         #     print(var)
@@ -1357,7 +1359,8 @@ def after_enter(parse_tree, symbol_table, children):
                 code += child.code
             else:
                 code += child.text
-        return Node_Return(code=code, type=children[0].type if len(children) > 0 else Type(), text=children[0].text if len(children) > 0 else None)  # TODO: not good!
+        return Node_Return(code=code, type=children[0].type if len(children) > 0 else Type(),
+                           text=children[0].text if len(children) > 0 else None)  # TODO: not good!
 
 
 all_node = '''
