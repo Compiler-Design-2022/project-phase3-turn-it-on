@@ -19,8 +19,24 @@ class ClassObj:
         self.fields: [Field] = []
         self.init_code = ""
 
+    def get_field_dist(self, field_name):
+        size = 0
+        for field in reversed(self.fields):
+            field: Field
+            if field.variable.name == field_name:
+                return size
+            size += field.variable.type.size
+        raise ValueError
+
     def add_field(self, field):
         self.fields.append(field)
+
+    def get_field_by_name(self, name):
+        for field in self.fields:
+            field: Field
+            if field.variable.name == name:
+                return field
+        raise ValueError
 
     def size(self):
         ans = 0
@@ -110,7 +126,8 @@ class Type():
         return self.inside_type == other.inside_type
 
     def __str__(self):
-        return "TYPE " + self.name +" "+ self.class_name if self.class_name is not None else ""+ (str(self.inside_type) if self.inside_type is not None else " ")
+        return "TYPE " + self.name + " " + self.class_name if self.class_name is not None else "" + (
+            str(self.inside_type) if self.inside_type is not None else " ")
 
     def merge_type(self, other, limit=None):
         if self.size != other.size:

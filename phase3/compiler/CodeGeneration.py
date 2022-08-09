@@ -245,7 +245,8 @@ def after_enter(parse_tree, symbol_table, children):
         if not var.is_global:
             if symbol_table.get_variable_scope(children[0].text).class_scope:
                 diff_to_this = symbol_table.get_address_diff("$THIS")
-                diff_from_this = symbol_table.get_variable_scope(children[0].text).get_address_diff(children[0].text)
+                diff_from_this = symbol_table.get_variable_scope(children[0].text).get_address_diff(children[0].text)-var.type.size
+                print(f"READ {diff_from_this} to get {var.name}")
                 code = f'''
                                         #load THIS address
                                         \t addi $t0, $sp, {diff_to_this}
@@ -315,6 +316,7 @@ def after_enter(parse_tree, symbol_table, children):
         class_obj = symbol_table.get_class(class_name)
         symbol_table.last_scope().push_variable(
             Variable("__IGNORE_CLASS_ADDRESS", Type("class", class_name=class_obj.name)))
+        print(f"GET {class_obj.size()}byte for {class_name}")
         code = f'''#new_expr class {class_name}
             #new class expr get memory
                     \t li $t0, {class_obj.size()}
@@ -356,6 +358,42 @@ def after_enter(parse_tree, symbol_table, children):
                 '''
         assert children[1].type == Type("int")
         return Node_Return(code=code, type=Type("ref", inside_type=children[0].type.inside_type))
+
+    elif parse_tree.data == "this_expr":
+        diff_to_this = symbol_table.get_address_diff("$THIS")
+        symbol_table.last_scope().push_variable(Variable("__IGNORE_THIS_VALUE", Type("class", class_name=symbol_table.get_last_class().name)))
+        code = f'''
+                                #load THIS address
+                                \t addi $t0, $sp, {diff_to_this}
+                                #load THIS
+                                \t lw $t0, 0($t0)
+                                \t sw $t0, 0($sp)
+                                \t addi $sp, $sp, -4
+                                '''
+        return Node_Return(code=code, type=Type("class", class_name=symbol_table.get_last_class().name))
+
+
+    elif parse_tree.data == "class_val":
+        class_ref_builder = children[0].code
+        field_name = children[1].text
+        class_obj: ClassObj=symbol_table.get_class(children[0].type.class_name)
+        field = class_obj.get_field_by_name(field_name)
+        symbol_table.last_scope().pop_variable()
+        symbol_table.last_scope().push_variable(
+            Variable("__IGNORE_class_val", Type("ref", inside_type=field.variable.type)))
+        print(f"GET {class_obj.get_field_dist(field_name)} for {field_name} in class {class_obj.name}")
+        code = f'''#class val load class 
+                    {class_ref_builder} 
+                    #class val load class END
+                    #class val start
+                    \t lw $t0, {children[0].type.size}($sp)
+                    \t addi $sp, $sp, 4
+                    \t addi $t0, $t0, {class_obj.get_field_dist(field_name)}
+                    \t sw $t0, 0($sp)
+                    \t addi $sp, $sp, -4
+                    #class val end
+                '''
+        return Node_Return(code=code, type=Type("ref", inside_type=field.variable.type))
 
     # assignment_expr_empty: lvalue "=" expr
     elif parse_tree.data == "assignment_expr_empty":
@@ -1439,6 +1477,7 @@ def after_enter(parse_tree, symbol_table, children):
                 pop_size += scope.size()
         code += f'''
                     \t addi $sp, $sp, {pop_size}
+                    \t addi $sp, $sp, -{parse_tree.method.output_type.size}
                     \t jr $t1
                 '''
 
