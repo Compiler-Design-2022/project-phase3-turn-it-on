@@ -72,6 +72,7 @@ class Type():
         self.name = name
         self.length = None
         self.inside_type = None
+        self.class_name = None
         if name == "bool":
             self.size = 4
         elif name == "int":
@@ -90,14 +91,14 @@ class Type():
         elif name == "char":
             self.size = 4
         elif name == "class":
-            self.size=4
-            self.class_name=class_name
+            self.size = 4
+            self.class_name = class_name
 
         elif name == "void":
             self.size = 0
         else:
             # print(name)
-            raise ValueError  # type not found
+            raise ValueError(f"couldn't find type{name}")  # type not found
 
     def __eq__(self, other):
         if other is None:
@@ -109,7 +110,7 @@ class Type():
         return self.inside_type == other.inside_type
 
     def __str__(self):
-        return "TYPE " + self.name + (str(self.inside_type) if self.inside_type is not None else " ")
+        return "TYPE " + self.name +" "+ self.class_name if self.class_name is not None else ""+ (str(self.inside_type) if self.inside_type is not None else " ")
 
     def merge_type(self, other, limit=None):
         if self.size != other.size:
@@ -191,14 +192,22 @@ class SymbolTable():
         self.class_list: [ClassObj] = []
         self.temp_class = None
 
+    def get_last_class(self):
+        for scope in reversed(self.scope_stack):
+            scope: Scope
+            if scope.class_scope:
+                return scope.class_obj
+        return None
+
     def push_class(self, class_obj: ClassObj):
         self.class_list.append(class_obj)
 
     def get_class(self, name):
+        name = name.replace("@", "")
         for class_obj in self.class_list:
             if class_obj.name == name:
                 return class_obj
-        raise ValueError
+        raise ValueError(f"don't have class {name}")
 
     def push_method(self, method: Method):
         # print("push method", method)
@@ -235,6 +244,12 @@ class SymbolTable():
         for i in range(len(self.scope_stack) - 1, -1, -1):
             if self.scope_stack[i].get_variable(name) is not None:
                 return self.scope_stack[i].get_variable(name)
+        raise ValueError(name)  # value doesn't declared
+
+    def get_variable_scope(self, name):
+        for i in range(len(self.scope_stack) - 1, -1, -1):
+            if self.scope_stack[i].get_variable(name) is not None:
+                return self.scope_stack[i]
         raise ValueError(name)  # value doesn't declared
 
     def last_scope(self) -> Scope:

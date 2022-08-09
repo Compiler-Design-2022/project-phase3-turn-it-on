@@ -48,7 +48,7 @@ output_file = "out/" + sys.argv[4]
 mips_code = run(decaf_code_file)
 input_file = open(decaf_code_file)
 input_content = input_file.read()
-bad_words=["class", "matherfucker"]
+bad_words=["matherfucker"]
 for bad_word in bad_words:
     if bad_word in input_content:
         try:

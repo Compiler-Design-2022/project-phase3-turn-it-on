@@ -1,44 +1,46 @@
 from os import listdir
 from parserC import parser
-from CodeGeneration import cgen, function_declaration
+from CodeGeneration import cgen, function_declaration, reset_function_declaration_phase
 from SymbolTable import SymbolTable, Scope, Method, Type
 from preloadfunctions import code_predified_functions
 
+def get_mips_code(input_content):
+    reset_function_declaration_phase()
+    parse_tree, code = parser(code_predified_functions + input_content)
+    symbol_table = SymbolTable()
+    symbol_table.push_scope(Scope())
+    function_declaration(parse_tree, symbol_table)
+    mips_code = cgen(parse_tree, symbol_table).code
+    return mips_code
+
+
 def run() -> str:
     input_content = ''' 
-int main() {
-    double d1;
-    double d2;
-    double d3;
-    double d4;
-    double d5;
-    double d6;
-    double d7;
-    double d8;
 
-    d1 = 69.82413714;
-    d2 = 960.7071281;
-    d3 = 0.5281794697;
-    d4 = 0.5281794697;
-    d5 = -5039.128903;
-    d6 = 7585.800593;
-    d7 = -11748.63533;
-    d8 = -13446.89678;
 
-    Print(d1 / d2);
-    Print(d4 / d4);
-    Print(d5 / d6);
-    Print(d7 / d8);
+class Test {
+    int f;
 
+    void test() {
+        f = 145369;
+        Print(f);
+    }
 }
 
+int main() {
+    Test t;
+    t = new Test;
+
+    t.test();
+}
 
 
     '''
 
     try:
         print(input_content)
-        parse_tree, code = parser(input_content)
+        # parse_tree, code = parser(code_predified_functions+ input_content)
+        parse_tree, code = parser( input_content)
         print(parse_tree.pretty())
         try:
             symbol_table = SymbolTable()
@@ -49,15 +51,14 @@ int main() {
                 f.write(mips_code)
             print(mips_code)
             return mips_code
-        except Exception:
+        except:
             print("Semantic Error")
             raise ValueError
     except:
         print("Syntax Error")
         raise ValueError
 
-
-run()
+print(run())
 # all_tests = {}
 # for f in listdir('./'):
 #     all_tests[f.split('.')[0]] = True

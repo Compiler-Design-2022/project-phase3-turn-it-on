@@ -7,9 +7,11 @@ import copy
 
 function_declaration_phase = True
 
+
 def reset_function_declaration_phase():
     global function_declaration_phase
     function_declaration_phase = True
+
 
 class Node_Return:
     def __init__(self, code=None, type=None, scope=None, text=None):
@@ -59,6 +61,8 @@ def function_declaration(parse_tree, symbol_table: SymbolTable, height=0):
         input_child = cgen(parse_tree.children[2], symbol_table1)
         function_name = name_child.text
         if symbol_table.temp_class is not None:
+            input_child.type = [Variable("$THIS",
+                                         Type("class", class_name=symbol_table.temp_class.name))] + input_child.type
             function_name = symbol_table.temp_class.name + "." + function_name
 
         method = Method(function_name, type_child.type, input_child.type)
@@ -105,6 +109,7 @@ def function_declaration(parse_tree, symbol_table: SymbolTable, height=0):
         function_declaration_phase = False
     if parse_tree.data == "class_decl":
         symbol_table.push_class(symbol_table.temp_class)
+        parse_tree.class_obj = symbol_table.temp_class
         symbol_table.temp_class = None
     return code
 
@@ -139,9 +144,17 @@ def before_enter(parse_tree, symbol_table):
         symbol_table.push_scope(new_scope)
     elif parse_tree.data == "function_decl":
         symbol_table.push_scope(Scope(method_scope=True, method=parse_tree.method))
-    elif parse_tree.data == "normal_function_call":
-        symbol_table.last_scope().push_variable(Variable("__IGNORE_GSA", Type("int")))
+        if '.' in parse_tree.method.name:  # class function
+            symbol_table.last_scope().push_variable(Variable("$THIS",
+                                                             Type("class",
+                                                                  class_name=symbol_table.get_last_class().name)))
+    elif parse_tree.data == "normal_function_call" or parse_tree.data == "class_function_call":
         symbol_table.last_scope().push_variable(Variable("__IGNORE_RA", Type("int")))
+        symbol_table.last_scope().push_variable(Variable("__IGNORE_GSA", Type("int")))
+
+
+    elif parse_tree.data == "class_decl":
+        symbol_table.push_scope(Scope(class_scope=True, class_obj=parse_tree.class_obj))
 
 
 def after_enter(parse_tree, symbol_table, children):
@@ -149,6 +162,9 @@ def after_enter(parse_tree, symbol_table, children):
     if parse_tree.data == "type":
         if children[0].text == None:
             return Node_Return(type=Type("array", inside_type=children[0].type))
+        if len(children[0].text) > 0 and children[0].text[0] == "@":
+            return Node_Return(type=Type("class", class_name=children[0].text[1:]))
+
         return Node_Return(code="", type=Type(children[0].text))
     elif parse_tree.data == "ident":
         return Node_Return(code="", type=None, text=children[0].text)
@@ -192,6 +208,7 @@ def after_enter(parse_tree, symbol_table, children):
     elif parse_tree.data == "boolconstant_false":
         return Node_Return(code="", type=Type("bool"), text=0)
 
+
     # variable: type ident
     elif parse_tree.data == "variable":
         if len(symbol_table.scope_stack) > 1 or function_declaration_phase:
@@ -226,13 +243,29 @@ def after_enter(parse_tree, symbol_table, children):
         diff = symbol_table.get_address_diff(children[0].text)
         var: Variable = symbol_table.get_variable(children[0].text)
         if not var.is_global:
-            code = f'''
-                        \t addi $t0, $sp, {diff}
-                        \t sw $t0, 0($sp)
-                        \t addi $sp, $sp, -4
-                    '''
-            symbol_table.last_scope().push_variable(Variable("__IGNORE_lvalue", var.type))
-            return Node_Return(code=code, type=Type("ref", inside_type=var.type))
+            if symbol_table.get_variable_scope(children[0].text).class_scope:
+                diff_to_this = symbol_table.get_address_diff("$THIS")
+                diff_from_this = symbol_table.get_variable_scope(children[0].text).get_address_diff(children[0].text)
+                code = f'''
+                                        #load THIS address
+                                        \t addi $t0, $sp, {diff_to_this}
+                                        #load THIS
+                                        \t lw $t0, 0($t0)
+                                        #load var address
+                                        \t addi $t0, $t0, {diff_from_this}
+                                        \t sw $t0, 0($sp)
+                                        \t addi $sp, $sp, -4
+                                    '''
+                symbol_table.last_scope().push_variable(Variable("__IGNORE_class_lvalue", var.type))
+                return Node_Return(code=code, type=Type("ref", inside_type=var.type))
+            else:
+                code = f'''
+                            \t addi $t0, $sp, {diff}
+                            \t sw $t0, 0($sp)
+                            \t addi $sp, $sp, -4
+                        '''
+                symbol_table.last_scope().push_variable(Variable("__IGNORE_lvalue", var.type))
+                return Node_Return(code=code, type=Type("ref", inside_type=var.type))
         else:
             diff_to_gsa = symbol_table.get_address_diff("$GSA")
             diff_from_gsa = symbol_table.scope_stack[0].get_address_diff(children[0].text)
@@ -246,7 +279,7 @@ def after_enter(parse_tree, symbol_table, children):
                         \t sw $t0, 0($sp)
                         \t addi $sp, $sp, -4
                     '''
-            symbol_table.last_scope().push_variable(Variable("__IGNORE_lvalue", var.type))
+            symbol_table.last_scope().push_variable(Variable("__IGNORE_global_lvalue", var.type))
             return Node_Return(code=code, type=Type("ref", inside_type=var.type))
 
     # new_array_expr: "NewArray" "(" expr "," type ")"
@@ -280,16 +313,19 @@ def after_enter(parse_tree, symbol_table, children):
     elif parse_tree.data == "new_expr":  # TODO differrent type different code
         class_name = children[0].text
         class_obj = symbol_table.get_class(class_name)
+        symbol_table.last_scope().push_variable(
+            Variable("__IGNORE_CLASS_ADDRESS", Type("class", class_name=class_obj.name)))
         code = f'''#new_expr class {class_name}
             #new class expr get memory
                     \t li $t0, {class_obj.size()}
                     \t move $a0, $t0
                     \t li $v0, 9 
                     \t syscall
-                    \t sw $v0, {children[0].type.size}($sp)
+                    \t sw $v0, 0($sp)
+                    \t addi $sp, $sp, -4
             #new class expr get memory END
                 '''
-        return Node_Return(code=code, type=Type("ref", inside_type=Type("class", class_name=class_name)))
+        return Node_Return(code=code, type=Type("class", class_name=class_obj.name))
 
 
     # array_val: expr "[" expr "]"
@@ -328,7 +364,12 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.last_scope().pop_variable()
         symbol_table.last_scope().pop_variable()
         symbol_table.last_scope().push_variable(Variable("__IGNORE_assignment_expr_empty", children[1].type))
-        assert children[0].type.inside_type == children[1].type
+        try:
+            assert children[0].type.inside_type == children[1].type
+        except:
+            print(children[0].type.inside_type)
+            print(children[1].type)
+            raise ValueError
         code = f'''{variable_code} {expr_code}
                     \t lw $t0, {children[1].type.size}($sp)
                     \t lw $t1, {children[1].type.size + children[0].type.size}($sp)
@@ -347,7 +388,8 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.last_scope().pop_variable()
         symbol_table.last_scope().push_variable(Variable("__IGNORE_assignment_expr_with_plus", children[1].type))
         assert children[0].type.inside_type == children[1].type
-        if children[1].type.name == "double" or (children[1].type.name == "ref" and children[1].type.inside_type == "double"):
+        if children[1].type.name == "double" or (
+                children[1].type.name == "ref" and children[1].type.inside_type == "double"):
             code = f'''{variable_code} {expr_code}
                         \t lw $t0, {children[1].type.size}($sp)
                         \t lw $t1, {children[1].type.size + children[0].type.size}($sp) 
@@ -383,7 +425,8 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.last_scope().pop_variable()
         symbol_table.last_scope().push_variable(Variable("__IGNORE_assignment_expr_with_min", children[1].type))
         assert children[0].type.inside_type == children[1].type
-        if children[1].type.name == "double" or (children[1].type.name == "ref" and children[1].type.inside_type == "double"):
+        if children[1].type.name == "double" or (
+                children[1].type.name == "ref" and children[1].type.inside_type == "double"):
             code = f'''{variable_code} {expr_code}
                         \t lw $t0, {children[1].type.size}($sp)
                         \t lw $t1, {children[1].type.size + children[0].type.size}($sp) 
@@ -419,7 +462,8 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.last_scope().pop_variable()
         symbol_table.last_scope().push_variable(Variable("__IGNORE_assignment_expr_with_mul", children[1].type))
         assert children[0].type.inside_type == children[1].type
-        if children[1].type.name == "double" or (children[1].type.name == "ref" and children[1].type.inside_type == "double"):
+        if children[1].type.name == "double" or (
+                children[1].type.name == "ref" and children[1].type.inside_type == "double"):
             code = f'''{variable_code} {expr_code}
                         \t lw $t0, {children[1].type.size}($sp)
                         \t lw $t1, {children[1].type.size + children[0].type.size}($sp) 
@@ -455,7 +499,8 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.last_scope().pop_variable()
         symbol_table.last_scope().push_variable(Variable("__IGNORE_assignment_expr_with_div", children[1].type))
         assert children[0].type.inside_type == children[1].type
-        if children[1].type.name == "double" or (children[1].type.name == "ref" and children[1].type.inside_type == "double"):
+        if children[1].type.name == "double" or (
+                children[1].type.name == "ref" and children[1].type.inside_type == "double"):
             code = f'''{variable_code} {expr_code}
                         \t lw $t0, {children[1].type.size}($sp)
                         \t lw $t1, {children[1].type.size + children[0].type.size}($sp) 
@@ -533,7 +578,8 @@ def after_enter(parse_tree, symbol_table, children):
         right_expr_code = children[1].code
         symbol_table.last_scope().pop_variable()
         assert children[0].type == children[1].type
-        if children[1].type.name == "double" or (children[1].type.name == "ref" and children[1].type.inside_type == "double"):
+        if children[1].type.name == "double" or (
+                children[1].type.name == "ref" and children[1].type.inside_type == "double"):
             code = f'''{left_expr_code} {right_expr_code}
                         \t lw $t0, {children[1].type.size}($sp)
                         \t lw $t1, {children[1].type.size + children[0].type.size}($sp)
@@ -583,7 +629,8 @@ def after_enter(parse_tree, symbol_table, children):
         right_expr_code = children[1].code
         symbol_table.last_scope().pop_variable()
         assert children[0].type == children[1].type
-        if children[1].type.name == "double" or (children[1].type.name == "ref" and children[1].type.inside_type == "double"):
+        if children[1].type.name == "double" or (
+                children[1].type.name == "ref" and children[1].type.inside_type == "double"):
             code = f'''{left_expr_code} {right_expr_code}
                         \t lw $t0, {children[1].type.size}($sp)
                         \t lw $t1, {children[1].type.size + children[0].type.size}($sp)
@@ -613,7 +660,8 @@ def after_enter(parse_tree, symbol_table, children):
         right_expr_code = children[1].code
         symbol_table.last_scope().pop_variable()
         assert children[0].type == children[1].type
-        if children[1].type.name == "double" or (children[1].type.name == "ref" and children[1].type.inside_type == "double"):
+        if children[1].type.name == "double" or (
+                children[1].type.name == "ref" and children[1].type.inside_type == "double"):
             code = f'''{left_expr_code} {right_expr_code}
                         \t lw $t0, {children[1].type.size}($sp)
                         \t lw $t1, {children[1].type.size + children[0].type.size}($sp)
@@ -643,7 +691,8 @@ def after_enter(parse_tree, symbol_table, children):
         right_expr_code = children[1].code
         symbol_table.last_scope().pop_variable()
         assert children[0].type == children[1].type
-        if children[1].type.name == "double" or (children[1].type.name == "ref" and children[1].type.inside_type == "double"):
+        if children[1].type.name == "double" or (
+                children[1].type.name == "ref" and children[1].type.inside_type == "double"):
             code = f'''{left_expr_code} {right_expr_code}
                         \t lw $t0, {children[1].type.size}($sp)
                         \t lw $t1, {children[1].type.size + children[0].type.size}($sp)
@@ -865,7 +914,8 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.last_scope().pop_variable()  # t0 right t1 left
         symbol_table.last_scope().push_variable(Variable("__IGNORE_condition_expr_equal_BOOL", Type("bool")))
         assert children[0].type == children[1].type
-        if children[1].type.name == "double" or (children[1].type.name == "ref" and children[1].type.inside_type == "double"):
+        if children[1].type.name == "double" or (
+                children[1].type.name == "ref" and children[1].type.inside_type == "double"):
             true_label = "__IGONRE" + get_label()
             false_label = "__IGONRE" + get_label()
             code = f'''{left_expr_code} {right_expr_code}
@@ -929,7 +979,8 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.last_scope().pop_variable()  # t0 right t1 left
         symbol_table.last_scope().push_variable(Variable("__IGNORE_condition_expr_less_equal_BOOL", Type("bool")))
         assert children[0].type == children[1].type
-        if children[1].type.name == "double" or (children[1].type.name == "ref" and children[1].type.inside_type == "double"):
+        if children[1].type.name == "double" or (
+                children[1].type.name == "ref" and children[1].type.inside_type == "double"):
             true_label = "__IGONRE" + get_label()
             false_label = "__IGONRE" + get_label()
             code = f'''{left_expr_code} {right_expr_code}
@@ -970,7 +1021,8 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.last_scope().pop_variable()  # t0 right t1 left
         symbol_table.last_scope().push_variable(Variable("__IGNORE_condition_expr_less_BOOL", Type("bool")))
         assert children[0].type == children[1].type
-        if children[1].type.name == "double" or (children[1].type.name == "ref" and children[1].type.inside_type == "double"):
+        if children[1].type.name == "double" or (
+                children[1].type.name == "ref" and children[1].type.inside_type == "double"):
             true_label = "__IGONRE" + get_label()
             false_label = "__IGONRE" + get_label()
             code = f'''{left_expr_code} {right_expr_code}
@@ -1010,7 +1062,8 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.last_scope().pop_variable()  # t0 right t1 left
         symbol_table.last_scope().push_variable(Variable("__IGNORE_condition_expr_greater_BOOL", Type("bool")))
         assert children[0].type == children[1].type
-        if children[1].type.name == "double" or (children[1].type.name == "ref" and children[1].type.inside_type == "double"):
+        if children[1].type.name == "double" or (
+                children[1].type.name == "ref" and children[1].type.inside_type == "double"):
             true_label = "__IGONRE" + get_label()
             false_label = "__IGONRE" + get_label()
             code = f'''{left_expr_code} {right_expr_code}
@@ -1050,7 +1103,8 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.last_scope().pop_variable()  # t0 right t1 left
         symbol_table.last_scope().push_variable(Variable("__IGNORE_condition_expr_greater_equal_BOOL", Type("bool")))
         assert children[0].type == children[1].type
-        if children[1].type.name == "double" or (children[1].type.name == "ref" and children[1].type.inside_type == "double"):
+        if children[1].type.name == "double" or (
+                children[1].type.name == "ref" and children[1].type.inside_type == "double"):
             true_label = "__IGONRE" + get_label()
             false_label = "__IGONRE" + get_label()
             code = f'''{left_expr_code} {right_expr_code}
@@ -1090,7 +1144,8 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.last_scope().pop_variable()
         symbol_table.last_scope().push_variable(Variable("__IGNORE_condition_expr_not_equal_BOOL", Type("bool")))
         assert children[0].type == children[1].type
-        if children[1].type.name == "double" or (children[1].type.name == "ref" and children[1].type.inside_type == "double"):
+        if children[1].type.name == "double" or (
+                children[1].type.name == "ref" and children[1].type.inside_type == "double"):
             true_label = "__IGONRE" + get_label()
             false_label = "__IGONRE" + get_label()
             code = f'''{left_expr_code} {right_expr_code}
@@ -1280,6 +1335,47 @@ def after_enter(parse_tree, symbol_table, children):
     elif parse_tree.data == "mipscode":
         return Node_Return(code=children[0].code)
 
+    # class_function_call: lvalue_exp.ident "(" actuals ")"
+    elif parse_tree.data == "class_function_call":
+        function_name = children[0].type.class_name+"."+children[1].text.replace("@", "")
+        method: Method = symbol_table.get_method(function_name, [children[0].type]+children[2].type)
+        for var in method.input_variables:
+            symbol_table.last_scope().pop_variable()
+        symbol_table.last_scope().pop_variable()
+        symbol_table.last_scope().pop_variable()
+
+        code = f'''
+                    #load GSA
+                    \tlw $t0, {symbol_table.get_address_diff("$GSA")}($sp)
+                    \taddi $sp, $sp, -{Type("int").size}
+                    \tsw $t0, 0($sp)
+                    \taddi $sp, $sp, -{Type("int").size}
+                '''
+        for child in children:
+            code += child.code
+
+        if method.output_type.size != 0:
+            code += f'''
+                        \t jal {function_name}
+                        \t lw $t0, {method.output_type.size}($sp)
+                        \t addi $sp, $sp, {method.output_type.size}
+                        \t addi $sp, $sp, {method.get_method_inputs_size() + Type("int").size + Type("int").size}
+                        \t sw $t0, 0($sp)
+                        \t addi $sp, $sp, -{method.output_type.size}
+                    '''
+        else:
+            code += f'''
+                        \t jal {function_name}
+                        \t addi $sp, $sp, {method.get_method_inputs_size() + Type("int").size + Type("int").size}
+                    '''
+        # print("&" * 40)
+        # for var in symbol_table.last_scope().variables:
+        #     print(var)
+        # print("*" * 40)
+        symbol_table.last_scope().push_variable(Variable("__IGNORE_function_output", method.output_type))
+        return Node_Return(code=code, type=method.output_type)
+
+
     # normal_function_call: ident "(" actuals ")"
     elif parse_tree.data == "normal_function_call":
         function_name = children[0].text.replace("@", "")
@@ -1322,7 +1418,7 @@ def after_enter(parse_tree, symbol_table, children):
 
     # function_decl: type ident "(" formals ")" stmtblock | /void/ ident "(" formals ")" stmtblock
     elif parse_tree.data == "function_decl":
-        function_name = children[1].text.replace("@", "")
+        function_name = parse_tree.method.name
         stmtblock_code = children[3].code
         save_ra = f'''sw $ra {symbol_table.get_address_diff("$RA")}($sp)'''
 
@@ -1346,6 +1442,18 @@ def after_enter(parse_tree, symbol_table, children):
                     \t jr $t1
                 '''
 
+        symbol_table.pop_scope()
+        return Node_Return(code=code, type=None)
+
+    elif parse_tree.data == "class_decl":
+        code = f'''
+        #class start'''
+        for i, child in enumerate(children):
+            if parse_tree.children[i].data=="field" and parse_tree.children[i].children[1].data=="function_decl":
+                code += child.code
+        code += f'''
+        #class end
+        '''
         symbol_table.pop_scope()
         return Node_Return(code=code, type=None)
 

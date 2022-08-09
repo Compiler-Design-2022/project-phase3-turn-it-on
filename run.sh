@@ -1,6 +1,6 @@
 #!/bin/bash
 subtasks=("G1" "G2" "G3" "Arrays" "ConditionalStatements" "GlobalVariables" "SemanticError(type1)" "BooleanExpressions" "FloatExpressions" "Inheritance" "SemanticError(type2)" "CallingMethodsOfClass(withInherit)" "Functions" "IntegerExpressions" "SemanticError(type3)" "CastFunctions" "Interface" "SemanticError(type4)" "Class(Simple)" "LoopStatements" "SemanticError(type5)" "ConcatArraysAndStringsAndCompareString" "ReadAndWrite" "StringExpressions")
-subtasks=("ReadAndWrite")
+subtasks=("Class(Simple)")
 
 scores=(10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10)
 rm -r out

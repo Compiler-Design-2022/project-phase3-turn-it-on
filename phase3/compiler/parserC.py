@@ -156,7 +156,6 @@ def parser(string):
     # linker_add_imports(string)
     string = replace_ident(string)
     string = re.sub("\[[ ]+\]", '[]', string)
-    # print(string)
     # for x in string:
     #     print(x, end="---")
     return json_parser.parse(string), string
