@@ -18,30 +18,25 @@ def run() -> str:
     input_content = ''' 
 
 
-class Test {
-    int field;
-
-    void init() {
-        field = 365214;
+class A {
+    void a() {
+        Print("entering method a of A");
+        b();
+        Print("exiting method a of A");
     }
 
-    int test() {
-        Print("test begin ", getsp());
-        Print(471569);
-        Print(this.field);
-        Print("test end ", getsp());
+    void b() {
+        Print("inside method b");
     }
 }
 
 int main() {
-    Test t;
-    t = new Test;
-    Print("before t.init ", getsp());
-    t.init();
-    Print("after  t.init ", getsp());
-    t.test();
-    
+    A a;
+    a = new A;
+
+    a.a();
 }
+
 
 
 
@@ -50,8 +45,8 @@ int main() {
 
     try:
         print(input_content)
-        parse_tree, code = parser(code_predified_functions+ input_content)
-        # parse_tree, code = parser(input_content)
+        # parse_tree, code = parser(code_predified_functions+ input_content)
+        parse_tree, code = parser(input_content)
         print(parse_tree.pretty())
         try:
             symbol_table = SymbolTable()

@@ -8,6 +8,12 @@ import copy
 function_declaration_phase = True
 
 
+class fake_parse_tree():
+    def __init__(self, name):
+        self.data = name
+        self.children = []
+
+
 def reset_function_declaration_phase():
     global function_declaration_phase
     function_declaration_phase = True
@@ -151,6 +157,14 @@ def before_enter(parse_tree, symbol_table):
     elif parse_tree.data == "normal_function_call" or parse_tree.data == "class_function_call":
         symbol_table.last_scope().push_variable(Variable("__IGNORE_RA", Type("int")))
         symbol_table.last_scope().push_variable(Variable("__IGNORE_GSA", Type("int")))
+        if parse_tree.data == "normal_function_call" and symbol_table.get_last_class() is not None:
+            # self function call
+            class_function_name = symbol_table.get_last_class().name + "." + parse_tree.children[0].children[0].value
+            if symbol_table.get_method_tof(class_function_name):
+                parse_tree.data = "class_function_call"
+                parse_tree.children = [fake_parse_tree("this_expr")] + parse_tree.children
+                print("CHANGE CODE!", parse_tree.data, len(parse_tree.children))
+
 
 
     elif parse_tree.data == "class_decl":
@@ -245,7 +259,8 @@ def after_enter(parse_tree, symbol_table, children):
         if not var.is_global:
             if symbol_table.get_variable_scope(children[0].text).class_scope:
                 diff_to_this = symbol_table.get_address_diff("$THIS")
-                diff_from_this = symbol_table.get_variable_scope(children[0].text).get_address_diff(children[0].text)-var.type.size
+                diff_from_this = symbol_table.get_variable_scope(children[0].text).get_address_diff(
+                    children[0].text) - var.type.size
                 print(f"READ {diff_from_this} to get {var.name}")
                 code = f'''
                                         #load THIS address
@@ -361,7 +376,8 @@ def after_enter(parse_tree, symbol_table, children):
 
     elif parse_tree.data == "this_expr":
         diff_to_this = symbol_table.get_address_diff("$THIS")
-        symbol_table.last_scope().push_variable(Variable("__IGNORE_THIS_VALUE", Type("class", class_name=symbol_table.get_last_class().name)))
+        symbol_table.last_scope().push_variable(
+            Variable("__IGNORE_THIS_VALUE", Type("class", class_name=symbol_table.get_last_class().name)))
         code = f'''
                                 #load THIS address
                                 \t addi $t0, $sp, {diff_to_this}
@@ -376,7 +392,7 @@ def after_enter(parse_tree, symbol_table, children):
     elif parse_tree.data == "class_val":
         class_ref_builder = children[0].code
         field_name = children[1].text
-        class_obj: ClassObj=symbol_table.get_class(children[0].type.class_name)
+        class_obj: ClassObj = symbol_table.get_class(children[0].type.class_name)
         field = class_obj.get_field_by_name(field_name)
         symbol_table.last_scope().pop_variable()
         symbol_table.last_scope().push_variable(
@@ -1375,8 +1391,8 @@ def after_enter(parse_tree, symbol_table, children):
 
     # class_function_call: lvalue_exp.ident "(" actuals ")"
     elif parse_tree.data == "class_function_call":
-        function_name = children[0].type.class_name+"."+children[1].text.replace("@", "")
-        method: Method = symbol_table.get_method(function_name, [children[0].type]+children[2].type)
+        function_name = children[0].type.class_name + "." + children[1].text.replace("@", "")
+        method: Method = symbol_table.get_method(function_name, [children[0].type] + children[2].type)
         for var in method.input_variables:
             symbol_table.last_scope().pop_variable()
         symbol_table.last_scope().pop_variable()
@@ -1488,7 +1504,7 @@ def after_enter(parse_tree, symbol_table, children):
         code = f'''
         #class start'''
         for i, child in enumerate(children):
-            if parse_tree.children[i].data=="field" and parse_tree.children[i].children[1].data=="function_decl":
+            if parse_tree.children[i].data == "field" and parse_tree.children[i].children[1].data == "function_decl":
                 code += child.code
         code += f'''
         #class end

@@ -249,6 +249,14 @@ class SymbolTable():
                     return method
         raise ValueError(f"couldn't find {name} input-types:{' '.join(map(str, input_types))}")
 
+    def get_method_tof(self, name):
+        name = name.replace("@", "")
+        for method in self.functions_list:
+            if method.name == name:
+                return method
+        raise ValueError(f"couldn't find {name} input-types:{' '.join(map(str, input_types))}")
+
+
     def get_address_diff(self, name):
         offset = 0
         for i in range(len(self.scope_stack) - 1, -1, -1):
