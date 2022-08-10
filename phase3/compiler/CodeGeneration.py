@@ -160,7 +160,7 @@ def before_enter(parse_tree, symbol_table):
         if parse_tree.data == "normal_function_call" and symbol_table.get_last_class() is not None:
             # self function call
             class_function_name = symbol_table.get_last_class().name + "." + parse_tree.children[0].children[0].value
-            if symbol_table.get_method_tof(class_function_name):
+            if symbol_table.get_method_tof(class_function_name) is not None:
                 parse_tree.data = "class_function_call"
                 parse_tree.children = [fake_parse_tree("this_expr")] + parse_tree.children
                 print("CHANGE CODE!", parse_tree.data, len(parse_tree.children))

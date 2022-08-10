@@ -254,7 +254,8 @@ class SymbolTable():
         for method in self.functions_list:
             if method.name == name:
                 return method
-        raise ValueError(f"couldn't find {name} input-types:{' '.join(map(str, input_types))}")
+        return None
+        # raise ValueError(f"couldn't find {name} ")
 
 
     def get_address_diff(self, name):

@@ -146,6 +146,10 @@ int ReadInteger(){
         } 
         return res * sign; 
 }
+void printGSA(){
+    Print("GSA: ",getGSA());
+}
+
 
 string math_expr_sum_4(string a, string b){
     int al;
