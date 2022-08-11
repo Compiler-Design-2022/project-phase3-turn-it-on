@@ -306,25 +306,41 @@ class SymbolTable():
 
     def get_method(self, name, input_types=None):
         name = name.replace("@", "")
-        # print(name, input_types)
-        for method in self.functions_list:
-            # print(method)
-            if method.name == name and len(input_types) == len(method.input_variables):
-                good = True
-                for var1, type2 in zip(method.input_variables, input_types):
-                    if var1.type != type2:
-                        good = False
-                        break
-                if good:
-                    return method
-        raise ValueError(f"couldn't find {name} input-types:{' '.join(map(str, input_types))}")
+        if '.' in name:
+            class_name = name.split('.')[0]
+            method_name = name.split('.')[1]
+            class_obj: ClassObj = ClassObj.get_class_by_name(class_name)
+            try:
+                id = class_obj.get_function_id(name)
+                method = class_obj.get_methods()
+                return method[id]
+            except:
+                raise ValueError(f"couldn't find {name} input-types:{' '.join(map(str, input_types))}")
+        else:
+            # print(name, input_types)
+            for method in self.functions_list:
+                # print(method)
+                if method.name == name and len(input_types) == len(method.input_variables):
+                    good = True
+                    for var1, type2 in zip(method.input_variables, input_types):
+                        if var1.type != type2:
+                            good = False
+                            break
+                    if good:
+                        return method
+            raise ValueError(f"couldn't find {name} input-types:{' '.join(map(str, input_types))}")
 
     def get_method_tof(self, name):
         name = name.replace("@", "")
-        for method in self.functions_list:
-            if method.name == name:
-                return method
-        return None
+        class_name = name.split('.')[0]
+        method_name = name.split('.')[1]
+        class_obj: ClassObj = ClassObj.get_class_by_name(class_name)
+        try:
+            id = class_obj.get_function_id(name)
+            method = class_obj.get_methods()
+            return method[id]
+        except:
+            return None
         # raise ValueError(f"couldn't find {name} ")
 
     def get_address_diff(self, name):
