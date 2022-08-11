@@ -23,6 +23,12 @@ class ClassObj:
         self.par = None
         ClassObj.all_classes.append(self)
 
+    def get_variables(self):
+        if self.par is not None:
+            yield ClassObj.get_class_by_name(self.par).get_variables()
+        for field in self.fields:
+            yield field.variable
+
     def is_child(self, class2):
         if class2.name == self.name:
             return True

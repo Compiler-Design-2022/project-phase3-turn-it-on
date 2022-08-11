@@ -173,6 +173,8 @@ def before_enter(parse_tree, symbol_table):
 
     elif parse_tree.data == "class_decl":
         symbol_table.push_scope(Scope(class_scope=True, class_obj=parse_tree.class_obj))
+        for v in parse_tree.class_obj.get_variables():
+            symbol_table.last_scope().push_variable(v)
 
 
 def after_enter(parse_tree, symbol_table, children):
@@ -231,7 +233,8 @@ def after_enter(parse_tree, symbol_table, children):
     elif parse_tree.data == "variable":
         if len(symbol_table.scope_stack) > 1 or function_declaration_phase:
             variable = Variable(children[1].text, children[0].type)
-            symbol_table.last_scope().push_variable(variable)
+            if symbol_table.get_last_class() is None:
+                symbol_table.last_scope().push_variable(variable)
 
             if children[0].type.name == "double":
                 double_name = "__IGNORE" + get_label()
