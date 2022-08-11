@@ -1626,7 +1626,7 @@ def after_enter(parse_tree, symbol_table, children):
                         \t addi $sp, $sp, -{children[0].type.size}
                         \t jr $t1
                     '''
-            assert children[0].type == function_scope.method.output_type
+            assert  function_scope.method.output_type == children[0].type
         return Node_Return(code=code, type=None)
 
     elif parse_tree.data == "bool_math_expr_and":
