@@ -50,12 +50,18 @@ class ClassObj:
     def add_method(self, method):
         self.methods.append(method)
 
-    def get_fields(self):
+    def get_fields_gen(self):
         if self.par is not None:
             for f in ClassObj.get_class_by_name(self.par).get_fields():
                 yield f
         for field in self.fields:
             yield field
+
+    def get_fields(self):
+        ans = []
+        for f in self.get_fields_gen():
+            ans.append(f)
+        return ans
 
     def is_child(self, class2):
         if class2.name == self.name:

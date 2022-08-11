@@ -173,7 +173,7 @@ def before_enter(parse_tree, symbol_table):
 
     elif parse_tree.data == "class_decl":
         symbol_table.push_scope(Scope(class_scope=True, class_obj=parse_tree.class_obj))
-        for f in parse_tree.class_obj.get_fields():
+        for f in reversed(parse_tree.class_obj.get_fields()):
             # print(f"PUSH VARIABLE {v}")
             if f.access_mode == "private":
                 f.variable = Variable("IT IS PROTECTED", f.variable.type)
@@ -354,6 +354,9 @@ def after_enter(parse_tree, symbol_table, children):
                 \t addi $v0, $v0, 4
             '''
         # print(f"{class_obj.name}.get_function_num() = {class_obj.get_function_num()}")
+        forloop=f"for_loop{get_label()}"
+        forloopend=f"for_loop_end{get_label()}"
+        print(f"AXE class {class_obj.name} size={class_obj.size()}")
         code = f'''#new_expr class {class_name}
             #new class expr get memory
                     \t li $t0, {class_obj.size()}
@@ -362,6 +365,18 @@ def after_enter(parse_tree, symbol_table, children):
                     \t syscall
                     \t sw $v0, 0($sp)
                     \t addi $sp, $sp, -4
+                    #zero memory
+                    \t li $t0, {class_obj.size()//4}
+                    \t li $t1, 0
+                    beq $t0, $t1, {forloopend}
+                    \t{forloop}:
+                    sw $t1, 0($v0)
+                    addi $v0, $v0, 4
+                    addi $t0, $t0, -1
+                    bne $t0, $t1, {forloop}
+                    \t{forloopend}:
+                    #zero memory ended
+                    
                     
                     \t li $t0, {class_obj.get_function_num() * 4}
                     \t move $a0, $t0
@@ -1692,8 +1707,6 @@ def after_enter(parse_tree, symbol_table, children):
         for child in children:
             if child.code is not None:
                 code += child.code
-            # else:
-            #     code += child.text
         return Node_Return(code=code, type=children[0].type if len(children) > 0 else Type(),
                            text=children[0].text if len(children) > 0 else None)  # TODO: not good!
 
