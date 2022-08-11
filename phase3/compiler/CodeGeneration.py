@@ -279,6 +279,7 @@ def after_enter(parse_tree, symbol_table, children):
                                         \t addi $t0, $sp, {diff_to_this}
                                         #load THIS
                                         \t lw $t0, 0($t0)
+                                        \t lw $t0, 0($t0)
                                         #load var address
                                         \t addi $t0, $t0, {diff_from_this}
                                         \t sw $t0, 0($sp)
@@ -339,7 +340,7 @@ def after_enter(parse_tree, symbol_table, children):
         assert children[0].type == Type("int")
         return Node_Return(code=code, type=Type("array", inside_type=children[1].type))
 
-    elif parse_tree.data == "new_expr":  # TODO differrent type different code
+    elif parse_tree.data == "new_expr":
         class_name = children[0].text
         class_obj = symbol_table.get_class(class_name)
         symbol_table.last_scope().push_variable(
@@ -353,6 +354,33 @@ def after_enter(parse_tree, symbol_table, children):
                     \t syscall
                     \t sw $v0, 0($sp)
                     \t addi $sp, $sp, -4
+                    
+                    \t li $t0, {len(class_obj.methods)}
+                    \t move $a0, $t0
+                    \t li $v0, 9 
+                    \t syscall
+                    \t sw $v0, 0($sp)
+                    \t addi $sp, $sp, -4
+                    
+                    \t li $t0, {8}
+                    \t move $a0, $t0
+                    \t li $v0, 9 
+                    \t syscall
+                    \t sw $v0, 0($sp)
+                    \t addi $sp, $sp, -4
+                    
+                    
+                    \t lw $t0, 4($sp)
+                    \t lw $t1, 8($sp)
+                    \t lw $t2, 12($sp)
+                    \t addi $sp, $sp, 12
+                    
+                    \t sw $t0, 0($t2)
+                    \t sw $t1, 4($t2)
+                    
+                    \t sw $t2, 0($sp)
+                    \t addi $sp, $sp, -4
+                    
             #new class expr get memory END
                 '''
         return Node_Return(code=code, type=Type("class", class_name=class_obj.name))

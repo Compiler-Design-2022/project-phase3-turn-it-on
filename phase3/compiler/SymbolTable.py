@@ -21,7 +21,11 @@ class ClassObj:
         self.fields: [Field] = []
         self.init_code = ""
         self.par = None
+        self.methods: [Method] = []
         ClassObj.all_classes.append(self)
+
+    def add_method(self, method):
+        self.methods.append(method)
 
     def get_fields(self):
         if self.par is not None:
@@ -270,6 +274,8 @@ class SymbolTable():
     def push_method(self, method: Method):
         # print("push method", method)
         self.functions_list.append(method)
+        if method.name.find(".") != -1:
+            ClassObj.get_class_by_name(method.name.split(".")[0]).add_method(method)
 
     def push_scope(self, scope: Scope):
         # print("push scope ")
