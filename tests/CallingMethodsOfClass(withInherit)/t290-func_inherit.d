@@ -1,4 +1,4 @@
-class Person {// matherfucker
+class Person {
 
     void set_name(string name) {
         this.name = name;

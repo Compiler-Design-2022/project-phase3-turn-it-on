@@ -356,7 +356,7 @@ def after_enter(parse_tree, symbol_table, children):
         # print(f"{class_obj.name}.get_function_num() = {class_obj.get_function_num()}")
         forloop=f"for_loop{get_label()}"
         forloopend=f"for_loop_end{get_label()}"
-        print(f"AXE class {class_obj.name} size={class_obj.size()}")
+        # print(f"AXE class {class_obj.name} size={class_obj.size()}")
         code = f'''#new_expr class {class_name}
             #new class expr get memory
                     \t li $t0, {class_obj.size()}
