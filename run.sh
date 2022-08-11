@@ -1,6 +1,6 @@
 #!/bin/bash
 subtasks=("G1" "G2" "G3" "Arrays" "ConditionalStatements" "GlobalVariables" "SemanticError(type1)" "BooleanExpressions" "FloatExpressions" "Inheritance" "SemanticError(type2)" "CallingMethodsOfClass(withInherit)" "Functions" "IntegerExpressions" "SemanticError(type3)" "CastFunctions" "Interface" "SemanticError(type4)" "Class(Simple)" "LoopStatements" "SemanticError(type5)" "ConcatArraysAndStringsAndCompareString" "ReadAndWrite" "StringExpressions")
-subtasks=("Class(Simple)")
+#subtasks=("GlobalVariables")
 
 scores=(10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10)
 rm -r out
@@ -37,9 +37,9 @@ for folder in ${dirlist[*]}; do
       program_input="$filename.in"
       report_filename="$filename.report.txt"
       if command -v python3; then
-        /mnt/c/Users/ASUS/PycharmProjects/Decaf-Compiler/venv/Desktop/ML/Scripts/python.exe phase3/compiler/main.py -i "$folder/$filelist" -o "$folder/$output_asm"
+        python3 phase3/compiler/main.py -i "$folder/$filelist" -o "$folder/$output_asm"
       else
-        python main.py -i "$folder/$filelist" -o "$folder/$output_asm"
+        python phase3/compiler/main.py -i "$folder/$filelist" -o "$folder/$output_asm"
       fi
       if [[ -f "out/$folder/$output_asm" ]]; then
         if [ $? -eq 0 ]; then
@@ -66,6 +66,7 @@ for folder in ${dirlist[*]}; do
         echo "failed attttttttttttttttttttt $folder/$output_asm"
         ((NUMBER_OF_FAILED++))
       fi
+
     done
 
     echo "Passed : $NUMBER_OF_PASSED"
