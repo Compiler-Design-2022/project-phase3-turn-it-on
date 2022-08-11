@@ -105,7 +105,7 @@ def function_declaration(parse_tree, symbol_table: SymbolTable, height=0):
         symbol_table1.push_scope(Scope())
         class_name = cgen(parse_tree.children[0], symbol_table1).text.replace("@", "")
         class_obj = ClassObj(class_name)
-        if len(parse_tree.children) > 1 and parse_tree.children[1].data=="ident":
+        if len(parse_tree.children) > 1 and parse_tree.children[1].data == "ident":
             class_par_name = cgen(parse_tree.children[1], symbol_table1).text.replace("@", "")
             class_obj.set_par(class_par_name)
 
@@ -173,9 +173,11 @@ def before_enter(parse_tree, symbol_table):
 
     elif parse_tree.data == "class_decl":
         symbol_table.push_scope(Scope(class_scope=True, class_obj=parse_tree.class_obj))
-        for v in parse_tree.class_obj.get_variables():
+        for f in parse_tree.class_obj.get_fields():
             # print(f"PUSH VARIABLE {v}")
-            symbol_table.last_scope().push_variable(v)
+            if f.access_mode == "private":
+                f.variable = Variable("IT IS PROTECTED", f.variable.type)
+            symbol_table.last_scope().push_variable(f.variable)
 
 
 def after_enter(parse_tree, symbol_table, children):
@@ -267,7 +269,7 @@ def after_enter(parse_tree, symbol_table, children):
         var: Variable = symbol_table.get_variable(children[0].text)
         if not var.is_global:
             if symbol_table.get_variable_scope(children[0].text).class_scope:
-                diff=None
+                diff = None
                 diff_to_this = symbol_table.get_address_diff("$THIS")
                 diff_from_this = symbol_table.get_variable_scope(children[0].text).get_address_diff(
                     children[0].text) - var.type.size

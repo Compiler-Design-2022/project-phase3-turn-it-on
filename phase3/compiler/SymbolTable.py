@@ -23,12 +23,12 @@ class ClassObj:
         self.par = None
         ClassObj.all_classes.append(self)
 
-    def get_variables(self):
+    def get_fields(self):
         if self.par is not None:
-            for v in ClassObj.get_class_by_name(self.par).get_variables():
-                yield v
+            for f in ClassObj.get_class_by_name(self.par).get_fields():
+                yield f
         for field in self.fields:
-            yield field.variable
+            yield field
 
     def is_child(self, class2):
         if class2.name == self.name:
@@ -60,7 +60,7 @@ class ClassObj:
                 return field
         if self.par is not None:
             return ClassObj.get_class_by_name(self.par).get_field_by_name(name)
-        raise ValueError
+        raise ValueError(f"couldn't find field {name} in {self.name}")
 
     # in stack | self.1 self.2, ...., self.k, par.1, par.2, ..., par.k, par.par.1, par.par.2, ... , par.par.k
     def add_field(self, field):
