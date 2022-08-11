@@ -1,4 +1,4 @@
 int main() {
-    // empty input intended matherfucker
+    // empty input intended
     Print(ReadLine());
 }
