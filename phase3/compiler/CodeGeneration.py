@@ -353,6 +353,7 @@ def after_enter(parse_tree, symbol_table, children):
                 \t sw $t0, 0($v0)
                 \t addi $v0, $v0, 4
             '''
+        print(f"{class_obj.name}.get_function_num() = {class_obj.get_function_num()}")
         code = f'''#new_expr class {class_name}
             #new class expr get memory
                     \t li $t0, {class_obj.size()}
@@ -1462,7 +1463,7 @@ def after_enter(parse_tree, symbol_table, children):
         child_size = 4
         for t in children[2].type:
             child_size += t.size
-
+        print(f"id = {ClassObj.get_class_by_name(children[0].type.class_name).get_function_id(function_name)} for {function_name} in {ClassObj.get_class_by_name(children[0].type.class_name).name}")
         if method.output_type.size != 0:
             code += f'''
                         # load THIS stack location
@@ -1483,7 +1484,16 @@ def after_enter(parse_tree, symbol_table, children):
                     '''
         else:
             code += f'''
-                        \t jal {function_name}
+                        # load THIS stack location
+                        \t add $t0, $sp, {child_size}
+                        # load THIS Location
+                        \t lw $t0, 0($t0)
+                        # load function list
+                        \t lw $t0, 4($t0)
+                        # load function adress
+                        \t lw $t0, {ClassObj.get_class_by_name(children[0].type.class_name).get_function_id(function_name) * 4}($t0)
+                        \t jal $t0
+
                         \t addi $sp, $sp, {method.get_method_inputs_size() + Type("int").size + Type("int").size}
                     '''
         # print("&" * 40)

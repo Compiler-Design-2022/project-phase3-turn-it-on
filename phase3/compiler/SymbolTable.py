@@ -24,29 +24,28 @@ class ClassObj:
         self.methods: [Method] = []
         ClassObj.all_classes.append(self)
 
-
     def get_methods(self):
-        if self.par is not None:
-            for f in ClassObj.get_class_by_name(self.par).get_methods():
-                yield f
+        methods = ClassObj.get_class_by_name(self.par).get_methods() if self.par is not None else []
         for f in self.methods:
-            yield f
+            assign = False
+            for i, met in enumerate(methods):
+                if met.name.split(".")[1] == f.name.split(".")[1]:
+                    methods[i] = f
+                    assign = True
+                    break
+            if not assign:
+                methods.append(f)
+        return methods
 
     def get_function_num(self):
-        if self.par is None:
-            return len(self.methods)
-        else:
-            return len(self.methods)+ClassObj.get_class_by_name(self.par).get_function_num()
-
+        return len(self.get_methods())
 
     def get_function_id(self, name):
-        for i, method in enumerate(self.methods):
-            if method.name == name:
-                return i + 0 if self.par is None else ClassObj.get_class_by_name(self.par).get_function_num()
-        if self.par is not None:
-            return ClassObj.get_class_by_name(self.par).get_function_id(name)
+        methods = self.get_methods()
+        for i, method in enumerate(methods):
+            if method.name.split(".")[1] == name.split(".")[1]:
+                return i
         raise ValueError(f"Couldn't find method {name} in {self.name} for function id")
-
 
     def add_method(self, method):
         self.methods.append(method)

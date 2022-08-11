@@ -1,4 +1,3 @@
-
 class A {
     void test() {
         Print("A.test()");
