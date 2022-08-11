@@ -25,7 +25,8 @@ class ClassObj:
 
     def get_variables(self):
         if self.par is not None:
-            yield ClassObj.get_class_by_name(self.par).get_variables()
+            for v in ClassObj.get_class_by_name(self.par).get_variables():
+                yield v
         for field in self.fields:
             yield field.variable
 
