@@ -346,6 +346,13 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.last_scope().push_variable(
             Variable("__IGNORE_CLASS_ADDRESS", Type("class", class_name=class_obj.name)))
         # print(f"GET {class_obj.size()}byte for {class_name}")
+        method_set = ""
+        for method in class_obj.methods:
+            method_set += f'''
+                \t la $t0, {method.name}
+                \t sw $t0, 0($v0)
+                \t addi $v0, $v0, 4
+            '''
         code = f'''#new_expr class {class_name}
             #new class expr get memory
                     \t li $t0, {class_obj.size()}
@@ -355,12 +362,13 @@ def after_enter(parse_tree, symbol_table, children):
                     \t sw $v0, 0($sp)
                     \t addi $sp, $sp, -4
                     
-                    \t li $t0, {len(class_obj.methods)*4}
+                    \t li $t0, {len(class_obj.methods) * 4}
                     \t move $a0, $t0
                     \t li $v0, 9 
                     \t syscall
                     \t sw $v0, 0($sp)
                     \t addi $sp, $sp, -4
+                    {method_set}
                     
                     \t li $t0, {8}
                     \t move $a0, $t0
@@ -1447,12 +1455,26 @@ def after_enter(parse_tree, symbol_table, children):
                     \tsw $t0, 0($sp)
                     \taddi $sp, $sp, -{Type("int").size}
                 '''
+
         for child in children:
             code += child.code
 
+        child_size = 4
+        for t in children[2].type:
+            child_size += t.size
+
         if method.output_type.size != 0:
             code += f'''
-                        \t jal {function_name}
+                        # load THIS stack location
+                        \t add $t0, $sp, {child_size}
+                        # load THIS Location
+                        \t lw $t0, 0($t0)
+                        # load function list
+                        \t lw $t0, 4($t0)
+                        # load function adress
+                        \t lw $t0, {ClassObj.get_class_by_name(children[0].type.class_name).get_function_id(function_name) * 4}($t0)
+                        
+                        \t jal $t0
                         \t lw $t0, {method.output_type.size}($sp)
                         \t addi $sp, $sp, {method.output_type.size}
                         \t addi $sp, $sp, {method.get_method_inputs_size() + Type("int").size + Type("int").size}

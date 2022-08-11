@@ -24,6 +24,13 @@ class ClassObj:
         self.methods: [Method] = []
         ClassObj.all_classes.append(self)
 
+    def get_function_id(self, name):
+        for i, method in enumerate(self.methods):
+            if method.name == name:
+                return i
+        raise ValueError(f"Couldn't find method {name} in {self.name} for function id")
+
+
     def add_method(self, method):
         self.methods.append(method)
 
