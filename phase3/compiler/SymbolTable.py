@@ -14,35 +14,64 @@ class Field:
 
 
 class ClassObj:
+    all_classes = []
+
     def __init__(self, classname):
         self.name = classname
         self.fields: [Field] = []
         self.init_code = ""
+        self.par = None
+        ClassObj.all_classes.append(self)
+
+    def is_child(self, class2):
+        if class2.name == self.name:
+            return True
+        if self.par is None:
+            return False
+        return ClassObj.get_class_by_name(self.par).is_child(class2)
+
+    def set_par(self, par):
+        self.par = par
 
     def get_field_dist(self, field_name):
         size = 0
+        offset = 0 if self.par is None else ClassObj.get_class_by_name(self.par).size()
         for field in reversed(self.fields):
             field: Field
             if field.variable.name == field_name:
-                return size
+                return size + offset
             size += field.variable.type.size
+        if self.par is not None:
+            return ClassObj.get_class_by_name(self.par).get_field_dist(field_name)
         raise ValueError
 
-    def add_field(self, field):
-        self.fields.append(field)
-
     def get_field_by_name(self, name):
-        for field in self.fields:
+        for field in reversed(self.fields):
             field: Field
             if field.variable.name == name:
                 return field
+        if self.par is not None:
+            return ClassObj.get_class_by_name(self.par).get_field_by_name(name)
         raise ValueError
+
+    # in stack | self.1 self.2, ...., self.k, par.1, par.2, ..., par.k, par.par.1, par.par.2, ... , par.par.k
+    def add_field(self, field):
+        self.fields.append(field)
 
     def size(self):
         ans = 0
         for field in self.fields:
             ans += field.variable.type.size
+        if self.par is not None:
+            ans += ClassObj.get_class_by_name(self.par).size()
         return ans
+
+    @staticmethod
+    def get_class_by_name(name):
+        for class_obj in ClassObj.all_classes:
+            if class_obj.name == name:
+                return class_obj
+        raise ValueError
 
 
 def get_label():
@@ -121,7 +150,11 @@ class Type():
             return False
         if self.inside_type is None:
             if self.name == "class":
-                return self.name == other.name and self.class_name == other.class_name
+                if self.name == other.name:
+                    class1 = ClassObj.get_class_by_name(self.class_name)
+                    class2 = ClassObj.get_class_by_name(other.class_name)
+                    return class2.is_child(class1)
+                return False
             return self.name == other.name
         return self.inside_type == other.inside_type
 
@@ -256,7 +289,6 @@ class SymbolTable():
                 return method
         return None
         # raise ValueError(f"couldn't find {name} ")
-
 
     def get_address_diff(self, name):
         offset = 0

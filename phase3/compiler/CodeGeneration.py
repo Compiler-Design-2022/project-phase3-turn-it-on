@@ -105,6 +105,10 @@ def function_declaration(parse_tree, symbol_table: SymbolTable, height=0):
         symbol_table1.push_scope(Scope())
         class_name = cgen(parse_tree.children[0], symbol_table1).text.replace("@", "")
         class_obj = ClassObj(class_name)
+        if len(parse_tree.children) > 1:
+            class_par_name = cgen(parse_tree.children[1], symbol_table1).text.replace("@", "")
+            class_obj.set_par(class_par_name)
+
         symbol_table.temp_class = class_obj
     code = ""
     for child in parse_tree.children:
@@ -258,6 +262,7 @@ def after_enter(parse_tree, symbol_table, children):
         var: Variable = symbol_table.get_variable(children[0].text)
         if not var.is_global:
             if symbol_table.get_variable_scope(children[0].text).class_scope:
+                diff=None
                 diff_to_this = symbol_table.get_address_diff("$THIS")
                 diff_from_this = symbol_table.get_variable_scope(children[0].text).get_address_diff(
                     children[0].text) - var.type.size
