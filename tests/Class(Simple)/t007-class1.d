@@ -1,5 +1,5 @@
 
-class Person { // matherfucker
+class Person {
     string name;
     int age;
 
