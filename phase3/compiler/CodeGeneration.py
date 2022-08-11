@@ -424,7 +424,6 @@ def after_enter(parse_tree, symbol_table, children):
                                 \t addi $t0, $sp, {diff_to_this}
                                 #load THIS
                                 \t lw $t0, 0($t0)
-                                \t lw $t0, 0($t0)
                                 \t sw $t0, 0($sp)
                                 \t addi $sp, $sp, -4
                                 '''
@@ -445,6 +444,7 @@ def after_enter(parse_tree, symbol_table, children):
                     #class val load class END
                     #class val start
                     \t lw $t0, {children[0].type.size}($sp)
+                    \t lw $t0, 0($t0)
                     \t addi $sp, $sp, 4
                     \t addi $t0, $t0, {class_obj.get_field_dist(field_name)}
                     \t sw $t0, 0($sp)
