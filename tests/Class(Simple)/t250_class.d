@@ -1,4 +1,4 @@
-class table {
+class table {//matherfucker
 	int [][] table;
 	string [] chars;
 	
