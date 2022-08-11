@@ -348,14 +348,14 @@ def after_enter(parse_tree, symbol_table, children):
         # print(f"GET {class_obj.size()}byte for {class_name}")
         code = f'''#new_expr class {class_name}
             #new class expr get memory
-                    \t li $t0, {class_obj.size()}
+                    \t li $t0, {class_obj.size()+16}
                     \t move $a0, $t0
                     \t li $v0, 9 
                     \t syscall
                     \t sw $v0, 0($sp)
                     \t addi $sp, $sp, -4
                     
-                    \t li $t0, {len(class_obj.methods)}
+                    \t li $t0, {len(class_obj.methods)*4}
                     \t move $a0, $t0
                     \t li $v0, 9 
                     \t syscall
