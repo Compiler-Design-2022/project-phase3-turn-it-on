@@ -1692,8 +1692,8 @@ def after_enter(parse_tree, symbol_table, children):
         for child in children:
             if child.code is not None:
                 code += child.code
-            else:
-                code += child.text
+            # else:
+            #     code += child.text
         return Node_Return(code=code, type=children[0].type if len(children) > 0 else Type(),
                            text=children[0].text if len(children) > 0 else None)  # TODO: not good!
 

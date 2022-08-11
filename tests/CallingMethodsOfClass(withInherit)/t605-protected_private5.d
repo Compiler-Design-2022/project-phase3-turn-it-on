@@ -1,4 +1,5 @@
 class A {
+    int c;
 
     public int getC() {
         return this.c;
