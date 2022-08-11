@@ -347,7 +347,7 @@ def after_enter(parse_tree, symbol_table, children):
             Variable("__IGNORE_CLASS_ADDRESS", Type("class", class_name=class_obj.name)))
         # print(f"GET {class_obj.size()}byte for {class_name}")
         method_set = ""
-        for method in class_obj.methods:
+        for method in class_obj.get_methods():
             method_set += f'''
                 \t la $t0, {method.name}
                 \t sw $t0, 0($v0)
@@ -362,7 +362,7 @@ def after_enter(parse_tree, symbol_table, children):
                     \t sw $v0, 0($sp)
                     \t addi $sp, $sp, -4
                     
-                    \t li $t0, {len(class_obj.methods) * 4}
+                    \t li $t0, {class_obj.get_function_num() * 4}
                     \t move $a0, $t0
                     \t li $v0, 9 
                     \t syscall
