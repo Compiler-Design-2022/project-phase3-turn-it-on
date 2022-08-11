@@ -105,7 +105,7 @@ def function_declaration(parse_tree, symbol_table: SymbolTable, height=0):
         symbol_table1.push_scope(Scope())
         class_name = cgen(parse_tree.children[0], symbol_table1).text.replace("@", "")
         class_obj = ClassObj(class_name)
-        if len(parse_tree.children) > 1:
+        if len(parse_tree.children) > 1 and parse_tree.children[1].data=="ident":
             class_par_name = cgen(parse_tree.children[1], symbol_table1).text.replace("@", "")
             class_obj.set_par(class_par_name)
 
@@ -290,6 +290,7 @@ def after_enter(parse_tree, symbol_table, children):
         else:
             diff_to_gsa = symbol_table.get_address_diff("$GSA")
             diff_from_gsa = symbol_table.scope_stack[0].get_address_diff(children[0].text)
+            print(f" for global {children[0].text} get {diff_from_gsa}")
             code = f'''
                         #load GSA address
                         \t addi $t0, $sp, {diff_to_gsa}

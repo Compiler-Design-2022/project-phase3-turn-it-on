@@ -31,6 +31,7 @@ class ClassObj:
         return ClassObj.get_class_by_name(self.par).is_child(class2)
 
     def set_par(self, par):
+        print(f"SET PAR {self.name} to {par}")
         self.par = par
 
     def get_field_dist(self, field_name):
@@ -71,7 +72,7 @@ class ClassObj:
         for class_obj in ClassObj.all_classes:
             if class_obj.name == name:
                 return class_obj
-        raise ValueError
+        raise ValueError(f"couldn't find class {name}, {len(name)}")
 
 
 def get_label():
