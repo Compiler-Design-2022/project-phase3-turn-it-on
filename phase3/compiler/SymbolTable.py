@@ -37,7 +37,7 @@ class ClassObj:
         return ClassObj.get_class_by_name(self.par).is_child(class2)
 
     def set_par(self, par):
-        print(f"SET PAR {self.name} to {par}")
+        # print(f"SET PAR {self.name} to {par}")
         self.par = par
 
     def get_field_dist(self, field_name):

@@ -167,14 +167,14 @@ def before_enter(parse_tree, symbol_table):
             if symbol_table.get_method_tof(class_function_name) is not None:
                 parse_tree.data = "class_function_call"
                 parse_tree.children = [fake_parse_tree("this_expr")] + parse_tree.children
-                print("CHANGE CODE!", parse_tree.data, len(parse_tree.children))
+                # print("CHANGE CODE!", parse_tree.data, len(parse_tree.children))
 
 
 
     elif parse_tree.data == "class_decl":
         symbol_table.push_scope(Scope(class_scope=True, class_obj=parse_tree.class_obj))
         for v in parse_tree.class_obj.get_variables():
-            print(f"PUSH VARIABLE {v}")
+            # print(f"PUSH VARIABLE {v}")
             symbol_table.last_scope().push_variable(v)
 
 
@@ -271,7 +271,7 @@ def after_enter(parse_tree, symbol_table, children):
                 diff_to_this = symbol_table.get_address_diff("$THIS")
                 diff_from_this = symbol_table.get_variable_scope(children[0].text).get_address_diff(
                     children[0].text) - var.type.size
-                print(f"READ {diff_from_this} to get {var.name}")
+                # print(f"READ {diff_from_this} to get {var.name}")
                 code = f'''
                                         #load THIS address
                                         \t addi $t0, $sp, {diff_to_this}
@@ -295,7 +295,7 @@ def after_enter(parse_tree, symbol_table, children):
         else:
             diff_to_gsa = symbol_table.get_address_diff("$GSA")
             diff_from_gsa = symbol_table.scope_stack[0].get_address_diff(children[0].text)
-            print(f" for global {children[0].text} get {diff_from_gsa}")
+            # print(f" for global {children[0].text} get {diff_from_gsa}")
             code = f'''
                         #load GSA address
                         \t addi $t0, $sp, {diff_to_gsa}
@@ -342,7 +342,7 @@ def after_enter(parse_tree, symbol_table, children):
         class_obj = symbol_table.get_class(class_name)
         symbol_table.last_scope().push_variable(
             Variable("__IGNORE_CLASS_ADDRESS", Type("class", class_name=class_obj.name)))
-        print(f"GET {class_obj.size()}byte for {class_name}")
+        # print(f"GET {class_obj.size()}byte for {class_name}")
         code = f'''#new_expr class {class_name}
             #new class expr get memory
                     \t li $t0, {class_obj.size()}
@@ -408,7 +408,7 @@ def after_enter(parse_tree, symbol_table, children):
         symbol_table.last_scope().pop_variable()
         symbol_table.last_scope().push_variable(
             Variable("__IGNORE_class_val", Type("ref", inside_type=field.variable.type)))
-        print(f"GET {class_obj.get_field_dist(field_name)} for {field_name} in class {class_obj.name}")
+        # print(f"GET {class_obj.get_field_dist(field_name)} for {field_name} in class {class_obj.name}")
         code = f'''#class val load class 
                     {class_ref_builder} 
                     #class val load class END
