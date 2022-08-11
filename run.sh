@@ -37,7 +37,7 @@ for folder in ${dirlist[*]}; do
       program_input="$filename.in"
       report_filename="$filename.report.txt"
       if command -v python3; then
-        /mnt/c/Users/ASUS/PycharmProjects/Decaf-Compiler/venv/Desktop/ML/Scripts/python.exe phase3/compiler/main.py -i "$folder/$filelist" -o "$folder/$output_asm"
+        python3 phase3/compiler/main.py -i "$folder/$filelist" -o "$folder/$output_asm"
       else
         python phase3/compiler/main.py -i "$folder/$filelist" -o "$folder/$output_asm"
       fi
