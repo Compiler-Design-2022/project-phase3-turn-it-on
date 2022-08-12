@@ -1,4 +1,3 @@
-//matherfucker
 class Random {
 
   int seed;
