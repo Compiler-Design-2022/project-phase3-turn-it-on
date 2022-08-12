@@ -1,6 +1,6 @@
 
 int main() {
     bool b;
-    b=("&yty"=="?");
+    b=(1==3);
     Print( " (", b, ") ");
 }
