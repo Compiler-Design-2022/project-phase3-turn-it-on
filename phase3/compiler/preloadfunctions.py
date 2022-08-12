@@ -174,6 +174,7 @@ bool string_equality_check(string a, string b){
     al=ctoi(a[-1]);
     bl=ctoi(b[-1]);
     if (al!=bl){
+        //Print("FALSE");
         return false;
     }
     for(i=0;i<bl;i+=1){
