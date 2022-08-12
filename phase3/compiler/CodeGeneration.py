@@ -1730,6 +1730,8 @@ def after_enter(parse_tree, symbol_table, children):
         \t addi $sp, $sp, -400
         {parse_tree.code}        
         \t addi $t0, $sp, 0
+        \t addi $sp, $sp, -40
+        
         \t addi $sp, $sp, -4
         \t sw $t0, 0($sp)
         \t addi $sp, $sp, -4
