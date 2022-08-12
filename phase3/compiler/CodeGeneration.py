@@ -339,6 +339,11 @@ def after_enter(parse_tree, symbol_table, children):
                         \t lw $t0, 0($t0)
                         #load var address
                         \t addi $t0, $t0, {diff_from_gsa}
+                        # allign
+                        \t li $t1, 3
+                        \t and $t1, $t1, $t0
+                        \t sub $t0, $t0, $t1
+                        
                         \t sw $t0, 0($sp)
                         \t addi $sp, $sp, -4
                     '''
