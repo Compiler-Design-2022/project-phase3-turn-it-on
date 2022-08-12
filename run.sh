@@ -1,6 +1,6 @@
 #!/bin/bash
 subtasks=("G1" "G2" "G3" "Arrays" "ConditionalStatements"  "SemanticError(type1)" "BooleanExpressions" "FloatExpressions" "Inheritance" "SemanticError(type2)" "CallingMethodsOfClass(withInherit)" "Functions" "IntegerExpressions" "SemanticError(type3)" "CastFunctions" "Interface" "SemanticError(type4)" "Class(Simple)" "LoopStatements" "SemanticError(type5)" "ConcatArraysAndStringsAndCompareString" "ReadAndWrite" "StringExpressions")
-subtasks=("CallingMethodsOfClass(withInherit)")
+subtasks=("Class(Simple)")
 
 scores=(10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10)
 rm -r out
@@ -55,6 +55,7 @@ for folder in ${dirlist[*]}; do
               echo "++++ test passed"
             else
               ((NUMBER_OF_FAILED++))
+              cat "$OUTPUT_DIRECTORY$folder/$output_filename"
               echo "------------------------------------------------------ test failed ! $folder/$output_asm"
             fi
           fi
