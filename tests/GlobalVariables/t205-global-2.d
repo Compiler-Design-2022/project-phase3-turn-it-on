@@ -7,7 +7,11 @@ void test() {
 }
 
 int main() {
+    printsp();
     printGSA();
+    printsp();
     g = 33;
+    printsp();
     test();
+    printsp();
 }

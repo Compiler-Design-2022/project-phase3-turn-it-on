@@ -149,7 +149,9 @@ int ReadInteger(){
 void printGSA(){
     Print("GSA: ",getGSA());
 }
-
+void printsp(){
+    Print("SP: ",getsp());
+}
 
 string math_expr_sum_4(string a, string b){
     int al;
