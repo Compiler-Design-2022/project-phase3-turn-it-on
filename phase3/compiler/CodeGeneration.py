@@ -74,6 +74,26 @@ def function_declaration(parse_tree, symbol_table: SymbolTable, height=0):
         method = Method(function_name, type_child.type, input_child.type)
         symbol_table.push_method(method)
         parse_tree.method = method
+
+    if parse_tree.data == "prototype":
+        symbol_table1 = SymbolTable()
+        symbol_table1.push_scope(Scope())
+        type_child = cgen(parse_tree.children[1], symbol_table1)
+        symbol_table1 = SymbolTable()
+        symbol_table1.push_scope(Scope())
+        name_child = cgen(parse_tree.children[2], symbol_table1)
+        symbol_table1 = SymbolTable()
+        symbol_table1.push_scope(Scope())
+        input_child = cgen(parse_tree.children[3], symbol_table1)
+        function_name = name_child.text
+        if symbol_table.temp_class is not None:
+            input_child.type = [Variable("$THIS",
+                                         Type("class", class_name=symbol_table.temp_class.name))] + input_child.type
+            function_name = symbol_table.temp_class.name + "." + function_name
+
+        method = Method(function_name,type_child.type, input_child.type)
+        symbol_table.push_method(method)
+        parse_tree.method = method
     if parse_tree.data == "variable" and height == 3:
         symbol_table1 = SymbolTable()
         symbol_table1.push_scope(Scope())
@@ -110,6 +130,19 @@ def function_declaration(parse_tree, symbol_table: SymbolTable, height=0):
             class_obj.set_par(class_par_name)
 
         symbol_table.temp_class = class_obj
+
+    if parse_tree.data == "interface_decl":
+        symbol_table1 = SymbolTable()
+        symbol_table1.push_scope(Scope())
+        symbol_table1.push_scope(Scope())
+        class_name = cgen(parse_tree.children[0], symbol_table1).text.replace("@", "")
+        class_obj = ClassObj(class_name, interface=True)
+        if len(parse_tree.children) > 1 and parse_tree.children[1].data == "ident":
+            class_par_name = cgen(parse_tree.children[1], symbol_table1).text.replace("@", "")
+            class_obj.set_par(class_par_name)
+
+        symbol_table.temp_class = class_obj
+
     code = ""
     for child in parse_tree.children:
         code += function_declaration(child, symbol_table, height + 1)
@@ -117,7 +150,7 @@ def function_declaration(parse_tree, symbol_table: SymbolTable, height=0):
         parse_tree.code = code
         global function_declaration_phase
         function_declaration_phase = False
-    if parse_tree.data == "class_decl":
+    if parse_tree.data == "class_decl" or parse_tree.data == "interface_decl":
         symbol_table.push_class(symbol_table.temp_class)
         parse_tree.class_obj = symbol_table.temp_class
         symbol_table.temp_class = None
@@ -171,7 +204,7 @@ def before_enter(parse_tree, symbol_table):
 
 
 
-    elif parse_tree.data == "class_decl":
+    elif parse_tree.data == "class_decl" or parse_tree.data == "interface_decl":
         symbol_table.push_scope(Scope(class_scope=True, class_obj=parse_tree.class_obj))
         for f in reversed(parse_tree.class_obj.get_fields()):
             # print(f"PUSH VARIABLE {v}")
@@ -1600,6 +1633,11 @@ def after_enter(parse_tree, symbol_table, children):
         '''
         symbol_table.pop_scope()
         return Node_Return(code=code, type=None)
+
+    elif parse_tree.data == "interface_decl":
+        symbol_table.pop_scope()
+        return Node_Return(code="", type=None)
+
 
     # formals: variable ("," variable)+ |  variable | null
     elif parse_tree.data == "formals":

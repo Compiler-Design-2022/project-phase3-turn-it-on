@@ -16,25 +16,32 @@ class Field:
 class ClassObj:
     all_classes = []
 
-    def __init__(self, classname):
+    def __init__(self, classname, interface=False):
         self.name = classname
         self.fields: [Field] = []
         self.init_code = ""
         self.par = None
+        self.interface=interface
         self.methods: [Method] = []
         ClassObj.all_classes.append(self)
 
     def get_methods(self):
         methods = ClassObj.get_class_by_name(self.par).get_methods() if self.par is not None else []
+        replace=[False] * len(methods)
         for f in self.methods:
             assign = False
             for i, met in enumerate(methods):
                 if met.name.split(".")[1] == f.name.split(".")[1]:
                     methods[i] = f
+                    replace[i]=True
                     assign = True
                     break
             if not assign:
                 methods.append(f)
+        if self.par is not None and ClassObj.get_class_by_name(self.par).interface:
+            for i in range(len(replace)):
+                assert replace[i]==True
+
         return methods
 
     def get_function_num(self):

@@ -14,7 +14,7 @@ grammer = r"""
     field: access_mode variable_decl | access_mode function_decl
     access_mode: /private/ | /public/ | /protected/ | null
     interface_decl: "interface" ident "{" prototype* "}"
-    prototype: type ident "(" formals ")"";" | /void/ ident "(" formals ")" ";" 
+    prototype: access_mode type ident "(" formals ")"";" 
     stmtblock: "{" variable_decl* stmt* "}" | mipscode
     mipscode: "~"/[^~]+/"~"
     stmt: expr? ";" | ifstmt | whilestmt | whilestmt | forstmt | breakstmt | continuestmt | returnstmt | printstmt | stmtblock     
