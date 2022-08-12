@@ -1,4 +1,4 @@
-class vector {//matherfucker
+class vector {
     int actual_size;
     int fixed_size;
     int[] a;
