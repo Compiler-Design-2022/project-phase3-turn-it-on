@@ -62,6 +62,7 @@ for folder in ${dirlist[*]}; do
           ((NUMBER_OF_FAILED++))
         fi
       else
+        cat "$OUTPUT_DIRECTORY$folder/$output_filename"
         echo "failed attttttttttttttttttttt $folder/$output_asm"
         ((NUMBER_OF_FAILED++))
       fi
