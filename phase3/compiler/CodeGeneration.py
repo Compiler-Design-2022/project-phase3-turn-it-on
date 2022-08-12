@@ -1722,6 +1722,8 @@ def after_enter(parse_tree, symbol_table, children):
         return Node_Return(code=code, type=[children[i].type for i in range(len(children))])
     elif parse_tree.data == "program":
         code = f'''{parse_tree.code}
+        \t addi $sp, $sp, -4
+        
         \t addi $t0, $sp, 0
         \t addi $sp, $sp, -4
         \t sw $t0, 0($sp)
