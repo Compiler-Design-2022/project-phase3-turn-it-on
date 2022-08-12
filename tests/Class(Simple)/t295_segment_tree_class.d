@@ -1,3 +1,5 @@
+int inf;
+
 class segment_tree{
     int n;
     int[] seg;
@@ -7,7 +9,7 @@ class segment_tree{
         this.n=n;
         seg=NewArray(4*n+10, int);
         for(i=0;i<4*n+10;i=i+1){
-            seg[i]=10000;
+            seg[i]=inf;
         }
     }
     void update2(int id,int val,int s,int e,int p){
@@ -35,7 +37,7 @@ class segment_tree{
         int r1;
         int r2;
         if(l>=e || r<=s){
-            return 10000;
+            return inf;
         }
         if(l<=s && r>=e){
             return seg[p];
@@ -58,6 +60,7 @@ int main() {
     int q;
     int i;
 
+    inf = 1000000000;
     my_st=new segment_tree;
     n=ReadInteger();
     q=ReadInteger();
