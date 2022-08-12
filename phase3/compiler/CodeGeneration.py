@@ -331,7 +331,7 @@ def after_enter(parse_tree, symbol_table, children):
         else:
             diff_to_gsa = symbol_table.get_address_diff("$GSA")
             diff_from_gsa = symbol_table.scope_stack[0].get_address_diff(children[0].text)
-            print(f" for global {children[0].text} get {diff_from_gsa}")
+            # print(f" for global {children[0].text} get {diff_from_gsa}")
             code = f'''
                         #load GSA address
                         \t addi $t0, $sp, {diff_to_gsa}
