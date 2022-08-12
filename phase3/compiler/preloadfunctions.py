@@ -150,7 +150,7 @@ void printGSA(){
     Print("GSA: ",getGSA(), "   ");
 }
 void printsp(){
-    Print("SP: ",getsp(), "   ");
+    Print("SP: ",getsp(), "  X ");
 }
 
 string math_expr_sum_4(string a, string b){
