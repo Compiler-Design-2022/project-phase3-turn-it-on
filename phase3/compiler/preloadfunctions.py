@@ -147,7 +147,7 @@ int ReadInteger(){
         return res * sign; 
 }
 void printGSA(){
-    Print("GSA: ",getGSA(), "   ");
+    Print("GSA: ",getGSA(), "  X ");
 }
 void printsp(){
     Print("SP: ",getsp(), "  X ");
