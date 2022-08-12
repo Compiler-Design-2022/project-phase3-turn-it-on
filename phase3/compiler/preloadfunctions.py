@@ -147,10 +147,10 @@ int ReadInteger(){
         return res * sign; 
 }
 void printGSA(){
-    Print("GSA: ",getGSA());
+    Print("GSA: ",getGSA(), " ");
 }
 void printsp(){
-    Print("SP: ",getsp());
+    Print("SP: ",getsp(), " ");
 }
 
 string math_expr_sum_4(string a, string b){

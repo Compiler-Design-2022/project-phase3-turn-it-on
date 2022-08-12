@@ -331,7 +331,7 @@ def after_enter(parse_tree, symbol_table, children):
         else:
             diff_to_gsa = symbol_table.get_address_diff("$GSA")
             diff_from_gsa = symbol_table.scope_stack[0].get_address_diff(children[0].text)
-            # print(f" for global {children[0].text} get {diff_from_gsa}")
+            print(f" for global {children[0].text} get {diff_from_gsa}")
             code = f'''
                         #load GSA address
                         \t addi $t0, $sp, {diff_to_gsa}
@@ -1721,9 +1721,9 @@ def after_enter(parse_tree, symbol_table, children):
 
         return Node_Return(code=code, type=[children[i].type for i in range(len(children))])
     elif parse_tree.data == "program":
-        code = f'''{parse_tree.code}
-        \t addi $sp, $sp, -4
-        
+        code = f'''
+        \t addi $sp, $sp, -400
+        {parse_tree.code}        
         \t addi $t0, $sp, 0
         \t addi $sp, $sp, -4
         \t sw $t0, 0($sp)
