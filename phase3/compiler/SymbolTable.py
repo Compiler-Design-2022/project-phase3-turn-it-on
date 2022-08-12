@@ -77,7 +77,7 @@ class ClassObj:
     def get_field_dist(self, field_name):
         size = 0
         offset = 0 if self.par is None else ClassObj.get_class_by_name(self.par).size()
-        for field in reversed(self.fields):
+        for field in self.fields:
             field: Field
             if field.variable.name == field_name:
                 return size + offset

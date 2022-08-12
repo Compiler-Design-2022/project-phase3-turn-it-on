@@ -1,4 +1,4 @@
-class QueueItem {//matherfucker
+class QueueItem {
   int data;
   QueueItem next;
   QueueItem prev;

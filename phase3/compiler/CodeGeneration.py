@@ -366,12 +366,12 @@ def after_enter(parse_tree, symbol_table, children):
                     \t sw $v0, 0($sp)
                     \t addi $sp, $sp, -4
                     #zero memory
-                    \t li $t0, {class_obj.size()//4}
+                    \t li $t0, {class_obj.size()}
                     \t li $t1, 0
                     beq $t0, $t1, {forloopend}
                     \t{forloop}:
-                    sw $t1, 0($v0)
-                    addi $v0, $v0, 4
+                    sb $t1, 0($v0)
+                    addi $v0, $v0, 1
                     addi $t0, $t0, -1
                     bne $t0, $t1, {forloop}
                     \t{forloopend}:
